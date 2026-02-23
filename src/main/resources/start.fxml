@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.farmingdale.demo1.StartController" prefWidth="600.0" prefHeight="400.0">
+    <children>
+        <Label text="PlanetSim" layoutX="200.0" layoutY="50.0">
+            <font>
+                <Font size="48"/>
+            </font>
+        </Label>
+
+        <Button text="Start Game" layoutX="250.0" layoutY="150.0" onAction="#handleStartGame"/>
+        <Button text="Settings" layoutX="250.0" layoutY="200.0" onAction="#handleSettings"/>
+        <Button text="Exit" layoutX="250.0" layoutY="250.0" onAction="#handleExit"/>
+    </children>
+</AnchorPane>

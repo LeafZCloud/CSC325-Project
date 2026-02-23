@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.farmingdale.demo1.LoginController" prefHeight="400.0" prefWidth="600.0">
+    <children>
+        <Label text="PlanetSim" layoutX="220.0" layoutY="50.0">
+            <font>
+                <Font size="36"/>
+            </font>
+        </Label>
+        <TextField fx:id="usernameField" layoutX="200.0" layoutY="150.0" promptText="Username" />
+        <PasswordField fx:id="passwordField" layoutX="200.0" layoutY="200.0" promptText="Password" />
+        <Button text="Login" layoutX="250.0" layoutY="260.0" onAction="#handleLogin"/>
+        <Label fx:id="statusLabel" layoutX="200.0" layoutY="300.0" textFill="RED"/>
+    </children>
+</AnchorPane>

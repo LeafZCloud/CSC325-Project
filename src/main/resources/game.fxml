@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.farmingdale.demo1.GameController" prefWidth="800.0" prefHeight="600.0">
+    <children>
+        <!-- Game Pane -->
+        <Pane fx:id="gamePane" layoutX="0" layoutY="0" prefWidth="800" prefHeight="600" style="-fx-background-color: linear-gradient(to bottom, #87CEEB, #4682B4);">
+            <!-- North America shape will be drawn here -->
+        </Pane>
+
+        <!-- Snow Button -->
+        <Button text="Snow Effect" layoutX="650" layoutY="20" onAction="#handleSnowEffect"/>
+    </children>
+</AnchorPane>
