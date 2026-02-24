@@ -3,6 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
+classproject-1717-firebase-adminsdk-fbsvc-4ed10da603.json
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
