@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.farmingdale.demo1.LoginController" prefHeight="400.0" prefWidth="600.0">
-    <children>
-        <Label text="PlanetSim" layoutX="220.0" layoutY="50.0">
-            <font>
-                <Font size="36"/>
-            </font>
-        </Label>
-        <TextField fx:id="usernameField" layoutX="200.0" layoutY="150.0" promptText="Username" />
-        <PasswordField fx:id="passwordField" layoutX="200.0" layoutY="200.0" promptText="Password" />
-        <Button text="Login" layoutX="250.0" layoutY="260.0" onAction="#handleLogin"/>
-        <Label fx:id="statusLabel" layoutX="200.0" layoutY="300.0" textFill="RED"/>
-    </children>
-</AnchorPane>
+<?import javafx.scene.image.Image?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="edu.farmingdale.demo1.LoginController"
+           fx:id="rootPane">
+
+
+    <!-- Stretchy background -->
+    <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false">
+        <image>
+            <Image url="@images/start_screen.png"/>
+        </image>
+    </ImageView>
+
+    <!-- Centered VBox (fixed size children) -->
+    <VBox spacing="20" alignment="CENTER">
+
+        <Label text="PlanetSim" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: orange;"/>
+        <TextField fx:id="usernameField" promptText="Username" prefWidth="300" maxWidth="300"/>
+        <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" maxWidth="300"/>
+        <Button text="Login" prefWidth="300"  maxWidth="300"  onAction="#handleLogin"/>
+        <Button text="Create Account"  prefWidth="300"  maxWidth="300" onAction="#handleCreateAccount"/>
+        <Label fx:id="statusLabel" textFill="RED"/>
+
+    </VBox>
+
+</StackPane>
