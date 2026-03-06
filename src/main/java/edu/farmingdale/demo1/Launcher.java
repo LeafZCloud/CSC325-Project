@@ -2,7 +2,6 @@ package edu.farmingdale.demo1;
 
 import com.google.firebase.auth.FirebaseAuth;
 import javafx.application.Application;
-
 import java.io.*;
 
 public class Launcher {
