@@ -7,6 +7,7 @@ module edu.farmingdale.demo1 {
     requires com.google.common;
     requires jdk.httpserver;
     requires proto.google.common.protos;
+    requires okhttp3;
 
 
     opens edu.farmingdale.demo1 to javafx.fxml;
