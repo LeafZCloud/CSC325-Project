@@ -1,19 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="edu.farmingdale.demo1.StartController" prefWidth="600.0" prefHeight="400.0">
-    <children>
-        <Label text="PlanetSim" layoutX="200.0" layoutY="50.0">
-            <font>
-                <Font size="48"/>
-            </font>
-        </Label>
+<?import javafx.scene.image.Image?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="edu.farmingdale.demo1.StartController"
+           fx:id="rootPane">
 
-        <Button text="Start Game" layoutX="250.0" layoutY="150.0" onAction="#handleStartGame"/>
-        <Button text="Settings" layoutX="250.0" layoutY="200.0" onAction="#handleSettings"/>
-        <Button text="Exit" layoutX="250.0" layoutY="250.0" onAction="#handleExit"/>
-    </children>
-</AnchorPane>
+
+    <!-- Background image (stretches fullscreen) -->
+    <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false">
+        <image>
+            <Image url="@images/start_screen.png"/>
+        </image>
+    </ImageView>
+
+    <!-- Centered VBox for logo and buttons -->
+    <VBox spacing="40" alignment="CENTER">
+
+        <!-- PlanetSim Logo -->
+        <Label text="PlanetSim" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: orange;"/>
+
+        <!-- Menu buttons (fixed size, centered) -->
+        <VBox spacing="20" alignment="CENTER">
+            <Button text="Start Game" prefWidth="300" onAction="#handleStartGame"/>
+            <Button text="New Game" prefWidth="300" onAction="#handleNewGame"/>
+            <Button text="Settings" prefWidth="300" onAction="#handleSettings"/>
+            <Button text="Exit" prefWidth="300" onAction="#handleExit"/>
+        </VBox>
+
+    </VBox>
+
+</StackPane>

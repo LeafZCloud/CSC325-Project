@@ -3,30 +3,45 @@ package edu.farmingdale.demo1;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.stage.Stage;
-
 
 public class StartController {
 
     @FXML
-    private void handleStartGame(ActionEvent event) {
+    private StackPane rootPane;
+
+    @FXML
+    private ImageView bgImage;
+
+    @FXML
+    public void initialize() {
+        // Make background fill the screen
+        bgImage.fitWidthProperty().bind(rootPane.widthProperty());
+        bgImage.fitHeightProperty().bind(rootPane.heightProperty());
+    }
+
+    @FXML
+    private void handleStartGame() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-            Scene gameScene = new Scene(loader.load(), 800, 600);
+            Scene scene = new Scene(loader.load());
 
-            // Get the current stage from the event source
-            Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            stage.setScene(gameScene);
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setFullScreen(true);   // keeps fullscreen
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @FXML
+    private void handleNewGame() {
+        System.out.println("New Game clicked!");
+    }
 
     @FXML
     private void handleSettings() {
