@@ -7,12 +7,9 @@
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.farmingdale.demo1.StartController">
 
     <!-- Background Image -->
-    <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false" smooth="true">
+    <ImageView fx:id="bgImage" pickOnBounds="true">
 
-        <image>
-            <Image url="@images/Background.png" />
-        </image>
-
+        <Image url="@images/Background.png"/>
     </ImageView>
 
     <!-- Start Button Image -->
