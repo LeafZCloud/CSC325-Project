@@ -24,7 +24,7 @@ public class StartController {
     }
 
     @FXML
-    private void handleStartGame() {
+    private void handleStartGame() { // Actually starts the login or sign up screen now
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
             Scene scene = new Scene(loader.load());
