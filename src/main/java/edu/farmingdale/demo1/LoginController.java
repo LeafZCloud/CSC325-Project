@@ -46,7 +46,7 @@ public class LoginController {
             statusLabel.setText("Login successful!");
 
             try {
-                // Load start screen
+                // Load game screen
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
                 Scene startScene = new Scene(loader.load());
 
