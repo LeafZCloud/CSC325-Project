@@ -29,7 +29,7 @@
 
         <!-- Username holder + real text field -->
         <StackPane>
-            <ImageView fx:id="usernameHolderImage"
+            <ImageView fx:id="UsernameHolder"
                        fitWidth="360"
                        preserveRatio="true">
                 <image>
@@ -38,14 +38,14 @@
             </ImageView>
 
             <TextField fx:id="usernameField"
-                       promptText="Username"
+                       promptText="Username:"
                        maxWidth="280"
-                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 18px;" />
+                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
         </StackPane>
 
         <!-- Password holder + real password field -->
         <StackPane>
-            <ImageView fx:id="passwordHolderImage"
+            <ImageView fx:id="PasswordHolder"
                        fitWidth="360"
                        preserveRatio="true">
                 <image>
@@ -54,9 +54,9 @@
             </ImageView>
 
             <PasswordField fx:id="passwordField"
-                           promptText="Password"
+                           promptText="Password:"
                            maxWidth="280"
-                           style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 18px;" />
+                           style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
         </StackPane>
 
         <!-- Login button image + invisible real button -->
