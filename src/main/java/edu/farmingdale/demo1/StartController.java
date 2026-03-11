@@ -26,12 +26,12 @@ public class StartController {
     @FXML
     private void handleStartGame() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
             Scene scene = new Scene(loader.load());
 
             Stage stage = (Stage) rootPane.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(true);   // keeps fullscreen
+            stage.setFullScreen(false);   // keeps fullscreen
 
         } catch (Exception e) {
             e.printStackTrace();
