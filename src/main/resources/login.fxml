@@ -1,31 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<StackPane fx:id="rootPane" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="edu.farmingdale.demo1.LoginController">
+<StackPane fx:id="rootPane"
+           xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="edu.farmingdale.demo1.LoginController">
 
-
-    <!-- Stretchy background -->
-    <ImageView fx:id="bgImage" pickOnBounds="true">
-
-        <Image url="@images/Background.png"/>
+    <!-- Background -->
+    <ImageView fx:id="bgImage"
+               pickOnBounds="true"
+               preserveRatio="false"
+               smooth="true">
+        <image>
+            <Image url="@images/Background.png" />
+        </image>
     </ImageView>
 
-    <!-- Planet Sim Logo -->
-    <ImageView fx:id="planetSimLogo" fitWidth="1250.0" preserveRatio="true" translateY="-100">
+    <!-- Centered login UI -->
+    <VBox alignment="CENTER" spacing="22" translateY="-20">
 
-        <Image url="@images/PlanetSimLogo.png"/>
-    </ImageView>
+        <!-- Username holder + real text field -->
+        <StackPane>
+            <ImageView fx:id="usernameHolderImage"
+                       fitWidth="360"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@images/UsernameHolder.png" />
+                </image>
+            </ImageView>
 
-    <!-- Centered VBox (fixed size children) -->
-    <VBox alignment="CENTER" spacing="20">
-        <TextField fx:id="usernameField" maxWidth="300" prefWidth="300" promptText="Username" />
-        <PasswordField fx:id="passwordField" maxWidth="300" prefWidth="300" promptText="Password" />
-        <Button maxWidth="300" onAction="#handleLogin" prefWidth="300" text="Login" />
-        <Button maxWidth="300" onAction="#handleCreateAccount" prefWidth="300" text="Create Account" />
-        <Label fx:id="statusLabel" textFill="RED" />
+            <TextField fx:id="usernameField"
+                       promptText="Username"
+                       maxWidth="280"
+                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 18px;" />
+        </StackPane>
+
+        <!-- Password holder + real password field -->
+        <StackPane>
+            <ImageView fx:id="passwordHolderImage"
+                       fitWidth="360"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@images/PasswordHolder.png" />
+                </image>
+            </ImageView>
+
+            <PasswordField fx:id="passwordField"
+                           promptText="Password"
+                           maxWidth="280"
+                           style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 18px;" />
+        </StackPane>
+
+        <!-- Login button image + invisible real button -->
+        <StackPane>
+            <ImageView fx:id="loginButtonImage"
+                       fitWidth="280"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@images/LoginButton.png" />
+                </image>
+            </ImageView>
+
+            <Button text=""
+                    prefWidth="280"
+                    prefHeight="80"
+                    onAction="#handleLogin"
+                    style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+        </StackPane>
+
+        <!-- Status message -->
+        <Label fx:id="statusLabel"
+               textFill="RED"
+               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
     </VBox>
 
