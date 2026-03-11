@@ -22,27 +22,20 @@ public class ChoiceController {
         bgImage.fitHeightProperty().bind(rootPane.heightProperty());
     }
 
+    // This method runs when the user clicks the "Login" button
     @FXML
     private void handleLoginChoice() {
         try {
+            // load the login screen
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
             Scene scene = new Scene(loader.load());
 
             Stage stage = (Stage) rootPane.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(true);
+            stage.setFullScreen(false);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void handleSignupChoice() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Sign Up");
-        alert.setHeaderText(null);
-        alert.setContentText("Sign up is not implemented yet.");
-        alert.showAndWait();
     }
 }
