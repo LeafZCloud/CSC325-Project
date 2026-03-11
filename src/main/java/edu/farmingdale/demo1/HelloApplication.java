@@ -14,6 +14,7 @@ public class HelloApplication extends Application {
         stage.setTitle("Planet Sim");
         stage.setScene(scene);
         stage.show();
+        stage.setFullScreen(true);
     }
 
     public static void main(String[] args) {
