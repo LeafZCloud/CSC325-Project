@@ -22,13 +22,13 @@
     </ImageView>
 
     <!-- Centered layout -->
-    <VBox alignment="CENTER" spacing="30">
+    <VBox alignment="CENTER" spacing="15" translateY="0">
 
         <!-- Logo -->
         <ImageView fx:id="logoImage"
-                   fitWidth="420"
+                   fitWidth="700"
                    preserveRatio="true"
-                   translateY="-40">
+                   translateY="-10">
             <image>
                 <Image url="@images/PlanetSimLogo.png" />
             </image>
@@ -60,12 +60,6 @@
                     <Image url="@images/SignUpButton.png" />
                 </image>
             </ImageView>
-
-            <Button text=""
-                    prefWidth="360"
-                    prefHeight="95"
-                    onAction="#handleSignupChoice"
-                    style="-fx-background-color: transparent; -fx-border-color: transparent;" />
         </StackPane>
 
     </VBox>

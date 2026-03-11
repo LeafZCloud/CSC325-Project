@@ -28,7 +28,7 @@
     <Button onAction="#handleStartGame" prefHeight="125" prefWidth="400" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="" translateY="200" />
 
     <!-- Planet Sim Logo -->
-    <ImageView fx:id="planetSimLogo" fitWidth="1250.0" preserveRatio="true" translateY="-100">
+    <ImageView fx:id="planetSimLogo" fitWidth="750.0" preserveRatio="true" translateY="-100">
 
         <image>
             <Image url="@images/PlanetSimLogo.png" />
