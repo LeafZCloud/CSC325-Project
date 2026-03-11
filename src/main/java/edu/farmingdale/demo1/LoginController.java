@@ -47,7 +47,7 @@ public class LoginController {
 
             try {
                 // Load start screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/start.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
                 Scene startScene = new Scene(loader.load());
 
                 // Get current window (stage) and set new scene
