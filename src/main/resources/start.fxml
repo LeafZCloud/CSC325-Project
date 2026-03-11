@@ -15,10 +15,7 @@
     <!-- Start Button Image -->
     <ImageView fx:id="startButtonImage" fitWidth="400" preserveRatio="true" translateY="200">
 
-        <image>
-            <Image url="@images/StartButton.png" />
-        </image>
-
+        <Image url="@images/StartButton.png"/>
     </ImageView>
 
     <!-- Invisible Clickable Button -->
@@ -27,10 +24,7 @@
     <!-- Planet Sim Logo -->
     <ImageView fx:id="planetSimLogo" fitWidth="750.0" preserveRatio="true" translateY="-100">
 
-        <image>
-            <Image url="@images/PlanetSimLogo.png" />
-        </image>
-
+        <Image url="@images/PlanetSimLogo.png"/>
     </ImageView>
 
 </StackPane>

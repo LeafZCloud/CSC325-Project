@@ -8,20 +8,15 @@
 
 
     <!-- Stretchy background -->
-    <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false">
-        <image>
-            <Image url="@images/Background.png" />
-        </image>
+    <ImageView fx:id="bgImage" pickOnBounds="true">
 
+        <Image url="@images/Background.png"/>
     </ImageView>
 
     <!-- Planet Sim Logo -->
     <ImageView fx:id="planetSimLogo" fitWidth="1250.0" preserveRatio="true" translateY="-100">
 
-        <image>
-            <Image url="@images/PlanetSimLogo.png" />
-        </image>
-
+        <Image url="@images/PlanetSimLogo.png"/>
     </ImageView>
 
     <!-- Centered VBox (fixed size children) -->

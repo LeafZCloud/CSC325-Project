@@ -13,25 +13,19 @@
 
     <!-- Background -->
     <ImageView fx:id="bgImage"
-               pickOnBounds="true"
-               preserveRatio="false"
-               smooth="true">
-        <image>
-            <Image url="@images/Background.png" />
-        </image>
+               pickOnBounds="true">
+        <Image url="@images/Background.png"/>
     </ImageView>
 
     <!-- Centered layout -->
-    <VBox alignment="CENTER" spacing="15" translateY="0">
+    <VBox alignment="CENTER" spacing="15">
 
         <!-- Logo -->
         <ImageView fx:id="logoImage"
                    fitWidth="700"
                    preserveRatio="true"
                    translateY="-10">
-            <image>
-                <Image url="@images/PlanetSimLogo.png" />
-            </image>
+            <Image url="@images/PlanetSimLogo.png"/>
         </ImageView>
 
         <!-- Login button -->
@@ -39,9 +33,7 @@
             <ImageView fx:id="loginButtonImage"
                        fitWidth="360"
                        preserveRatio="true">
-                <image>
-                    <Image url="@images/LoginButton.png" />
-                </image>
+                <Image url="@images/LoginButton.png"/>
             </ImageView>
 
             <Button text=""
