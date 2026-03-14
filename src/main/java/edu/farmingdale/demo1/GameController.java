@@ -49,18 +49,16 @@ public class GameController {
     private void drawNorthAmerica() {
 
         northAmerica = new Polygon(
-                200, 100,
-                300, 80,
-                400, 120,
-                450, 200,
-                350, 300,
-                200, 250,
-                180, 150
+                400, 200,
+                600, 160,
+                800, 240,
+                900, 400,
+                700, 600,
+                400, 500,
+                360, 300
         );
 
         northAmerica.setFill(Color.GREEN);
-        northAmerica.setStroke(Color.DARKGREEN);
-        northAmerica.setStrokeWidth(2);
 
         gamePane.getChildren().add(northAmerica);
     }
