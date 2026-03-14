@@ -13,50 +13,53 @@ import javafx.stage.Stage;
 public class LoginController {
 
     @FXML
-    private StackPane rootPane;       // StackPane in FXML
+    private StackPane rootPane;
 
     @FXML
-    private ImageView bgImage;        // Background image
+    private ImageView bgImage;
 
     @FXML
-    private TextField usernameField;  // Username input
+    private TextField usernameField;
 
     @FXML
-    private PasswordField passwordField; // Password input
+    private PasswordField passwordField;
 
     @FXML
-    private Label statusLabel;        // Status label
+    private Label statusLabel;
 
-    // This method is called when FXML is loaded
     @FXML
     public void initialize() {
-        // Bind background image to StackPane size (fullscreen)
+
+        // Make background fill window
         bgImage.fitWidthProperty().bind(rootPane.widthProperty());
         bgImage.fitHeightProperty().bind(rootPane.heightProperty());
     }
 
-    // <--- This is the method your Login button calls
+    // Login button
     @FXML
     private void handleLogin() {
+
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Simple login check (replace with real auth later)
+        // Temporary test login
         if (username.equals("player") && password.equals("1234")) {
+
             statusLabel.setText("Login successful!");
 
             try {
-                // Load game screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
 
-                // Get current window (stage) and set new scene
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
+                Scene gameScene = new Scene(loader.load());
+
                 Stage stage = (Stage) usernameField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);  // optional
+                stage.setScene(gameScene);
+                stage.setFullScreen(true);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         } else {
             statusLabel.setText("Invalid username or password.");
         }

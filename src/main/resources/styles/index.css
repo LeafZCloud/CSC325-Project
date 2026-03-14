@@ -1,0 +1,28 @@
+@import "fonts.css";
+@import "tailwind.css";
+@import "theme.css";
+
+/* Global application styling */
+
+.root {
+    -fx-background-color: #0f172a;
+    -fx-font-family: "Arial";
+}
+
+/* Default text color */
+
+.label {
+    -fx-text-fill: #f1f5f9;
+}
+
+/* Default spacing helpers */
+
+.container {
+    -fx-padding: 20;
+}
+
+/* Centering utility */
+
+.center {
+    -fx-alignment: center;
+}

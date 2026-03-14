@@ -1,0 +1,112 @@
+/* Layout utilities */
+
+.flex-row {
+    -fx-alignment: center-left;
+}
+
+.flex-column {
+    -fx-alignment: center;
+}
+
+.center {
+    -fx-alignment: center;
+}
+
+
+/* Spacing */
+
+.p-4 {
+    -fx-padding: 16;
+}
+
+.p-6 {
+    -fx-padding: 24;
+}
+
+.m-4 {
+    -fx-padding: 16;
+}
+
+.gap-4 {
+    -fx-spacing: 16;
+}
+
+.gap-6 {
+    -fx-spacing: 24;
+}
+
+
+/* Background colors */
+
+.bg-dark {
+    -fx-background-color: #0f172a;
+}
+
+.bg-panel {
+    -fx-background-color: #1e293b;
+}
+
+.bg-primary {
+    -fx-background-color: #2563eb;
+}
+
+
+/* Text */
+
+.text-white {
+    -fx-text-fill: white;
+}
+
+.text-gray {
+    -fx-text-fill: #94a3b8;
+}
+
+.text-lg {
+    -fx-font-size: 18px;
+}
+
+.text-xl {
+    -fx-font-size: 22px;
+}
+
+.text-2xl {
+    -fx-font-size: 26px;
+}
+
+.font-bold {
+    -fx-font-weight: bold;
+}
+
+
+/* Buttons */
+
+.btn {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16 8 16;
+}
+
+.btn:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+
+/* Panels */
+
+.panel {
+    -fx-background-color: #1e293b;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+}
+
+
+/* Rounded */
+
+.rounded {
+    -fx-background-radius: 10;
+}
+
+.rounded-lg {
+    -fx-background-radius: 16;
+}
