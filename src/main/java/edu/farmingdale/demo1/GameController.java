@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1;
 
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -66,10 +67,16 @@ public class GameController {
     @FXML
     private void handleSnowEffect() {
 
-        if (northAmerica != null) {
-            northAmerica.setFill(new ImagePattern(snowForest));
-        }
+        // 3-second delay for snow image
+        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+        delay.setOnFinished(e -> {
+            if (northAmerica != null) {
+                northAmerica.setFill(new ImagePattern(snowForest));
+            }
+        });
+        delay.play();
 
+        // snow animation
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
 
             Circle snowflake = new Circle(
@@ -81,15 +88,16 @@ public class GameController {
 
             gamePane.getChildren().add(snowflake);
 
-            Timeline fall = new Timeline(new KeyFrame(Duration.millis(50), e ->
-                    snowflake.setLayoutY(snowflake.getLayoutY() + 5)
-            ));
+            double paneHeight = gamePane.getHeight();
+            int steps = (int)((paneHeight - snowflake.getCenterY()) / 5);
 
-            fall.setCycleCount(100);
+            Timeline fall = new Timeline(new KeyFrame(Duration.millis(50), e2 ->
+                    snowflake.setCenterY(snowflake.getCenterY() + 5)
+            ));
+            fall.setCycleCount(steps);
             fall.play();
 
         }));
-
         timeline.setCycleCount(50);
         timeline.play();
     }
