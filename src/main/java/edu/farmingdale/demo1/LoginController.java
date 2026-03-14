@@ -19,7 +19,7 @@ public class LoginController {
     private ImageView bgImage;        // Background image
 
     @FXML
-    private TextField usernameField;  // Username input
+    private TextField emailField;  // Username input
 
     @FXML
     private PasswordField passwordField; // Password input
@@ -38,11 +38,11 @@ public class LoginController {
     // <--- This is the method your Login button calls
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText();
+        String email = emailField.getText();
         String password = passwordField.getText();
 
         // Simple login check (replace with real auth later)
-        if (username.equals("player") && password.equals("1234")) {
+        if (email.equals("player") && password.equals("1234")) {
             statusLabel.setText("Login successful!");
 
             try {
@@ -51,7 +51,7 @@ public class LoginController {
                 Scene startScene = new Scene(loader.load());
 
                 // Get current window (stage) and set new scene
-                Stage stage = (Stage) usernameField.getScene().getWindow();
+                Stage stage = (Stage) emailField.getScene().getWindow();
                 stage.setScene(startScene);
                 stage.setFullScreen(true);  // optional
             } catch (Exception e) {
