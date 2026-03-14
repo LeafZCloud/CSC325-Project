@@ -41,7 +41,7 @@ public class GameController {
         drawNorthAmerica();
 
         normalForest = new Image(getClass().getResource("/images/forestBiomeNormal.png").toExternalForm());
-        snowForest = new Image(getClass().getResource("/images/forestBiomeSnow.png.png").toExternalForm());
+        snowForest = new Image(getClass().getResource("/images/forestBiomeSnow.png").toExternalForm());
 
         northAmerica.setFill(new ImagePattern(normalForest));
     }
@@ -69,7 +69,7 @@ public class GameController {
     private void handleSnowEffect() {
 
         if (northAmerica != null) {
-            northAmerica.setFill(Color.WHITE);
+            northAmerica.setFill(new ImagePattern(snowForest));
         }
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
