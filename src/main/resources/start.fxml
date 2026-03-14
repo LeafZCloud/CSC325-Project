@@ -1,38 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.image.Image?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="edu.farmingdale.demo1.StartController"
-           fx:id="rootPane">
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.farmingdale.demo1.StartController">
 
+    <!-- Background Image -->
+    <ImageView fx:id="bgImage" pickOnBounds="true">
 
-    <!-- Background image (stretches fullscreen) -->
-    <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false">
-        <image>
-            <Image url="@images/start_screen.png"/>
-        </image>
+        <Image url="@images/Background.png"/>
     </ImageView>
 
-    <!-- Centered VBox for logo and buttons -->
-    <VBox spacing="40" alignment="CENTER">
+    <!-- Start Button Image -->
+    <ImageView fx:id="startButtonImage" fitWidth="400" preserveRatio="true" translateY="200">
 
-        <!-- PlanetSim Logo -->
-        <Label text="PlanetSim" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: orange;"/>
+        <Image url="@images/StartButton.png"/>
+    </ImageView>
 
-        <!-- Menu buttons (fixed size, centered) -->
-        <VBox spacing="20" alignment="CENTER">
-            <Button text="Start Game" prefWidth="300" onAction="#handleStartGame"/>
-            <Button text="New Game" prefWidth="300" onAction="#handleNewGame"/>
-            <Button text="Settings" prefWidth="300" onAction="#handleSettings"/>
-            <Button text="Exit" prefWidth="300" onAction="#handleExit"/>
-        </VBox>
+    <!-- Invisible Clickable Button -->
+    <Button onAction="#handleStartGame" prefHeight="125" prefWidth="400" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="" translateY="200" />
 
-    </VBox>
+    <!-- Planet Sim Logo -->
+    <ImageView fx:id="planetSimLogo" fitWidth="750.0" preserveRatio="true" translateY="-100">
+
+        <Image url="@images/PlanetSimLogo.png"/>
+    </ImageView>
 
 </StackPane>
