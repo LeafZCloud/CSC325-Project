@@ -12,6 +12,8 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 
 import java.util.Random;
 
@@ -26,6 +28,9 @@ public class GameController {
     private Random random = new Random();
     private Polygon northAmerica;
 
+    private Image normalForest;
+    private Image snowForest;
+
     @FXML
     public void initialize() {
 
@@ -34,6 +39,11 @@ public class GameController {
         gamePane.prefHeightProperty().bind(rootPane.heightProperty());
 
         drawNorthAmerica();
+
+        normalForest = new Image(getClass().getResource("/images/forestBiomeNormal.png").toExternalForm());
+        snowForest = new Image(getClass().getResource("/images/forestBiomeSnow.png.png").toExternalForm());
+
+        northAmerica.setFill(new ImagePattern(normalForest));
     }
 
     private void drawNorthAmerica() {
