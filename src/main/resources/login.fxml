@@ -24,8 +24,8 @@
         <Label text="PlanetSim" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: orange;"/>
         <TextField fx:id="usernameField" promptText="Username" prefWidth="300" maxWidth="300"/>
         <PasswordField fx:id="passwordField" promptText="Password" prefWidth="300" maxWidth="300"/>
-        <Button text="Login" prefWidth="300"  maxWidth="300"  onAction="#handleLogin"/>
-        <Button text="Create Account"  prefWidth="300"  maxWidth="300" onAction="#handleCreateAccount"/>
+        <Button text="Login" prefWidth="300" maxWidth="300" onAction="#handleLogin"/>
+        <Button text="Create Account" prefWidth="300" maxWidth="300" onAction="#handleCreateAccount"/>
         <Label fx:id="statusLabel" textFill="RED"/>
 
     </VBox>

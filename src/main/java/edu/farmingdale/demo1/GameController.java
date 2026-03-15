@@ -29,7 +29,7 @@ public class GameController {
     @FXML
     public void initialize() {
 
-        // Make gamePane resize with window (fullscreen safe)
+        // Make gamePane resize with window
         gamePane.prefWidthProperty().bind(rootPane.widthProperty());
         gamePane.prefHeightProperty().bind(rootPane.heightProperty());
 
