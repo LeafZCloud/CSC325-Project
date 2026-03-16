@@ -13,11 +13,15 @@ public class FirebaseAuthService
 
     //Found the proper URL for the sign in and sign up in the Firebase documentations- https://firebase.google.com/docs/reference/rest/auth#section-fetch-providers-for-email
     //These are static and final because they will not change until the program is terminated
+    //information is automatically encrypted using https
+
     //The sign in URL
     private static final String SIGN_IN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBgR0ye0g-uEpIezZEbsVxgNBZmLmlOZ9k";
 
     //The signup URL
     private static final String SIGN_UP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBgR0ye0g-uEpIezZEbsVxgNBZmLmlOZ9k";
+
+    private static final String REAL_TIME_DB_URL = "https://classproject-1717-default-rtdb.firebaseio.com/users/";
 
     //instantiation of the OkHttpClient
     private final OkHttpClient client = new OkHttpClient();
@@ -28,6 +32,42 @@ public class FirebaseAuthService
     //Media type is to tell the server what kind of data you are sending (application/json)
     public static final MediaType JSON = MediaType.get("application/json");
 
+    //Sign In
+    public boolean signUp(String email, String password, String username){
+        JsonObject body = new JsonObject();
+
+        //creating the properties for sending the JSON data
+        body.addProperty("email", email);
+        body.addProperty("password", password);
+        body.addProperty("returnSecureToken", true);
+
+        //this is the request payload containing the properties above
+        RequestBody requestBody = RequestBody.create(body.toString(),JSON);
+        Request request = new Request.Builder().url(SIGN_UP_URL).post(requestBody).build();
+
+        try(Response response = client.newCall(request).execute()) {
+            //Converts the response body into the JsonObject by parsing it into a string using the .gson method
+            JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
+
+            if(json.has("idToken")) {
+                //Variables to store the idToken and localId token from the response
+                String idToken = json.get("idToken").getAsString();
+                String localId = json.get("localId").getAsString();
+
+                //JSON object for the realtime database request
+                JsonObject rtDBObject = new JsonObject();
+                rtDBObject.addProperty("username", username);
+
+                //Request creating, using the RealTime URL and the rtDBObject in the request parameters
+                RequestBody realTime = RequestBody.create(rtDBObject.toString(),JSON);
+                Request realTimeRequest = new Request.Builder().url(REAL_TIME_DB_URL).put(realTime).build();
+            }
+
+        } catch (Exception e) {
+            System.out.println("User already exists, error message: " + e.getMessage());
+        }
+        return false;
+    }
 
     //Login, POST request
     public boolean login(String email, String password){
