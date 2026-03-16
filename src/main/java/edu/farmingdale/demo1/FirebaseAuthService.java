@@ -21,6 +21,7 @@ public class FirebaseAuthService
     //The signup URL
     private static final String SIGN_UP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBgR0ye0g-uEpIezZEbsVxgNBZmLmlOZ9k";
 
+    //The request URL for the real time database
     private static final String REAL_TIME_DB_URL = "https://classproject-1717-default-rtdb.firebaseio.com/users/";
 
     //instantiation of the OkHttpClient
@@ -49,7 +50,7 @@ public class FirebaseAuthService
             //Converts the response body into the JsonObject by parsing it into a string using the .gson method
             JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
 
-            if(json.has("idToken")) {
+            if(!json.has("idToken")) {
                 //Variables to store the idToken and localId token from the response
                 String idToken = json.get("idToken").getAsString();
                 String localId = json.get("localId").getAsString();

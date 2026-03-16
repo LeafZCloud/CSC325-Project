@@ -33,7 +33,7 @@
             <ImageView fx:id="signupButtonImage" fitWidth="360" preserveRatio="true">
                     <Image url="@images/SignUpButton.png" />
             </ImageView>
-            <Button onAction="#handleLoginChoice" prefHeight="95" prefWidth="360" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="" />
+            <Button onAction="#handleSignUpChoice" prefHeight="95" prefWidth="360" style="-fx-background-color: transparent; -fx-border-color: transparent;" text="" />
         </StackPane>
 
     </VBox>
