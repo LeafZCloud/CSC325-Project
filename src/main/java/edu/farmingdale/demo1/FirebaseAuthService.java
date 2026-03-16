@@ -59,12 +59,24 @@ public class FirebaseAuthService
                 rtDBObject.addProperty("username", username);
 
                 //Request creating, using the RealTime URL and the rtDBObject in the request parameters
-                RequestBody realTime = RequestBody.create(rtDBObject.toString(),JSON);
-                Request realTimeRequest = new Request.Builder().url(REAL_TIME_DB_URL).put(realTime).build();
+                RequestBody realTime = RequestBody.create(rtDBObject.toString(), JSON);
+                //Dynamic URL input, for the request
+                Request realTimeRequest = new Request.Builder().url(REAL_TIME_DB_URL + localId + ".json?auth=" + idToken).put(realTime).build();
+
+                //Execute the request
+                try (Response response2 = client.newCall(realTimeRequest).execute()) {
+
+                    if (response2.isSuccessful()){
+                        return true;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println("Something went wrong " + e.getMessage());
+                }
             }
 
-        } catch (Exception e) {
-            System.out.println("User already exists, error message: " + e.getMessage());
+        } catch (Exception ex) {
+            System.out.println("User already exists, error message: " + ex.getMessage());
         }
         return false;
     }
