@@ -1,0 +1,59 @@
+.root {
+    -fx-background-color: #05050f;
+}
+
+/* Labels */
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Buttons */
+
+.button {
+    -fx-background-color: #00d4ff;
+    -fx-text-fill: #0f172a;
+    -fx-background-radius: 10;
+    -fx-padding: 8 18;
+}
+
+.button:hover {
+    -fx-background-color: #00b8d9;
+}
+
+/* Text Fields */
+
+.text-field {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #334155;
+}
+
+/* Spinner */
+
+.spinner {
+    -fx-background-color: #1e293b;
+}
+
+/* Containers */
+
+.vbox {
+    -fx-background-color: transparent;
+}
+
+.hbox {
+    -fx-background-color: transparent;
+}
+
+/* Card style panels */
+
+.card {
+    -fx-background-color: #0f172a;
+    -fx-border-color: #1e293b;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-padding: 20;
+}

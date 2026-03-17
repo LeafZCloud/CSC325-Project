@@ -9,12 +9,20 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/start.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/start.fxml"));
+
+        Scene scene = new Scene(loader.load(), 1000, 700);
+
+        // max's CSS
+        scene.getStylesheets().add(
+                getClass().getResource("/styles/dark-theme.css").toExternalForm()
+        );
+
         stage.setTitle("Planet Sim");
         stage.setScene(scene);
-        stage.show();
         stage.setFullScreen(false);
+        stage.show();
     }
 
     public static void main(String[] args) {
