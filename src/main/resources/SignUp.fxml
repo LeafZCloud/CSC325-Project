@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
 
 <StackPane fx:id="rootPane"
            xmlns="http://javafx.com/javafx/17.0.12"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="edu.farmingdale.demo1.LoginController">
+           fx:controller="edu.farmingdale.demo1.SignUpController">
 
     <!-- Background -->
     <ImageView fx:id="bgImage"
@@ -59,20 +54,35 @@
                            style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
         </StackPane>
 
-        <!-- Login button image + invisible real button -->
         <StackPane>
-            <ImageView fx:id="loginButtonImage"
+            <ImageView fx:id="UsernameHolder"
+                       fitWidth="360"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@images/PasswordHolder.png" />
+                </image>
+            </ImageView>
+
+            <TextField fx:id="usernameField"
+                       promptText="Username:"
+                       maxWidth="280"
+                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
+        </StackPane>
+
+        <!-- Signup button image + invisible real button -->
+        <StackPane>
+            <ImageView fx:id="SignupButtonImage"
                        fitWidth="280"
                        preserveRatio="true">
                 <image>
-                    <Image url="@images/LoginButton.png" />
+                    <Image url="@images/SignUpButton.png" />
                 </image>
             </ImageView>
 
             <Button text=""
                     prefWidth="280"
                     prefHeight="80"
-                    onAction="#handleLogin"
+                    onAction="#handleSignUp"
                     style="-fx-background-color: transparent; -fx-border-color: transparent;" />
         </StackPane>
 
