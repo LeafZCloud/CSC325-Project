@@ -1,107 +1,85 @@
 package edu.farmingdale.demo1;
 
-import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
 
-import java.util.Random;
+// --- IMPORT PLANET SIM ---
+import edu.farmingdale.demo1.views.PlanetCreationView;
+import edu.farmingdale.demo1.views.SimulationView;
+import edu.farmingdale.demo1.views.SummaryView;
+
+import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
+import edu.farmingdale.demo1.simulation.GameTypes.GameState;
 
 public class GameController {
 
     @FXML
     private StackPane rootPane;
 
-    @FXML
-    private Pane gamePane;
-
-    private Random random = new Random();
-    private Polygon northAmerica;
-
-    private Image normalForest;
-    private Image snowForest;
-
+    // --------------------------------
+    // START GAME (YOUR SIMULATION)
+    // --------------------------------
     @FXML
     public void initialize() {
 
-        // Make gamePane resize with window (fullscreen safe)
-        gamePane.prefWidthProperty().bind(rootPane.widthProperty());
-        gamePane.prefHeightProperty().bind(rootPane.heightProperty());
-
-        drawNorthAmerica();
-
-        normalForest = new Image(getClass().getResource("/images/forestBiomeNormal.png").toExternalForm());
-        snowForest = new Image(getClass().getResource("/images/forestBiomeSnow.png").toExternalForm());
-
-        northAmerica.setFill(new ImagePattern(normalForest));
+        // Start planet simulation immediately
+        handlePlanetSim();
     }
 
-    private void drawNorthAmerica() {
+    // -----------------------------
+    // PLANET CREATION SCREEN
+    // -----------------------------
+    private void handlePlanetSim() {
 
-        northAmerica = new Polygon(
-                400, 200,
-                600, 160,
-                800, 240,
-                900, 400,
-                700, 600,
-                400, 500,
-                360, 300
-        );
+        PlanetCreationView view = new PlanetCreationView();
 
-        northAmerica.setFill(Color.GREEN);
+        view.setOnSimulationStart(() -> {
 
-        gamePane.getChildren().add(northAmerica);
-    }
+            PlanetConfig config = view.getCreatedConfig();
 
-    @FXML
-    private void handleSnowEffect() {
-
-        // 3-second delay for snow image
-        PauseTransition delay = new PauseTransition(Duration.seconds(3));
-        delay.setOnFinished(e -> {
-            if (northAmerica != null) {
-                northAmerica.setFill(new ImagePattern(snowForest));
-            }
+            showSimulation(config);
         });
-        delay.play();
 
-        // snow animation
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
-
-            Circle snowflake = new Circle(
-                    random.nextInt((int) gamePane.getWidth()),
-                    0,
-                    5,
-                    Color.WHITE
-            );
-
-            gamePane.getChildren().add(snowflake);
-
-            double paneHeight = gamePane.getHeight();
-            int steps = (int)((paneHeight - snowflake.getCenterY()) / 5);
-
-            Timeline fall = new Timeline(new KeyFrame(Duration.millis(50), e2 ->
-                    snowflake.setCenterY(snowflake.getCenterY() + 5)
-            ));
-            fall.setCycleCount(steps);
-            fall.play();
-
-        }));
-        timeline.setCycleCount(50);
-        timeline.play();
+        rootPane.getChildren().setAll(view);
     }
 
+    // -----------------------------
+    // RUN SIMULATION
+    // -----------------------------
+    private void showSimulation(PlanetConfig config) {
+
+        SimulationView view = new SimulationView(config);
+
+        view.setOnSimulationEnd(() -> {
+
+            GameState state = view.getState();
+
+            showSummary(state);
+        });
+
+        rootPane.getChildren().setAll(view);
+    }
+
+    // -----------------------------
+    // SUMMARY SCREEN
+    // -----------------------------
+    private void showSummary(GameState state) {
+
+        SummaryView view = new SummaryView(state);
+
+        view.setOnRestart(() -> {
+            handlePlanetSim();
+        });
+
+        rootPane.getChildren().setAll(view);
+    }
+
+    // -----------------------------
+    // BACK TO START MENU
+    // -----------------------------
     @FXML
     private void handleBackToStart() {
         try {
