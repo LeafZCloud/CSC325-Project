@@ -1,33 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml"
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml"
            fx:controller="edu.farmingdale.demo1.GameController"
            fx:id="rootPane">
 
     <children>
 
-        <!-- Game Drawing Area -->
+        <!-- Main Game Area -->
         <Pane fx:id="gamePane"
               style="-fx-background-color: linear-gradient(to bottom, #87CEEB, #4682B4);" />
 
-        <!-- Top Right Buttons -->
-        <VBox alignment="TOP_RIGHT"
-              StackPane.alignment="TOP_RIGHT"
-              spacing="10"
-              style="-fx-padding: 20;">
-
-            <Button text="Snow Effect"
-                    styleClass="cartoon-button"
-                    onAction="#handleSnowEffect"/>
-
-            <Button text="Back to Start"
-                    styleClass="cartoon-button"
-                    onAction="#handleBackToStart"/>
-
-        </VBox>
-
     </children>
+
 </StackPane>
