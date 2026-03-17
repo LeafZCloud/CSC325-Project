@@ -3,89 +3,83 @@ package edu.farmingdale.demo1;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
-import java.util.Random;
+// --- IMPORT PLANET SIM ---
+import edu.farmingdale.demo1.views.PlanetCreationView;
+import edu.farmingdale.demo1.views.SimulationView;
+import edu.farmingdale.demo1.views.SummaryView;
+
+import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
+import edu.farmingdale.demo1.simulation.GameTypes.GameState;
 
 public class GameController {
 
     @FXML
     private StackPane rootPane;
 
-    @FXML
-    private Pane gamePane;
-
-    private Random random = new Random();
-    private Polygon northAmerica;
-
+    // --------------------------------
+    // START GAME (YOUR SIMULATION)
+    // --------------------------------
     @FXML
     public void initialize() {
 
-        // Make gamePane resize with window (fullscreen safe)
-        gamePane.prefWidthProperty().bind(rootPane.widthProperty());
-        gamePane.prefHeightProperty().bind(rootPane.heightProperty());
-
-        drawNorthAmerica();
+        // Start planet simulation immediately
+        handlePlanetSim();
     }
 
-    private void drawNorthAmerica() {
+    // -----------------------------
+    // PLANET CREATION SCREEN
+    // -----------------------------
+    private void handlePlanetSim() {
 
-        northAmerica = new Polygon(
-                200, 100,
-                300, 80,
-                400, 120,
-                450, 200,
-                350, 300,
-                200, 250,
-                180, 150
-        );
+        PlanetCreationView view = new PlanetCreationView();
 
-        northAmerica.setFill(Color.GREEN);
-        northAmerica.setStroke(Color.DARKGREEN);
-        northAmerica.setStrokeWidth(2);
+        view.setOnSimulationStart(() -> {
 
-        gamePane.getChildren().add(northAmerica);
+            PlanetConfig config = view.getCreatedConfig();
+
+            showSimulation(config);
+        });
+
+        rootPane.getChildren().setAll(view);
     }
 
-    @FXML
-    private void handleSnowEffect() {
+    // -----------------------------
+    // RUN SIMULATION
+    // -----------------------------
+    private void showSimulation(PlanetConfig config) {
 
-        if (northAmerica != null) {
-            northAmerica.setFill(Color.WHITE);
-        }
+        SimulationView view = new SimulationView(config);
 
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(200), event -> {
+        view.setOnSimulationEnd(() -> {
 
-            Circle snowflake = new Circle(
-                    random.nextInt((int) gamePane.getWidth()),
-                    0,
-                    5,
-                    Color.WHITE
-            );
+            GameState state = view.getState();
 
-            gamePane.getChildren().add(snowflake);
+            showSummary(state);
+        });
 
-            Timeline fall = new Timeline(new KeyFrame(Duration.millis(50), e ->
-                    snowflake.setLayoutY(snowflake.getLayoutY() + 5)
-            ));
-
-            fall.setCycleCount(100);
-            fall.play();
-
-        }));
-
-        timeline.setCycleCount(50);
-        timeline.play();
+        rootPane.getChildren().setAll(view);
     }
 
+    // -----------------------------
+    // SUMMARY SCREEN
+    // -----------------------------
+    private void showSummary(GameState state) {
+
+        SummaryView view = new SummaryView(state);
+
+        view.setOnRestart(() -> {
+            handlePlanetSim();
+        });
+
+        rootPane.getChildren().setAll(view);
+    }
+
+    // -----------------------------
+    // BACK TO START MENU
+    // -----------------------------
     @FXML
     private void handleBackToStart() {
         try {
