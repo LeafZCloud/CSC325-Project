@@ -37,4 +37,20 @@ public class ChoiceController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void handleSignUpChoice() {
+        try {
+            // load the login screen
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/SignUp.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setFullScreen(false);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

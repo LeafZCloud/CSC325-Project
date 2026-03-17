@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class LoginController {
+public class SignUpController {
 
     @FXML
     private StackPane rootPane;       // StackPane in FXML
@@ -25,7 +25,11 @@ public class LoginController {
     private PasswordField passwordField; // Password input
 
     @FXML
-    private Label statusLabel;        // Status label
+    private Label statusLabel;
+
+    @FXML
+    private TextField usernameField;
+    // Status label
 
     FirebaseAuthService service = new FirebaseAuthService();
     // This method is called when FXML is loaded
@@ -36,16 +40,16 @@ public class LoginController {
         bgImage.fitHeightProperty().bind(rootPane.heightProperty());
     }
 
-    // <--- This is the method your Login button calls
+    // <--- This is the method your Signup button calls
     @FXML
-    private void handleLogin() {
+    private void handleSignUp() {
         String email = emailField.getText();
         String password = passwordField.getText();
+        String username = usernameField.getText();
 
-        // Simple login check (replace with real auth later)
-        if (service.login(email, password)) {
-            statusLabel.setText("Login successful!");
-
+        // Simple signUp
+        boolean makeAnAccount = service.signUp(email, password, username);
+        if (makeAnAccount){
             try {
                 // Load game screen
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
@@ -58,10 +62,14 @@ public class LoginController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            statusLabel.setText("Invalid username or password.");
+
+        }
+        else{
+            statusLabel.setText("This user already exists.");
         }
     }
+
+
 
     @FXML
     private void handleCreateAccount() {
