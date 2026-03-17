@@ -64,8 +64,9 @@ public class SignUpController {
             }
 
         }
-        statusLabel.setText("Invalid username or password.");
-
+        else{
+            statusLabel.setText("This user already exists.");
+        }
     }
 
 

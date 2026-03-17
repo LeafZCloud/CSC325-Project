@@ -27,6 +27,7 @@ public class LoginController {
     @FXML
     private Label statusLabel;        // Status label
 
+    FirebaseAuthService service = new FirebaseAuthService();
     // This method is called when FXML is loaded
     @FXML
     public void initialize() {
@@ -42,7 +43,7 @@ public class LoginController {
         String password = passwordField.getText();
 
         // Simple login check (replace with real auth later)
-        if (email.equals("player") && password.equals("1234")) {
+        if (service.login(email, password)) {
             statusLabel.setText("Login successful!");
 
             try {

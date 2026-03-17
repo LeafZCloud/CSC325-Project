@@ -50,7 +50,7 @@ public class FirebaseAuthService
             //Converts the response body into the JsonObject by parsing it into a string using the .gson method
             JsonObject json = gson.fromJson(response.body().string(), JsonObject.class);
 
-            if(!json.has("idToken")) {
+            if(json.has("idToken")) {
                 //Variables to store the idToken and localId token from the response
                 String idToken = json.get("idToken").getAsString();
                 String localId = json.get("localId").getAsString();
@@ -111,8 +111,6 @@ public class FirebaseAuthService
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-
         return false;
     }
 
