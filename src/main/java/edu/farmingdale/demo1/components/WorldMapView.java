@@ -16,7 +16,7 @@ import java.util.Set;
 
 public class WorldMapView extends Pane {
 
-    public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions) {
+    public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
         setPrefSize(400, 400);
 
@@ -54,7 +54,9 @@ public class WorldMapView extends Pane {
 
             Color color = Color.web(GameTypes.regionHealthColor(region));
 
-            if (flashingRegions.contains(region.id)) {
+            if ("ice_age".equals(lastEventId)) {
+                color = Color.WHITE;
+            } else if (flashingRegions.contains(region.id)) {
                 color = Color.RED;
             }
 
