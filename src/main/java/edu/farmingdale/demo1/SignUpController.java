@@ -70,6 +70,20 @@ public class SignUpController {
     }
 
 
+    @FXML // This method sets up the back button in the sign up screen. Takes you back to login or sign up choice area
+    private void handleBack() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(scene);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @FXML
     private void handleCreateAccount() {

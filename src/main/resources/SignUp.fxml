@@ -28,12 +28,27 @@
                        fitWidth="360"
                        preserveRatio="true">
                 <image>
-                    <Image url="@images/UsernameHolder.png" />
+                    <Image url="@images/EmailHolder.png" />
                 </image>
             </ImageView>
 
             <TextField fx:id="emailField"
                        promptText="Email:"
+                       maxWidth="280"
+                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
+        </StackPane>
+
+        <StackPane>
+            <ImageView fx:id="UsernameHolder"
+                       fitWidth="360"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@images/UsernameHolder.png" />
+                </image>
+            </ImageView>
+
+            <TextField fx:id="usernameField"
+                       promptText="Username:"
                        maxWidth="280"
                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
         </StackPane>
@@ -52,21 +67,6 @@
                            promptText="Password:"
                            maxWidth="280"
                            style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
-        </StackPane>
-
-        <StackPane>
-            <ImageView fx:id="UsernameHolder"
-                       fitWidth="360"
-                       preserveRatio="true">
-                <image>
-                    <Image url="@images/PasswordHolder.png" />
-                </image>
-            </ImageView>
-
-            <TextField fx:id="usernameField"
-                       promptText="Username:"
-                       maxWidth="280"
-                       style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.75); -fx-font-size: 24px;" />
         </StackPane>
 
         <!-- Signup button image + invisible real button -->
@@ -92,5 +92,33 @@
                style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
     </VBox>
+
+    <!-- Back button (Top-Left) -->
+    <StackPane alignment="TOP_LEFT"
+               translateX="15"
+               translateY="15">
+
+        <!-- Back button image -->
+        <ImageView fx:id="backButtonImage"
+                   fitWidth="96"
+                   preserveRatio="true"
+                   pickOnBounds="true">
+            <image>
+                <Image url="@images/BackButton.png" />
+            </image>
+        </ImageView>
+
+        <!-- Invisible clickable button (matches image size) -->
+        <Button text=""
+                minWidth="96"
+                prefWidth="96"
+                maxWidth="96"
+                minHeight="96"
+                prefHeight="96"
+                maxHeight="96"
+                onAction="#handleBack"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+
+    </StackPane>
 
 </StackPane>
