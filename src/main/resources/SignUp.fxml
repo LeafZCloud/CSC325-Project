@@ -98,7 +98,7 @@
                translateX="15"
                translateY="15">
 
-        <!-- Back button image -->
+
         <ImageView fx:id="backButtonImage"
                    fitWidth="96"
                    preserveRatio="true"
