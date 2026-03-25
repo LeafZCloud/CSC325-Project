@@ -83,32 +83,4 @@
 
     </VBox>
 
-    <!-- Back button (Top-Left) -->
-    <StackPane alignment="TOP_LEFT"
-               translateX="15"
-               translateY="15">
-
-
-        <ImageView fx:id="backButtonImage"
-                   fitWidth="96"
-                   preserveRatio="true"
-                   pickOnBounds="true">
-            <image>
-                <Image url="@images/BackButton.png" />
-            </image>
-        </ImageView>
-
-        <!-- Invisible clickable button (matches image size) -->
-        <Button text=""
-                minWidth="96"
-                prefWidth="96"
-                maxWidth="96"
-                minHeight="96"
-                prefHeight="96"
-                maxHeight="96"
-                onAction="#handleBack"
-                style="-fx-background-color: transparent; -fx-border-color: transparent;" />
-
-    </StackPane>
-
 </StackPane>
