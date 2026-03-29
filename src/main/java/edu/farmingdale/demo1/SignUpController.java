@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class SignUpController {
+public class SignUpController extends StartController{
 
     @FXML
     private StackPane rootPane;       // StackPane in FXML
@@ -50,19 +50,7 @@ public class SignUpController {
         // Simple signUp
         boolean makeAnAccount = service.signUp(email, password, username);
         if (makeAnAccount){
-            try {
-                // Load game screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
-
-                // Get current window (stage) and set new scene
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);  // optional
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            startForController(emailField);
         }
         else{
             statusLabel.setText("This user already exists.");

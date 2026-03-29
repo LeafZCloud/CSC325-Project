@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class LoginController {
+public class LoginController extends StartController{
 
     @FXML
     private StackPane rootPane;       // StackPane in FXML
@@ -45,19 +45,8 @@ public class LoginController {
         // Simple login check (replace with real auth later)
         if (service.login(email, password)) {
             statusLabel.setText("Login successful!");
+            startForController(emailField);
 
-            try {
-                // Load game screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
-
-                // Get current window (stage) and set new scene
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);  // optional
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         } else {
             statusLabel.setText("Invalid username or password.");
         }
