@@ -10,7 +10,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class LoginController extends StartController{
+public class LoginController extends StartController
+{
 
     @FXML
     private StackPane rootPane;       // StackPane in FXML
@@ -28,9 +29,11 @@ public class LoginController extends StartController{
     private Label statusLabel;        // Status label
 
     FirebaseAuthService service = new FirebaseAuthService();
+
     // This method is called when FXML is loaded
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Bind background image to StackPane size (fullscreen)
         bgImage.fitWidthProperty().bind(rootPane.widthProperty());
         bgImage.fitHeightProperty().bind(rootPane.heightProperty());
@@ -38,22 +41,27 @@ public class LoginController extends StartController{
 
     // <--- This is the method your Login button calls
     @FXML
-    private void handleLogin() {
+    private void handleLogin()
+    {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-        // Simple login check (replace with real auth later)
-        if (service.login(email, password)) {
-            statusLabel.setText("Login successful!");
-            startForController(emailField);
+        String inputResponse = service.loginInputValidation(email, password);
 
+        if (inputResponse == null) {
+            if (service.login(email, password)) {
+                startForController(emailField);
+                return;
+            }
+            statusLabel.setText("Something went wrong, during the startup");
         } else {
-            statusLabel.setText("Invalid username or password.");
+            statusLabel.setText(inputResponse);
         }
+
     }
 
-    @FXML
-    private void handleCreateAccount() {
+        @FXML
+        private void handleCreateAccount() {
         statusLabel.setText("Create Account clicked!");
     }
 }

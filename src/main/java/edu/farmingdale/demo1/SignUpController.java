@@ -47,13 +47,16 @@ public class SignUpController extends StartController{
         String password = passwordField.getText();
         String username = usernameField.getText();
 
-        // Simple signUp
-        boolean makeAnAccount = service.signUp(email, password, username);
-        if (makeAnAccount){
-            startForController(emailField);
-        }
-        else{
-            statusLabel.setText("This user already exists.");
+        String inputResponse = service.signUpInputValidation(email, password, username);
+
+        if (inputResponse == null) {
+            if (service.signUp(email, password, username)) {
+                startForController(emailField);
+                return;
+            }
+            statusLabel.setText("Something went wrong, during the startup");
+        } else {
+            statusLabel.setText(inputResponse);
         }
     }
 
