@@ -1,10 +1,15 @@
 package edu.farmingdale.demo1;
 
+import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.cloud.FirestoreClient;
 import javafx.application.Application;
 import java.io.*;
 
 public class Launcher {
+
+    public static Firestore firestore = FirestoreClient.getFirestore();
+
     public static void main(String[] args) {
         Application.launch(HelloApplication.class, args);
         FirebaseAuth.getInstance();
