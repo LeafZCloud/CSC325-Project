@@ -178,6 +178,7 @@ public class GameTypes {
         public List<FeedPost> feedPosts;
         public Map<String, Integer> cooldowns;
         public Set<String> flashingRegions;
+        public String lastEventId;
 
         public GameState() {
             regions = new ArrayList<>();
@@ -185,6 +186,7 @@ public class GameTypes {
             feedPosts = new ArrayList<>();
             cooldowns = new HashMap<>();
             flashingRegions = new HashSet<>();
+            lastEventId = "";
         }
     }
 
@@ -275,6 +277,23 @@ public class GameTypes {
                         0,
                         new ArrayList<>(),
                         5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "ice_age",
+                        "Ice Age",
+                        "disaster",
+                        "❄️",
+                        "Global temperatures plummet, and glaciers expand across the planet.",
+                        "The world freezes over.",
+                        new EventEffect(-0.15, 35, -25, 40),
+                        new EventEffect(-0.25, 50, -35, 60),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        8
                 )
         );
     }

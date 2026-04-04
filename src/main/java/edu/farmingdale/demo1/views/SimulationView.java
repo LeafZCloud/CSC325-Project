@@ -43,7 +43,8 @@ public class SimulationView extends BorderPane {
         WorldMapView map = new WorldMapView(
                 state.regions,
                 state.planet,
-                state.flashingRegions
+                state.flashingRegions,
+                state.lastEventId
         );
 
         setCenter(map);
