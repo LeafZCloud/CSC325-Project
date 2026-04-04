@@ -8,12 +8,13 @@ import java.io.*;
 
 public class Launcher {
 
-    public static Firestore firestore = FirestoreClient.getFirestore();
+    public static Firestore firestore;
 
     public static void main(String[] args) {
         Application.launch(HelloApplication.class, args);
-        FirebaseAuth.getInstance();
 
+        FirebaseAuth.getInstance();
+         Firestore firestore = FirestoreClient.getFirestore();
             InputStream inputStream = Launcher.class.getResourceAsStream("/classproject-1717-firebase-adminsdk-fbsvc-4ed10da603.json");
 
     }
