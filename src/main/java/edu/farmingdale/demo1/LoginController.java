@@ -64,6 +64,20 @@ public class LoginController {
     }
 
     @FXML
+    private void handleBack() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(scene);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleCreateAccount() {
         statusLabel.setText("Create Account clicked!");
     }
