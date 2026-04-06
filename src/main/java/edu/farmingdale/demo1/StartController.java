@@ -3,6 +3,7 @@ package edu.farmingdale.demo1;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.control.Alert;
@@ -21,6 +22,22 @@ public class StartController {
         // Make background fill the screen
         bgImage.fitWidthProperty().bind(rootPane.widthProperty());
         bgImage.fitHeightProperty().bind(rootPane.heightProperty());
+    }
+
+    public void startForController(TextField email)
+    {
+        try {
+            // Load game screen
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
+            Scene startScene = new Scene(loader.load());
+
+            // Get current window (stage) and set new scene
+            Stage stage = (Stage)email.getScene().getWindow();
+            stage.setScene(startScene);
+            stage.setFullScreen(true);  // optional
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

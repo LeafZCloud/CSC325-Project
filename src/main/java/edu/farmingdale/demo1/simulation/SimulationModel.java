@@ -85,6 +85,7 @@ public class SimulationModel {
         newState.feedPosts = new ArrayList<>(state.feedPosts);
         newState.cooldowns = new HashMap<>(state.cooldowns);
         newState.flashingRegions = new HashSet<>();
+        newState.lastEventId = event.id;
 
         GlobalStats gs = new GlobalStats(
                 state.globalStats.population,

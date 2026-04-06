@@ -42,27 +42,6 @@ public class LoginController {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-        // TEMPORARY BYPASS LOGIN, can't sign up rn
-        if (email.equalsIgnoreCase("Test") && password.equals("1234")) {
-            statusLabel.setText("Login successful!");
-
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
-
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return; // stops Firebase login from running
-        }
-
-        System.out.println("Login button clicked");
-
         // Simple login check (replace with real auth later)
         if (service.login(email, password)) {
             statusLabel.setText("Login successful!");
@@ -81,20 +60,6 @@ public class LoginController {
             }
         } else {
             statusLabel.setText("Invalid username or password.");
-        }
-    }
-
-    @FXML // This method sets up the back button in the sign up screen. Takes you back to login or sign up choice area
-    private void handleBack() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
-            Scene scene = new Scene(loader.load());
-
-            Stage stage = (Stage) rootPane.getScene().getWindow();
-            stage.setScene(scene);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
