@@ -76,6 +76,10 @@
                     style="-fx-background-color: transparent; -fx-border-color: transparent;" />
         </StackPane>
 
+        <Button text="Temp Enter Game"
+                onAction="#handleTempEnterGame"
+                style="-fx-background-color: rgba(15,23,42,0.85); -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 10; -fx-padding: 10 22; -fx-cursor: hand;" />
+
         <!-- Status message -->
         <Label fx:id="statusLabel"
                textFill="RED"
@@ -85,6 +89,7 @@
 
     <!-- Back button (Top-Left) -->
     <StackPane alignment="TOP_LEFT"
+               pickOnBounds="false"
                translateX="15"
                translateY="15">
 

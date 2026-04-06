@@ -9,6 +9,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import edu.farmingdale.demo1.simulation.GameTypes.GameState;
+import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
+import edu.farmingdale.demo1.views.PlanetCreationView;
+import edu.farmingdale.demo1.views.SimulationView;
+import edu.farmingdale.demo1.views.SummaryView;
 
 public class LoginController {
 
@@ -45,19 +50,7 @@ public class LoginController {
         // Simple login check (replace with real auth later)
         if (service.login(email, password)) {
             statusLabel.setText("Login successful!");
-
-            try {
-                // Load game screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
-
-                // Get current window (stage) and set new scene
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);  // optional
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            goToGame();
         } else {
             statusLabel.setText("Invalid username or password.");
         }
@@ -75,6 +68,54 @@ public class LoginController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void handleTempEnterGame() {
+        statusLabel.setText("Temporary bypass enabled.");
+        goToGame();
+    }
+
+    private void goToGame() {
+        try {
+            StackPane gameRoot = new StackPane();
+            showPlanetCreation(gameRoot);
+            Scene startScene = new Scene(gameRoot, 1000, 700);
+            String stylesheet = getClass().getResource("/styles/dark-theme.css").toExternalForm();
+            startScene.getStylesheets().add(stylesheet);
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(startScene);
+            stage.setFullScreen(false);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Game load failed: " + e.getClass().getSimpleName());
+        }
+    }
+
+    private void showPlanetCreation(StackPane gameRoot) {
+        PlanetCreationView view = new PlanetCreationView();
+        view.setOnSimulationStart(() -> {
+            PlanetConfig config = view.getCreatedConfig();
+            showSimulation(gameRoot, config);
+        });
+        gameRoot.getChildren().setAll(view);
+    }
+
+    private void showSimulation(StackPane gameRoot, PlanetConfig config) {
+        SimulationView view = new SimulationView(config);
+        view.setOnSimulationEnd(() -> {
+            GameState state = view.getState();
+            showSummary(gameRoot, state);
+        });
+        gameRoot.getChildren().setAll(view);
+    }
+
+    private void showSummary(StackPane gameRoot, GameState state) {
+        SummaryView view = new SummaryView(state);
+        view.setOnRestart(() -> showPlanetCreation(gameRoot));
+        gameRoot.getChildren().setAll(view);
     }
 
     @FXML

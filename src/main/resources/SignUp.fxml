@@ -95,6 +95,7 @@
 
     <!-- Back button (Top-Left) -->
     <StackPane alignment="TOP_LEFT"
+               pickOnBounds="false"
                translateX="15"
                translateY="15">
 
