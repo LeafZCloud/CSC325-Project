@@ -61,11 +61,21 @@ public class SimulationModel {
         state.planet = config;
         state.regions = buildRegions(config.continents);
 
+        double totalStress = 0;
+        double totalEcon = 0;
+        double totalExposure = 0;
+
+        for (Region r : state.regions) {
+            totalStress += r.stress * r.populationShare;
+            totalEcon += r.economicHealth * r.populationShare;
+            totalExposure += r.exposure * r.populationShare;
+        }
+
         state.globalStats = new GlobalStats(
-                7.2,
-                20,
-                70,
-                15
+                7.2, // Base population
+                (int) Math.round(totalStress),
+                (int) Math.round(totalEcon),
+                (int) Math.round(totalExposure)
         );
 
         state.year = 2157;
@@ -87,6 +97,7 @@ public class SimulationModel {
         newState.flashingRegions = new HashSet<>();
         newState.lastEventId = event.id;
 
+        // Start with a copy of the previous global stats
         GlobalStats gs = new GlobalStats(
                 state.globalStats.population,
                 state.globalStats.stress,
@@ -96,44 +107,60 @@ public class SimulationModel {
 
         EventEffect g = event.globalEffects;
 
-        gs.population = Math.max(0.01, gs.population * (1 + g.population));
-        gs.stress = GameTypes.clamp(gs.stress + g.stress, 0, 100);
-        gs.economicHealth = GameTypes.clamp(gs.economicHealth + g.economicHealth, 0, 100);
-        gs.exposure = GameTypes.clamp(gs.exposure + g.exposure, 0, 100);
-
-        newState.globalStats = gs;
-
         List<String> affectedRegions = new ArrayList<>();
 
         if (event.affectedRegions.equals("all")) {
-
             for (Region r : state.regions) {
                 affectedRegions.add(r.id);
             }
-
         } else {
-
             List<Region> shuffled = new ArrayList<>(state.regions);
             Collections.shuffle(shuffled);
-
-            for (int i = 0; i < event.numRegionsAffected; i++) {
+            int count = Math.min(event.numRegionsAffected, shuffled.size());
+            for (int i = 0; i < count; i++) {
                 affectedRegions.add(shuffled.get(i).id);
             }
         }
 
+        // Update regions
+        double totalNewPopulation = 0;
+        List<Double> regionPopulations = new ArrayList<>();
+
         for (Region r : state.regions) {
+            double currentPop = state.globalStats.population * r.populationShare;
+            // Apply global modifier first
+            currentPop *= (1 + g.population);
+            // Apply regional modifier if affected
+            if (affectedRegions.contains(r.id)) {
+                currentPop = Math.max(0.01, currentPop * (1 + event.regionEffects.population));
+            }
+            regionPopulations.add(currentPop);
+            totalNewPopulation += currentPop;
+        }
+
+        for (int i = 0; i < state.regions.size(); i++) {
+            Region r = state.regions.get(i);
+            double newPopShare = regionPopulations.get(i) / totalNewPopulation;
 
             if (!affectedRegions.contains(r.id)) {
-                newState.regions.add(r);
+                Region unchanged = new Region(
+                        r.id,
+                        r.name,
+                        newPopShare,
+                        r.stress,
+                        r.economicHealth,
+                        r.exposure,
+                        r.polygonIndex
+                );
+                newState.regions.add(unchanged);
                 continue;
             }
 
             EventEffect re = event.regionEffects;
-
             Region updated = new Region(
                     r.id,
                     r.name,
-                    r.populationShare,
+                    newPopShare,
                     GameTypes.clamp(r.stress + re.stress, 0, 100),
                     GameTypes.clamp(r.economicHealth + re.economicHealth, 0, 100),
                     GameTypes.clamp(r.exposure + re.exposure, 0, 100),
@@ -143,6 +170,25 @@ public class SimulationModel {
             newState.regions.add(updated);
             newState.flashingRegions.add(r.id);
         }
+
+        gs.population = totalNewPopulation;
+
+        // Recalculate global weighted averages from the new regional states
+        double totalStress = 0;
+        double totalEcon = 0;
+        double totalExposure = 0;
+
+        for (Region r : newState.regions) {
+            totalStress += r.stress * r.populationShare;
+            totalEcon += r.economicHealth * r.populationShare;
+            totalExposure += r.exposure * r.populationShare;
+        }
+
+        gs.stress = (int) Math.round(totalStress);
+        gs.economicHealth = (int) Math.round(totalEcon);
+        gs.exposure = (int) Math.round(totalExposure);
+
+        newState.globalStats = gs;
 
         EventLogEntry logEntry = new EventLogEntry(
                 generateId(),
@@ -160,7 +206,6 @@ public class SimulationModel {
         );
 
         newState.eventLog.add(0, logEntry);
-
         newState.cooldowns.put(event.id, state.year + event.cooldown);
 
         return newState;
