@@ -1,6 +1,5 @@
 package edu.farmingdale.demo1.views;
 
-import edu.farmingdale.demo1.components.StarField;
 import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 
 import javafx.geometry.Pos;
@@ -9,6 +8,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -29,12 +31,17 @@ public class PlanetCreationView extends StackPane {
 
     public PlanetCreationView() {
 
-        StarField stars = new StarField(1000);
+        // updated image background to match the game's interface
+        ImageView background = new ImageView(
+                new Image(getClass().getResource("/images/Background.png").toExternalForm())
+        );
+        background.setPreserveRatio(false);
+        background.fitWidthProperty().bind(widthProperty());
+        background.fitHeightProperty().bind(heightProperty());
 
         content = new VBox(20);
         content.setAlignment(Pos.CENTER);
-
-        getChildren().addAll(stars, content);
+        getChildren().addAll(background, content);
 
         renderStep();
     }
@@ -51,10 +58,7 @@ public class PlanetCreationView extends StackPane {
 
         content.getChildren().clear();
 
-        Label title = new Label("Create Your Planet");
-        title.setStyle("-fx-text-fill:white; -fx-font-size:24;");
-
-        content.getChildren().add(title);
+        content.getChildren().add(createStepImage("CreateYourPlanet.png", 620));
 
         switch (step) {
             case 1 -> renderNameStep();
@@ -66,14 +70,12 @@ public class PlanetCreationView extends StackPane {
 
     private void renderNameStep() {
 
-        Label question = new Label("What is your planet called?");
-        question.setStyle("-fx-text-fill:white;");
+        ImageView question = createStepImage("PlanetName.png", 500);
 
         TextField nameField = new TextField();
         nameField.setMaxWidth(300);
 
-        Button next = new Button("Next");
-        next.setStyle("-fx-background-color:#06b6d4; -fx-text-fill:white;");
+        Button next = createNextButton();
 
         next.setOnAction(e -> {
 
@@ -92,8 +94,7 @@ public class PlanetCreationView extends StackPane {
 
     private void renderTypeStep() {
 
-        Label question = new Label("What type of world is it?");
-        question.setStyle("-fx-text-fill:white;");
+        ImageView question = createStepImage("TypeOfWorld.png", 520);
 
         HBox types = new HBox(15);
         types.setAlignment(Pos.CENTER);
@@ -105,20 +106,14 @@ public class PlanetCreationView extends StackPane {
 
         types.getChildren().addAll(terran, arid, oceanic, volcanic);
 
-        Button back = new Button("Back");
-        Button next = new Button("Next");
-
-        back.setOnAction(e -> {
-            step--;
-            renderStep();
-        });
+        Button next = createNextButton();
 
         next.setOnAction(e -> {
             step++;
             renderStep();
         });
 
-        HBox nav = new HBox(10, back, next);
+        HBox nav = new HBox(10, next);
         nav.setAlignment(Pos.CENTER);
 
         content.getChildren().addAll(question, types, nav);
@@ -161,47 +156,34 @@ public class PlanetCreationView extends StackPane {
 
     private void renderContinentStep() {
 
-        Label question = new Label("How many continents?");
-        question.setStyle("-fx-text-fill:white;");
+        ImageView question = createStepImage("HowManyContinents.png", 560);
 
-        Spinner<Integer> spinner = new Spinner<>(2, 8, continents);
+        GridPane choices = new GridPane();
+        choices.setHgap(16);
+        choices.setVgap(16);
+        choices.setAlignment(Pos.CENTER);
 
-        Button back = new Button("Back");
-        Button next = new Button("Next");
+        for (int i = 1; i <= 8; i++) {
+            int value = i;
+            Button choice = createImageButton(value + ".png", 110);
+            choice.setOnAction(e -> {
+                continents = value;
+                step++;
+                renderStep();
+            });
+            choices.add(choice, (i - 1) % 4, (i - 1) / 4);
+        }
 
-        back.setOnAction(e -> {
-            step--;
-            renderStep();
-        });
-
-        next.setOnAction(e -> {
-
-            continents = spinner.getValue();
-
-            step++;
-            renderStep();
-        });
-
-        HBox nav = new HBox(10, back, next);
-        nav.setAlignment(Pos.CENTER);
-
-        content.getChildren().addAll(question, spinner, nav);
+        content.getChildren().addAll(question, choices);
     }
 
     private void renderMoonStep() {
 
-        Label question = new Label("How many moons orbit your planet?");
-        question.setStyle("-fx-text-fill:white;");
+        ImageView question = createStepImage("HowManyMoons.png", 520);
 
         Spinner<Integer> spinner = new Spinner<>(0, 3, moons);
 
-        Button back = new Button("Back");
-        Button start = new Button("Begin Simulation");
-
-        back.setOnAction(e -> {
-            step--;
-            renderStep();
-        });
+        Button start = createStartButton();
 
         start.setOnAction(e -> {
 
@@ -219,9 +201,36 @@ public class PlanetCreationView extends StackPane {
             }
         });
 
-        HBox nav = new HBox(10, back, start);
+        HBox nav = new HBox(10, start);
         nav.setAlignment(Pos.CENTER);
 
         content.getChildren().addAll(question, spinner, nav);
+    }
+
+    // Next Button UI Update
+    private Button createNextButton() {
+        return createImageButton("Next.png", 180);
+    }
+
+    private Button createStartButton() {
+        return createImageButton("StartButton.png", 220);
+    }
+
+    private ImageView createStepImage(String imageName, double fitWidth) {
+        ImageView imageView = new ImageView(
+                new Image(getClass().getResource("/images/" + imageName).toExternalForm())
+        );
+        imageView.setFitWidth(fitWidth);
+        imageView.setPreserveRatio(true);
+        return imageView;
+    }
+
+    private Button createImageButton(String imageName, double fitWidth) {
+        ImageView imageView = createStepImage(imageName, fitWidth);
+
+        Button button = new Button();
+        button.setGraphic(imageView);
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
+        return button;
     }
 }
