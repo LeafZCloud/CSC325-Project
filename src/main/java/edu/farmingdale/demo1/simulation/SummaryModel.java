@@ -34,7 +34,7 @@ public class SummaryModel {
             return new Outcome(
                     "💀",
                     "Extinction",
-                    "Civilisation did not survive. The planet is silent now."
+                    "Civilization did not survive. The planet is silent now."
             );
         }
 
@@ -65,7 +65,7 @@ public class SummaryModel {
         return new Outcome(
                 "🔥",
                 "Age of Collapse",
-                "Civilisation exists in fragments."
+                "Civilization exists in fragments."
         );
     }
 
