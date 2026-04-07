@@ -54,7 +54,7 @@ public class SimulationModel {
         return regions;
     }
 
-    public static GameState buildInitialState(PlanetConfig config) {
+    public static GameState  buildInitialState(PlanetConfig config) {
 
         GameState state = new GameState();
 
