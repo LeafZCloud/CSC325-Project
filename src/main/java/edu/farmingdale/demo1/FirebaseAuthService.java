@@ -8,6 +8,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import java.awt.*;
+
 public class FirebaseAuthService
 {
 
@@ -35,6 +37,8 @@ public class FirebaseAuthService
 
     //Sign In
     public boolean signUp(String email, String password, String username){
+
+        String inputResponse =  signUpInputValidation(email, password, username);
         JsonObject body = new JsonObject();
 
         //creating the properties for sending the JSON data
@@ -84,6 +88,11 @@ public class FirebaseAuthService
 
     //Login, POST request
     public boolean login(String email, String password){
+        String inputResponse = loginInputValidation(email, password);
+
+        if(inputResponse != null){
+            return inputResponse.contains("Failure");
+        }
 
         JsonObject body = new JsonObject();
 
@@ -114,4 +123,63 @@ public class FirebaseAuthService
         return false;
     }
 
+    //These would check for if the input is improper or malicious
+    public String signUpInputValidation(String email,  String password, String username){
+
+        if (email == null || email.isBlank())
+            return "Email cannot be empty.";
+        if (password == null || password.isBlank())
+            return "Password cannot be empty.";
+        if (username == null || username.isBlank())
+            return "Username cannot be empty.";
+        emailCheck(email);
+
+        if(password.length() < 6){
+            return "This password must be over 6 characters";
+        }
+
+        if(password.length() > 120){
+            return "This password cannot be over 20 characters";
+        }
+
+        if (email.contains(" "))
+            return "Email cannot contain spaces.";
+        if (password.contains(" "))
+            return "Password cannot contain spaces.";
+        if (username.contains(" "))
+            return "Username cannot contain spaces.";
+
+
+        return null;
+    }
+
+    public String loginInputValidation(String email, String password)
+    {
+        if (email == null || email.isBlank())
+            return "Email cannot be empty.";
+        if (password == null || password.isBlank())
+            return "Password cannot be empty.";
+        emailCheck(email);
+
+        if(password.length() < 6){
+            return "This password must be over 6 characters";
+        }
+        if(password.length() > 120){
+            return "This password cannot be over 20 characters";
+        }
+        if (email.contains(" "))
+            return "Email cannot contain spaces.";
+        if (password.contains(" "))
+            return "Password cannot contain spaces.";
+
+        return null;
+    }
+
+    public String emailCheck(String email)
+    {
+        if(!email.contains("@") || !email.contains(".")){
+            return "Invalid email, characters like @  and . are needed";
+        }
+        return null;
+    }
 }

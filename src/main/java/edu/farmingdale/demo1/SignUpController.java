@@ -10,7 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class SignUpController {
+public class SignUpController extends StartController{
 
     @FXML
     private StackPane rootPane;       // StackPane in FXML
@@ -47,28 +47,33 @@ public class SignUpController {
         String password = passwordField.getText();
         String username = usernameField.getText();
 
-        // Simple signUp
-        boolean makeAnAccount = service.signUp(email, password, username);
-        if (makeAnAccount){
-            try {
-                // Load game screen
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
-                Scene startScene = new Scene(loader.load());
+        String inputResponse = service.signUpInputValidation(email, password, username);
 
-                // Get current window (stage) and set new scene
-                Stage stage = (Stage) emailField.getScene().getWindow();
-                stage.setScene(startScene);
-                stage.setFullScreen(true);  // optional
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (inputResponse == null) {
+            if (service.signUp(email, password, username)) {
+                startForController(emailField);
+                return;
             }
-
-        }
-        else{
-            statusLabel.setText("This user already exists.");
+            statusLabel.setText("Something went wrong, during the startup");
+        } else {
+            statusLabel.setText(inputResponse);
         }
     }
 
+
+    @FXML // This method sets up the back button in the sign up screen. Takes you back to login or sign up choice area
+    private void handleBack() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(scene);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @FXML

@@ -76,11 +76,42 @@
                     style="-fx-background-color: transparent; -fx-border-color: transparent;" />
         </StackPane>
 
+        <Button text="Temp Enter Game"
+                onAction="#handleTempEnterGame"
+                style="-fx-background-color: rgba(15,23,42,0.85); -fx-text-fill: white; -fx-font-size: 18px; -fx-background-radius: 10; -fx-padding: 10 22; -fx-cursor: hand;" />
+
         <!-- Status message -->
         <Label fx:id="statusLabel"
                textFill="RED"
                style="-fx-font-size: 16px; -fx-font-weight: bold;" />
 
     </VBox>
+
+    <!-- Back button (Top-Left) -->
+    <StackPane alignment="TOP_LEFT"
+               pickOnBounds="false"
+               translateX="15"
+               translateY="15">
+
+        <ImageView fx:id="backButtonImage"
+                   fitWidth="96"
+                   preserveRatio="true"
+                   pickOnBounds="true">
+            <image>
+                <Image url="@images/BackButton.png" />
+            </image>
+        </ImageView>
+
+        <Button text=""
+                minWidth="96"
+                prefWidth="96"
+                maxWidth="96"
+                minHeight="96"
+                prefHeight="96"
+                maxHeight="96"
+                onAction="#handleBack"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;" />
+
+    </StackPane>
 
 </StackPane>
