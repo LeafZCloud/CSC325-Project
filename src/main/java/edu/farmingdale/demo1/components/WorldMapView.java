@@ -14,6 +14,9 @@ import javafx.scene.text.Text;
 import java.util.List;
 import java.util.Set;
 
+import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
+
 public class WorldMapView extends Pane {
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
@@ -52,6 +55,16 @@ public class WorldMapView extends Pane {
                 );
             }
 
+            //loading the normal image
+            Image image = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
+
+            //creating the image pattern
+            ImagePattern pattern = new ImagePattern(image);
+
+            //application
+            poly.setFill(pattern);
+
+
             Color color = Color.web(GameTypes.regionHealthColor(region));
 
             if ("ice_age".equals(lastEventId)) {
@@ -60,7 +73,6 @@ public class WorldMapView extends Pane {
                 color = Color.RED;
             }
 
-            poly.setFill(color);
             poly.setOpacity(0.85);
 
             getChildren().add(poly);
