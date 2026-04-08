@@ -55,20 +55,24 @@ public class WorldMapView extends Pane {
                 );
             }
 
-            //loading the normal image
-            Image image = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
+            //loading the images
+            Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
+            Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.PNG").toExternalForm());
+            Image forestQuakeImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
 
-            //creating the image pattern
-            ImagePattern pattern = new ImagePattern(image);
+            //creating the image patterns
+            ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
+            ImagePattern forestBlizzPattern = new ImagePattern(forestBlizzImage);
+            ImagePattern forestQuakeattern = new ImagePattern(forestQuakeImage);
 
-            //application
-            poly.setFill(pattern);
+            //application of forestNorm
+            poly.setFill(forestNormPattern);
 
 
             Color color = Color.web(GameTypes.regionHealthColor(region));
 
             if ("ice_age".equals(lastEventId)) {
-                color = Color.WHITE;
+                poly.setFill(forestBlizzPattern);
             } else if (flashingRegions.contains(region.id)) {
                 color = Color.RED;
             }
