@@ -61,10 +61,10 @@ public class WorldMapView extends Pane {
         Circle planet = new Circle(400, 400, 340);
         Image planetWater = new Image (getClass().getResource("/images/waterTexture2.JPG").toExternalForm());
         ImagePattern planetWaterPattern = new ImagePattern(planetWater);
-            // (this is a plain color) planet.setFill(Color.web("#1c6087"));
-            // (this is a water texture) planet.setFill(planetWaterPattern);
+            // (this is a plain color used in testing) planet.setFill(Color.web("#1c6087"));
+            // (this is a water texture used in testing) planet.setFill(planetWaterPattern);
         planet.setFill(planetWaterPattern);
-        planet.setStroke(Color.web("#12354a"));
+        planet.setStroke(Color.BLACK);
         planet.setStrokeWidth(8);
         getChildren().add(planet);
 
@@ -97,15 +97,16 @@ public class WorldMapView extends Pane {
 
             //application of forestNorm
             poly.setFill(forestNormPattern);
-            poly.setStroke(Color.web("#123808"));
+            // (used in testing dark green vs. black) poly.setStroke(Color.web("#123808"));
+            poly.setStroke(Color.BLACK);
             poly.setStrokeWidth(2);
 
             //shadow for the continents
             DropShadow shadow = new DropShadow();
-            shadow.setRadius(15);
-            shadow.setOffsetX(3);
-            shadow.setOffsetY(3);
-            shadow.setColor(Color.web("#00000080"));
+            shadow.setRadius(18);
+            shadow.setOffsetX(5);
+            shadow.setOffsetY(5);
+            shadow.setColor(Color.rgb(0, 0, 0, 0.6));
 
             poly.setEffect(shadow);
 
