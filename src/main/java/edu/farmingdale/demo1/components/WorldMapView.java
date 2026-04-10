@@ -17,11 +17,19 @@ import java.util.Set;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.animation.Animation;
+import javafx.util.Duration;
+
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
+
 public class WorldMapView extends Pane {
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
-        setPrefSize(400, 400);
+        setPrefSize(1500, 1500);
 
         // Stars
         List<WorldMapModel.Star> stars = WorldMapModel.generateStars(42);
@@ -29,15 +37,35 @@ public class WorldMapView extends Pane {
         for (WorldMapModel.Star s : stars) {
             Circle star = new Circle(s.x, s.y, s.radius);
             star.setFill(Color.WHITE);
+
+            // base opacity
             star.setOpacity(s.opacity);
+
+            Timeline twinkle = new Timeline(
+                    new KeyFrame(Duration.seconds(0), e -> {
+                        star.setOpacity(s.opacity);
+                    }),
+                    new KeyFrame(Duration.seconds(.2), e -> {
+                        star.setOpacity(s.opacity * (0.5 + Math.random()));
+                    })
+            );
+
+            twinkle.setCycleCount(Animation.INDEFINITE);
+            twinkle.setAutoReverse(true);
+            twinkle.play();
+
             getChildren().add(star);
         }
 
         // Planet base
         Circle planet = new Circle(400, 400, 340);
-        planet.setFill(Color.DARKSLATEBLUE);
-        planet.setStroke(Color.DARKCYAN);
-        planet.setStrokeWidth(4);
+        Image planetWater = new Image (getClass().getResource("/images/waterTexture2.JPG").toExternalForm());
+        ImagePattern planetWaterPattern = new ImagePattern(planetWater);
+            // (this is a plain color) planet.setFill(Color.web("#1c6087"));
+            // (this is a water texture) planet.setFill(planetWaterPattern);
+        planet.setFill(planetWaterPattern);
+        planet.setStroke(Color.web("#12354a"));
+        planet.setStrokeWidth(8);
         getChildren().add(planet);
 
         // Continents / Regions
@@ -65,10 +93,21 @@ public class WorldMapView extends Pane {
             //creating the image patterns
             ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
             ImagePattern forestBlizzPattern = new ImagePattern(forestBlizzImage);
-            ImagePattern forestQuakeattern = new ImagePattern(forestQuakeImage);
+            ImagePattern forestQuakePattern = new ImagePattern(forestQuakeImage);
 
             //application of forestNorm
             poly.setFill(forestNormPattern);
+            poly.setStroke(Color.web("#123808"));
+            poly.setStrokeWidth(2);
+
+            //shadow for the continents
+            DropShadow shadow = new DropShadow();
+            shadow.setRadius(15);
+            shadow.setOffsetX(3);
+            shadow.setOffsetY(3);
+            shadow.setColor(Color.web("#00000080"));
+
+            poly.setEffect(shadow);
 
 
             Color color = Color.web(GameTypes.regionHealthColor(region));
