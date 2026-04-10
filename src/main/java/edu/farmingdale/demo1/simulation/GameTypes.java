@@ -313,5 +313,107 @@ public class GameTypes {
                         8
                 )
         );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "resource_war",
+                        "Resource War",
+                        "conflict",
+                        "X",
+                        "Major powers clash over water and mineral reserves.",
+                        "Borders ignite under pressure.",
+                        new EventEffect(-0.08, 0, 0, 0),
+                        new EventEffect(-0.14, 26, -18, 24),
+                        "random",
+                        2,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "civil_unrest",
+                        "Civil Unrest",
+                        "conflict",
+                        "!",
+                        "Mass protests and riots destabilize major regions.",
+                        "Cities fill with smoke and sirens.",
+                        new EventEffect(-0.04, 0, 0, 0),
+                        new EventEffect(-0.09, 22, -14, 18),
+                        "random",
+                        2,
+                        new ArrayList<>(),
+                        3
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "fusion_breakthrough",
+                        "Fusion Breakthrough",
+                        "technology",
+                        "+",
+                        "Cheap clean energy transforms planetary infrastructure.",
+                        "A century of power problems ends overnight.",
+                        new EventEffect(0.06, 0, 0, 0),
+                        new EventEffect(0.10, -12, 20, -10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "orbital_network",
+                        "Orbital Network",
+                        "technology",
+                        "^",
+                        "A new satellite grid improves coordination across the world.",
+                        "The planet becomes fully connected.",
+                        new EventEffect(0.02, 0, 0, 0),
+                        new EventEffect(0.03, -8, 12, -6),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "cultural_renaissance",
+                        "Cultural Renaissance",
+                        "society",
+                        "*",
+                        "A surge of art, education, and civic pride lifts morale.",
+                        "People begin believing in the future again.",
+                        new EventEffect(0.03, 0, 0, 0),
+                        new EventEffect(0.05, -14, 8, -4),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "unification_summit",
+                        "Unification Summit",
+                        "society",
+                        "=",
+                        "Regional leaders sign agreements that reduce tensions.",
+                        "Old rivals sit at the same table.",
+                        new EventEffect(0.01, 0, 0, 0),
+                        new EventEffect(0.02, -10, 10, -8),
+                        "random",
+                        3,
+                        new ArrayList<>(),
+                        3
+                )
+        );
     }
 }
