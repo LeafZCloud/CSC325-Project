@@ -34,8 +34,10 @@ public class WorldMapView extends Pane {
         }
 
         // Planet base
-        Circle planet = new Circle(200, 200, 170);
+        Circle planet = new Circle(400, 400, 340);
         planet.setFill(Color.DARKSLATEBLUE);
+        planet.setStroke(Color.DARKCYAN);
+        planet.setStrokeWidth(4);
         getChildren().add(planet);
 
         // Continents / Regions
