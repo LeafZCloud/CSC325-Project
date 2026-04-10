@@ -23,7 +23,7 @@ import javafx.animation.Animation;
 import javafx.util.Duration;
 
 import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
+
 
 public class WorldMapView extends Pane {
 
@@ -88,12 +88,12 @@ public class WorldMapView extends Pane {
             //loading the images
             Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
             Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.PNG").toExternalForm());
-            Image forestQuakeImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
+            Image forestMeteorImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
 
             //creating the image patterns
             ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
             ImagePattern forestBlizzPattern = new ImagePattern(forestBlizzImage);
-            ImagePattern forestQuakePattern = new ImagePattern(forestQuakeImage);
+            ImagePattern forestMeteorPattern = new ImagePattern(forestMeteorImage);
 
             //application of forestNorm
             poly.setFill(forestNormPattern);
@@ -115,6 +115,14 @@ public class WorldMapView extends Pane {
 
             if ("ice_age".equals(lastEventId)) {
                 poly.setFill(forestBlizzPattern);
+                poly.setStroke(Color.WHITE);
+            } else if (flashingRegions.contains(region.id)) {
+                color = Color.RED;
+            }
+
+            if ("meteor".equals(lastEventId)) {
+                poly.setFill(forestMeteorPattern);
+                poly.setStroke(Color.RED);
             } else if (flashingRegions.contains(region.id)) {
                 color = Color.RED;
             }
