@@ -34,7 +34,7 @@ public class StartController {
             // Get current window (stage) and set new scene
             Stage stage = (Stage)email.getScene().getWindow();
             stage.setScene(startScene);
-            stage.setFullScreen(true);  // optional
+            HelloApplication.fitStageToScreen(stage);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +48,7 @@ public class StartController {
 
             Stage stage = (Stage) rootPane.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(false);   // keeps fullscreen
+            HelloApplication.fitStageToScreen(stage);
 
         } catch (Exception e) {
             e.printStackTrace();

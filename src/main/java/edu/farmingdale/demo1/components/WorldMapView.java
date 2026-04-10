@@ -5,6 +5,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 import edu.farmingdale.demo1.simulation.WorldMapModel;
 
+import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -26,10 +27,14 @@ import javafx.scene.effect.DropShadow;
 
 
 public class WorldMapView extends Pane {
+    private static final double PLANET_CENTER_X = 400;
+    private static final double PLANET_CENTER_Y = 400;
+    private static final double PLANET_RADIUS = 340;
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
         setPrefSize(1500, 1500);
+        Group worldGroup = new Group();
 
         // Stars
         List<WorldMapModel.Star> stars = WorldMapModel.generateStars(42);
@@ -58,7 +63,7 @@ public class WorldMapView extends Pane {
         }
 
         // Planet base
-        Circle planet = new Circle(400, 400, 340);
+        Circle planet = new Circle(PLANET_CENTER_X, PLANET_CENTER_Y, PLANET_RADIUS);
         Image planetWater = new Image (getClass().getResource("/images/waterTexture2.JPG").toExternalForm());
         ImagePattern planetWaterPattern = new ImagePattern(planetWater);
             // (this is a plain color used in testing) planet.setFill(Color.web("#1c6087"));
@@ -66,7 +71,9 @@ public class WorldMapView extends Pane {
         planet.setFill(planetWaterPattern);
         planet.setStroke(Color.BLACK);
         planet.setStrokeWidth(8);
-        getChildren().add(planet);
+        worldGroup.getChildren().add(planet);
+
+        addMoons(worldGroup, config);
 
         // Continents / Regions
         for (Region region : regions) {
@@ -129,7 +136,7 @@ public class WorldMapView extends Pane {
 
             poly.setOpacity(0.85);
 
-            getChildren().add(poly);
+            worldGroup.getChildren().add(poly);
 
             // Region label
             double[] centroid = WorldMapModel.getCentroid(pts);
@@ -138,7 +145,62 @@ public class WorldMapView extends Pane {
             label.setFill(Color.WHITE);
             label.setStyle("-fx-font-size: 8px;");
 
-            getChildren().add(label);
+            worldGroup.getChildren().add(label);
         }
+
+        getChildren().add(worldGroup);
+
+        widthProperty().addListener((obs, oldWidth, newWidth) -> centerWorld(worldGroup));
+        heightProperty().addListener((obs, oldHeight, newHeight) -> centerWorld(worldGroup));
+        layoutBoundsProperty().addListener((obs, oldBounds, newBounds) -> centerWorld(worldGroup));
+
+        centerWorld(worldGroup);
+    }
+
+    private void addMoons(Group worldGroup, PlanetConfig config) {
+        int moonCount = Math.max(0, Math.min(3, config != null ? config.moons : 0));
+
+        double[][] moonPositions = {
+                {170, 120, 42},
+                {655, 155, 34},
+                {710, 620, 26}
+        };
+
+        for (int i = 0; i < moonCount; i++) {
+            double[] moon = moonPositions[i];
+
+            Circle orbit = new Circle(PLANET_CENTER_X, PLANET_CENTER_Y, distanceFromPlanetCenter(moon[0], moon[1]));
+            orbit.setFill(Color.TRANSPARENT);
+            orbit.setStroke(Color.rgb(148, 163, 184, 0.18));
+            orbit.getStrokeDashArray().addAll(8.0, 12.0);
+            orbit.setStrokeWidth(1.5);
+
+            Circle moonBody = new Circle(moon[0], moon[1], moon[2]);
+            moonBody.setFill(Color.web("#d8dee9"));
+            moonBody.setStroke(Color.web("#94a3b8"));
+            moonBody.setStrokeWidth(2);
+
+            Circle craterA = new Circle(moon[0] - (moon[2] * 0.22), moon[1] - (moon[2] * 0.12), moon[2] * 0.18);
+            craterA.setFill(Color.rgb(148, 163, 184, 0.35));
+
+            Circle craterB = new Circle(moon[0] + (moon[2] * 0.18), moon[1] + (moon[2] * 0.16), moon[2] * 0.12);
+            craterB.setFill(Color.rgb(148, 163, 184, 0.28));
+
+            worldGroup.getChildren().addAll(orbit, moonBody, craterA, craterB);
+        }
+    }
+
+    private void centerWorld(Group worldGroup) {
+        double worldCenterX = worldGroup.getLayoutBounds().getMinX() + (worldGroup.getLayoutBounds().getWidth() / 2.0);
+        double worldCenterY = worldGroup.getLayoutBounds().getMinY() + (worldGroup.getLayoutBounds().getHeight() / 2.0);
+
+        worldGroup.setLayoutX((getWidth() / 2.0) - worldCenterX);
+        worldGroup.setLayoutY((getHeight() / 2.0) - worldCenterY);
+    }
+
+    private double distanceFromPlanetCenter(double x, double y) {
+        double dx = x - PLANET_CENTER_X;
+        double dy = y - PLANET_CENTER_Y;
+        return Math.sqrt((dx * dx) + (dy * dy));
     }
 }
