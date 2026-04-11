@@ -19,7 +19,7 @@ public class DatabaseController extends GameTypes
 
     //This methods will save the users game state when the trigger of either Exiting the game, Closing the game
     //or using the save button
-    public boolean saveGameState(GameState gameState, String userId, String idToken)
+    public boolean saveGameState(GameState gameState, String SaveIdToken, String SaveLocalIdToken)
     {
 
         String gameStateJson = gson.toJson(gameState);
@@ -37,14 +37,14 @@ public class DatabaseController extends GameTypes
         //Creation of the actual request being made
         RequestBody requestBody = RequestBody.create(body.toString(), JSON);
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + userId)
+                .url(FIRESTORE_URL + SaveIdToken)
                 .patch(requestBody)
-                .addHeader("Authorization", "Bearer " + idToken)  //Bearer is the authorization header in a request like this
+                .addHeader("Authorization", "Bearer " + SaveLocalIdToken)  //Bearer is the authorization header in a request like this
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
-                System.out.println("Game state saved for user: " + userId);
+                System.out.println("Game state saved for user: " + SaveIdToken);
                 return true;
             } else {
                 System.out.println("Save failed: " + response.code()
@@ -58,14 +58,14 @@ public class DatabaseController extends GameTypes
     }
 
     //Loading the game state from firestore, creating the request using the active user IdToken
-    public GameState loadGameState(String userId, String idToken)
+    public GameState loadGameState(String SaveIdToken, String SaveLocalIdToken)
     {
 
         //Firestore authorization header for verification of the user
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + userId)
+                .url(FIRESTORE_URL + SaveIdToken)
                 .get()
-                .addHeader("Authorization", "Bearer " + idToken)
+                .addHeader("Authorization", "Bearer " + SaveLocalIdToken)
                 .build();
 
         //Try with resources for the database request

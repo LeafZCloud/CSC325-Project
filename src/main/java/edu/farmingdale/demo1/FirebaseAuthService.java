@@ -11,6 +11,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class FirebaseAuthService
 {
@@ -42,7 +43,17 @@ public class FirebaseAuthService
 
     public void storeTokens(JsonObject json){
         this.SaveIdToken = json.get("idToken").getAsString();
-        this.SaveLocalIdToken = json.get("idToken").getAsString();
+         this.SaveLocalIdToken = json.get("idToken").getAsString();
+    }
+
+    public String getSaveIdToken()
+    {
+        return SaveIdToken;
+    }
+
+    public String getSaveLocalIdToken()
+    {
+        return SaveLocalIdToken;
     }
 
     //Sign In
@@ -194,4 +205,5 @@ public class FirebaseAuthService
         }
         return null;
     }
+
 }

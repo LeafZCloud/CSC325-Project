@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -30,9 +31,11 @@ public class LoginController {
     private PasswordField passwordField; // Password input
 
     @FXML
-    private Label statusLabel;        // Status label
+    private Label statusLabel;        // Status label\
 
+    DatabaseController databaseController = new  DatabaseController();
     FirebaseAuthService service = new FirebaseAuthService();
+
     // This method is called when FXML is loaded
     @FXML
     public void initialize() {
@@ -50,6 +53,11 @@ public class LoginController {
         // Simple login check (replace with real auth later)
         if (service.login(email, password)) {
             statusLabel.setText("Login successful!");
+
+            //This now gets the ID tokens from The firebase auth instance and uses them in the database controller to form the request
+            String SaveIdToken = service.getSaveIdToken();
+            String SaveLocalIdToken = service.getSaveLocalIdToken();
+            databaseController.loadGameState(SaveIdToken, SaveLocalIdToken);
             goToGame();
         } else {
             statusLabel.setText("Invalid username or password.");
