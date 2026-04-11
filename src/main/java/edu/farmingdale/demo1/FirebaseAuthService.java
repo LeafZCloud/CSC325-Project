@@ -1,7 +1,9 @@
 package edu.farmingdale.demo1;
 
+import com.google.auth.oauth2.IdToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.sun.javafx.css.parser.Token;
 import okhttp3.Request;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -35,6 +37,14 @@ public class FirebaseAuthService
     //Media type is to tell the server what kind of data you are sending (application/json)
     public static final MediaType JSON = MediaType.get("application/json");
 
+    private String SaveIdToken;
+    private String SaveLocalIdToken;
+
+    public void storeTokens(JsonObject json){
+        this.SaveIdToken = json.get("idToken").getAsString();
+        this.SaveLocalIdToken = json.get("idToken").getAsString();
+    }
+
     //Sign In
     public boolean signUp(String email, String password, String username){
 
@@ -56,6 +66,7 @@ public class FirebaseAuthService
 
             if(json.has("idToken")) {
                 //Variables to store the idToken and localId token from the response
+                storeTokens(json);
                 String idToken = json.get("idToken").getAsString();
                 String localId = json.get("localId").getAsString();
 
@@ -114,6 +125,7 @@ public class FirebaseAuthService
 
             //Checks to see if the json request contains an "idToken" in the json object
             if(json.has("idToken")) {
+                storeTokens(json);
                 return true;
             }
 
