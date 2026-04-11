@@ -88,7 +88,7 @@ public class GameController {
 
             Stage stage = (Stage) rootPane.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(true);
+            HelloApplication.fitStageToScreen(stage);
 
         } catch (Exception e) {
             e.printStackTrace();

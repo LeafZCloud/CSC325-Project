@@ -195,14 +195,31 @@ public class GameTypes {
     ------------------------- */
 
     public static final String[] CONTINENT_POLYGONS = {
-            "88,112 158,76 208,91 218,136 186,170 126,172 80,150",
-            "226,66 294,60 322,92 316,132 270,140 228,104",
-            "44,186 98,172 114,207 94,237 48,230",
-            "148,255 226,240 268,264 270,314 224,342 162,347 120,322 116,278",
-            "295,184 352,180 364,220 344,254 292,250",
-            "175,44 214,42 228,70 202,84 172,76",
-            "56,294 100,284 110,334 84,360 52,350 38,322",
-            "315,272 344,268 348,292 330,308 314,296"
+
+            // top continent (12 o'clock)
+            "303,102 403,82 503,142 463,242 363,222",
+
+            // top right continent (2 o'clock)
+            "508,252 608,232 708,312 668,412 568,372",
+
+            // middle right continent (5 o'clock)
+            "498,450 598,410 698,490 658,590 558,550",
+
+            // bottom (6 o'clock)
+            "366,552 466,512 546,592 506,692 406,672",
+
+            // bottom left (7 o'clock)
+            "146,530 246,490 346,570 306,670 206,630",
+
+            // middle left (9 o'clock)
+            "80,320 180,300 280,380 240,480 140,440",
+
+            // top left (11 o'clock)
+            "150,190 250,150 350,230 310,330 210,290",
+
+            // middle
+            "300,360 400,310 500,390 460,490 360,450"
+
     };
 
     public static final String[] REGION_NAMES_POOL = {
@@ -294,6 +311,108 @@ public class GameTypes {
                         0,
                         new ArrayList<>(),
                         8
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "resource_war",
+                        "Resource War",
+                        "conflict",
+                        "X",
+                        "Major powers clash over water and mineral reserves.",
+                        "Borders ignite under pressure.",
+                        new EventEffect(-0.08, 0, 0, 0),
+                        new EventEffect(-0.14, 26, -18, 24),
+                        "random",
+                        2,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "civil_unrest",
+                        "Civil Unrest",
+                        "conflict",
+                        "!",
+                        "Mass protests and riots destabilize major regions.",
+                        "Cities fill with smoke and sirens.",
+                        new EventEffect(-0.04, 0, 0, 0),
+                        new EventEffect(-0.09, 22, -14, 18),
+                        "random",
+                        2,
+                        new ArrayList<>(),
+                        3
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "fusion_breakthrough",
+                        "Fusion Breakthrough",
+                        "technology",
+                        "+",
+                        "Cheap clean energy transforms planetary infrastructure.",
+                        "A century of power problems ends overnight.",
+                        new EventEffect(0.06, 0, 0, 0),
+                        new EventEffect(0.10, -12, 20, -10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "orbital_network",
+                        "Orbital Network",
+                        "technology",
+                        "^",
+                        "A new satellite grid improves coordination across the world.",
+                        "The planet becomes fully connected.",
+                        new EventEffect(0.02, 0, 0, 0),
+                        new EventEffect(0.03, -8, 12, -6),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "cultural_renaissance",
+                        "Cultural Renaissance",
+                        "society",
+                        "*",
+                        "A surge of art, education, and civic pride lifts morale.",
+                        "People begin believing in the future again.",
+                        new EventEffect(0.03, 0, 0, 0),
+                        new EventEffect(0.05, -14, 8, -4),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "unification_summit",
+                        "Unification Summit",
+                        "society",
+                        "=",
+                        "Regional leaders sign agreements that reduce tensions.",
+                        "Old rivals sit at the same table.",
+                        new EventEffect(0.01, 0, 0, 0),
+                        new EventEffect(0.02, -10, 10, -8),
+                        "random",
+                        3,
+                        new ArrayList<>(),
+                        3
                 )
         );
     }

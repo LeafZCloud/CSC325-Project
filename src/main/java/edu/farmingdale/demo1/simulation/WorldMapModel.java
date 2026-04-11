@@ -23,7 +23,7 @@ public class WorldMapModel {
         }
     }
 
-    public static final int STAR_COUNT = 80;
+    public static final int STAR_COUNT = 400;
 
     public static List<Star> generateStars(int seed) {
 
@@ -33,10 +33,10 @@ public class WorldMapModel {
         for (int i = 0; i < STAR_COUNT; i++) {
 
             s = (s * 1664525 + 1013904223) & 0xffffffff;
-            double x = Math.abs(s % 400);
+            double x = Math.abs(s % 1500);
 
             s = (s * 1664525 + 1013904223) & 0xffffffff;
-            double y = Math.abs(s % 400);
+            double y = Math.abs(s % 1500);
 
             s = (s * 1664525 + 1013904223) & 0xffffffff;
             double r = (Math.abs(s % 100) / 100.0) * 1.5 + 0.3;
