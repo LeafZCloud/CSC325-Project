@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import edu.farmingdale.demo1.simulation.GameTypes;
 import okhttp3.*;
 import java.io.IOException;
-import java.util.*;
 
 public class DatabaseController extends GameTypes
 {
-    //Tool initialization
-    private final OkHttpClient client = new OkHttpClient();
+
+    private final OkHttpClient OK_HTTP_CLIENT = HttpClientResource.get();
+
     private final Gson gson = new Gson();
     public static final MediaType JSON = MediaType.get("application/json");
 
@@ -42,7 +42,7 @@ public class DatabaseController extends GameTypes
                 .addHeader("Authorization", "Bearer " + SaveLocalIdToken)  //Bearer is the authorization header in a request like this
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 System.out.println("Game state saved for user: " + SaveIdToken);
                 return true;
@@ -69,7 +69,7 @@ public class DatabaseController extends GameTypes
                 .build();
 
         //Try with resources for the database request
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 System.out.println("No game state in database found: " + response.code());
                 return null;
