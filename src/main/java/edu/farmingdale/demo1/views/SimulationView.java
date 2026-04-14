@@ -200,20 +200,6 @@ public class SimulationView extends BorderPane {
             return content;
         }
 
-        Label logTitle = sectionLabel("Event Log");
-        VBox logList = new VBox(8);
-        for (EventLogEntry entry : state.eventLog) {
-            Button item = new Button(entry.eventName + " · Year " + entry.year);
-            item.setMaxWidth(Double.MAX_VALUE);
-            item.setAlignment(Pos.CENTER_LEFT);
-            item.setStyle(eventLogItemStyle(entry.id.equals(selectedEventId)));
-            item.setOnAction(e -> {
-                selectedEventId = entry.id;
-                buildUI();
-            });
-            logList.getChildren().add(item);
-        }
-
         EventLogEntry selected = findSelectedEventEntry();
         if (selected != null) {
             GameEventDef definition = findEventDef(selected);
@@ -260,8 +246,24 @@ public class SimulationView extends BorderPane {
             }
             detail.getChildren().addAll(affected, effects);
 
-            content.getChildren().addAll(logTitle, logList, sectionLabel("Selected Event"), detail);
+            content.getChildren().addAll(sectionLabel("Selected Event"), detail);
         }
+
+        Label logTitle = sectionLabel("Event Log");
+        VBox logList = new VBox(8);
+        for (EventLogEntry entry : state.eventLog) {
+            Button item = new Button(entry.eventName + " · Year " + entry.year);
+            item.setMaxWidth(Double.MAX_VALUE);
+            item.setAlignment(Pos.CENTER_LEFT);
+            item.setStyle(eventLogItemStyle(entry.id.equals(selectedEventId)));
+            item.setOnAction(e -> {
+                selectedEventId = entry.id;
+                buildUI();
+            });
+            logList.getChildren().add(item);
+        }
+
+        content.getChildren().addAll(logTitle, logList);
 
         return content;
     }

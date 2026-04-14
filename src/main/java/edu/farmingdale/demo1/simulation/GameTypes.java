@@ -1,7 +1,11 @@
 package edu.farmingdale.demo1.simulation;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GameTypes {
 
@@ -262,13 +266,12 @@ public class GameTypes {
     public static final List<GameEventDef> GAME_EVENTS = new ArrayList<>();
 
     static {
-
         GAME_EVENTS.add(
                 new GameEventDef(
                         "meteor",
                         "Meteor Strike",
                         "disaster",
-                        "☄️",
+                        "☄",
                         "A massive meteor impacts the surface.",
                         "The sky burns.",
                         new EventEffect(-0.12, 28, -18, 22),
@@ -282,18 +285,18 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
-                        "pandemic",
-                        "Global Pandemic",
+                        "earthquakes",
+                        "Earthquakes",
                         "disaster",
-                        "🦠",
-                        "A deadly pathogen spreads across the planet.",
-                        "The invisible enemy arrives.",
-                        new EventEffect(-0.18, 40, -28, 20),
-                        new EventEffect(-0.18, 40, -28, 20),
-                        "all",
-                        0,
+                        "",
+                        "Violent tectonic shocks tear through cities and infrastructure.",
+                        "The ground refuses to stay still.",
+                        new EventEffect(-0.06, 18, -14, 15),
+                        new EventEffect(-0.14, 34, -24, 26),
+                        "random",
+                        2,
                         new ArrayList<>(),
-                        5
+                        4
                 )
         );
 
@@ -302,7 +305,7 @@ public class GameTypes {
                         "ice_age",
                         "Ice Age",
                         "disaster",
-                        "❄️",
+                        "❄",
                         "Global temperatures plummet, and glaciers expand across the planet.",
                         "The world freezes over.",
                         new EventEffect(-0.15, 35, -25, 40),
@@ -316,16 +319,101 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
-                        "resource_war",
-                        "Resource War",
-                        "conflict",
-                        "X",
-                        "Major powers clash over water and mineral reserves.",
-                        "Borders ignite under pressure.",
-                        new EventEffect(-0.08, 0, 0, 0),
-                        new EventEffect(-0.14, 26, -18, 24),
+                        "volcanic_eruptions",
+                        "Volcanic Eruptions",
+                        "disaster",
+                        "",
+                        "Ash clouds and lava flows devastate nearby regions.",
+                        "The crust splits open and fire follows.",
+                        new EventEffect(-0.08, 24, -17, 21),
+                        new EventEffect(-0.16, 40, -28, 30),
                         "random",
                         2,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "drought",
+                        "Drought",
+                        "disaster",
+                        "",
+                        "Long-term water shortages cripple crops and strain every settlement.",
+                        "Reservoirs crack and fields turn to dust.",
+                        new EventEffect(-0.07, 16, -16, 18),
+                        new EventEffect(-0.12, 28, -20, 24),
+                        "random",
+                        3,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "plague",
+                        "Plague",
+                        "conflict",
+                        "",
+                        "A deadly plague spreads through trade routes and crowded cities.",
+                        "Fear moves faster than the symptoms.",
+                        new EventEffect(-0.14, 30, -22, 18),
+                        new EventEffect(-0.18, 38, -24, 22),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        6
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "nuke",
+                        "Nuke",
+                        "conflict",
+                        "",
+                        "A nuclear strike wipes out infrastructure and poisons the surrounding region.",
+                        "One flash changes the century.",
+                        new EventEffect(-0.16, 38, -26, 30),
+                        new EventEffect(-0.36, 65, -44, 58),
+                        "random",
+                        1,
+                        new ArrayList<>(),
+                        8
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "world_war",
+                        "World War",
+                        "conflict",
+                        "",
+                        "Global alliances collapse into open war across multiple continents.",
+                        "Every border becomes a front line.",
+                        new EventEffect(-0.12, 34, -24, 26),
+                        new EventEffect(-0.20, 48, -34, 32),
+                        "random",
+                        4,
+                        new ArrayList<>(),
+                        7
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "trade_war",
+                        "Trade War",
+                        "conflict",
+                        "",
+                        "Major powers weaponize tariffs and embargoes against one another.",
+                        "Ports stay open, but little moves.",
+                        new EventEffect(-0.04, 10, -20, 12),
+                        new EventEffect(-0.06, 18, -24, 16),
+                        "random",
+                        3,
                         new ArrayList<>(),
                         4
                 )
@@ -333,31 +421,14 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
-                        "civil_unrest",
-                        "Civil Unrest",
-                        "conflict",
-                        "!",
-                        "Mass protests and riots destabilize major regions.",
-                        "Cities fill with smoke and sirens.",
-                        new EventEffect(-0.04, 0, 0, 0),
-                        new EventEffect(-0.09, 22, -14, 18),
-                        "random",
-                        2,
-                        new ArrayList<>(),
-                        3
-                )
-        );
-
-        GAME_EVENTS.add(
-                new GameEventDef(
-                        "fusion_breakthrough",
-                        "Fusion Breakthrough",
+                        "industrial_revolution",
+                        "Industrial Revolution",
                         "technology",
-                        "+",
-                        "Cheap clean energy transforms planetary infrastructure.",
-                        "A century of power problems ends overnight.",
-                        new EventEffect(0.06, 0, 0, 0),
-                        new EventEffect(0.10, -12, 20, -10),
+                        "",
+                        "Factories, transport, and energy systems scale production rapidly.",
+                        "The world begins building faster than ever before.",
+                        new EventEffect(0.05, 0, 12, 6),
+                        new EventEffect(0.08, -6, 18, 4),
                         "all",
                         0,
                         new ArrayList<>(),
@@ -367,14 +438,14 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
-                        "orbital_network",
-                        "Orbital Network",
+                        "medical_breakthrough",
+                        "Medical Breakthrough",
                         "technology",
-                        "^",
-                        "A new satellite grid improves coordination across the world.",
-                        "The planet becomes fully connected.",
-                        new EventEffect(0.02, 0, 0, 0),
-                        new EventEffect(0.03, -8, 12, -6),
+                        "",
+                        "New treatments and prevention systems dramatically improve survival.",
+                        "Hospitals suddenly start winning.",
+                        new EventEffect(0.06, -8, 6, -10),
+                        new EventEffect(0.08, -16, 8, -14),
                         "all",
                         0,
                         new ArrayList<>(),
@@ -384,13 +455,64 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
+                        "ai_singularity",
+                        "AI Singularity",
+                        "technology",
+                        "",
+                        "Superintelligent systems optimize logistics, science, and planning at planetary scale.",
+                        "The machines stop assisting and start directing.",
+                        new EventEffect(0.08, -10, 20, -8),
+                        new EventEffect(0.10, -14, 24, -10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        7
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "space_program",
+                        "Space Program",
+                        "technology",
+                        "",
+                        "A major space program accelerates research, industry, and global cooperation.",
+                        "The planet starts looking outward.",
+                        new EventEffect(0.03, -4, 10, -4),
+                        new EventEffect(0.04, -8, 14, -6),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        4
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "golden_age",
+                        "Golden Age",
+                        "society",
+                        "",
+                        "Prosperity, stability, and confidence lift the whole civilization.",
+                        "For once, the headlines feel optimistic.",
+                        new EventEffect(0.05, -12, 14, -8),
+                        new EventEffect(0.06, -18, 18, -10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
                         "cultural_renaissance",
                         "Cultural Renaissance",
                         "society",
-                        "*",
+                        "",
                         "A surge of art, education, and civic pride lifts morale.",
                         "People begin believing in the future again.",
-                        new EventEffect(0.03, 0, 0, 0),
+                        new EventEffect(0.03, -6, 6, -4),
                         new EventEffect(0.05, -14, 8, -4),
                         "all",
                         0,
@@ -401,18 +523,35 @@ public class GameTypes {
 
         GAME_EVENTS.add(
                 new GameEventDef(
-                        "unification_summit",
-                        "Unification Summit",
+                        "economic_collapse",
+                        "Economic Collapse",
                         "society",
-                        "=",
-                        "Regional leaders sign agreements that reduce tensions.",
-                        "Old rivals sit at the same table.",
-                        new EventEffect(0.01, 0, 0, 0),
-                        new EventEffect(0.02, -10, 10, -8),
-                        "random",
-                        3,
+                        "",
+                        "Banks fail, markets freeze, and daily life becomes harder everywhere.",
+                        "Confidence disappears overnight.",
+                        new EventEffect(-0.10, 22, -30, 14),
+                        new EventEffect(-0.12, 30, -36, 18),
+                        "all",
+                        0,
                         new ArrayList<>(),
-                        3
+                        6
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "mass_migration",
+                        "Mass Migration",
+                        "society",
+                        "",
+                        "Huge population shifts strain housing, services, and regional politics.",
+                        "Entire cities are forced to adapt at once.",
+                        new EventEffect(-0.02, 10, -8, 12),
+                        new EventEffect(-0.04, 18, -10, 20),
+                        "random",
+                        4,
+                        new ArrayList<>(),
+                        4
                 )
         );
     }
