@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1;
 
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

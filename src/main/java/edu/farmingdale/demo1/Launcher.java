@@ -4,6 +4,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
 import javafx.application.Application;
+import okhttp3.OkHttpClient;
+
 import java.io.*;
 
 public class Launcher {

@@ -1,6 +1,7 @@
 package edu.farmingdale.demo1;
 
 import edu.farmingdale.demo1.Database.DatabaseController;
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -57,7 +58,7 @@ public class LoginController {
             //This now gets the ID tokens from The firebase auth instance and uses them in the database controller to form the request
             String SaveIdToken = service.getSaveIdToken();
             String SaveLocalIdToken = service.getSaveLocalIdToken();
-            databaseController.loadGameState(SaveIdToken, SaveLocalIdToken);
+            GameState gameState = databaseController.loadGameState(SaveIdToken, SaveLocalIdToken);
             goToGame();
         } else {
             statusLabel.setText("Invalid username or password.");
@@ -100,6 +101,10 @@ public class LoginController {
             e.printStackTrace();
             statusLabel.setText("Game load failed: " + e.getClass().getSimpleName());
         }
+    }
+    //New method to display the previous saves
+    private void showPreviousSaves(StackPane gameRoot){
+
     }
 
     private void showPlanetCreation(StackPane gameRoot) {
