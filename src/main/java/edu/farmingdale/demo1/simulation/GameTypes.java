@@ -554,5 +554,56 @@ public class GameTypes {
                         4
                 )
         );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "industrial_revolution",
+                        "Industrial Revolution",
+                        "technology",
+                        "",
+                        "Advanced factories, transport, and energy systems scale production beyond all previous limits.",
+                        "A new era of manufacturing begins, and productivity skyrockets.",
+                        new EventEffect(0.07, -4, 18, 2),
+                        new EventEffect(0.10, -10, 24, 0),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        6
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "medical_breakthrough",
+                        "Medical Breakthrough",
+                        "technology",
+                        "",
+                        "Revolutionary treatments and automated prevention systems eliminate numerous chronic ailments.",
+                        "Humanity's lifespan takes a giant leap forward.",
+                        new EventEffect(0.08, -12, 10, -14),
+                        new EventEffect(0.10, -20, 12, -18),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        GAME_EVENTS.add(
+                new GameEventDef(
+                        "golden_age",
+                        "Golden Age",
+                        "society",
+                        "",
+                        "Unprecedented prosperity, total stability, and absolute confidence lift the whole civilization to new heights.",
+                        "Peace and abundance are no longer just dreams.",
+                        new EventEffect(0.07, -18, 20, -12),
+                        new EventEffect(0.08, -24, 24, -14),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        7
+                )
+        );
     }
 }
