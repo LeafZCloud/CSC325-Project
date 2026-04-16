@@ -10,7 +10,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +33,10 @@ public class WorldMapView extends Pane {
     private static final double PLANET_CENTER_X = 400;
     private static final double PLANET_CENTER_Y = 400;
     private static final double PLANET_RADIUS = 340;
+    private static final double HORIZONTAL_MARGIN = 48;
+    private static final double TOP_MARGIN = 36;
+    private static final double BOTTOM_MARGIN = 120;
+    private static final double WORLD_VERTICAL_BIAS = 0.43;
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
@@ -141,9 +148,25 @@ public class WorldMapView extends Pane {
             // Region label
             double[] centroid = WorldMapModel.getCentroid(pts);
 
-            Text label = new Text(centroid[0], centroid[1], region.name);
-            label.setFill(Color.WHITE);
-            label.setStyle("-fx-font-size: 8px;");
+            Text label = new Text(region.name);
+            label.setFill(Color.web("#ffffff"));
+            label.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 18));
+            label.setStroke(Color.rgb(0, 0, 0, 0.95));
+            label.setStrokeType(StrokeType.OUTSIDE);
+            label.setStrokeWidth(1.6);
+
+            DropShadow labelShadow = new DropShadow();
+            labelShadow.setRadius(10);
+            labelShadow.setOffsetX(1.5);
+            labelShadow.setOffsetY(1.5);
+            labelShadow.setColor(Color.rgb(0, 0, 0, 0.85));
+            label.setEffect(labelShadow);
+
+            double textWidth = label.getLayoutBounds().getWidth();
+            double textHeight = label.getLayoutBounds().getHeight();
+
+            label.setX(centroid[0] - (textWidth / 2.0));
+            label.setY(centroid[1] + (textHeight / 4.0));
 
             worldGroup.getChildren().add(label);
         }
@@ -191,11 +214,32 @@ public class WorldMapView extends Pane {
     }
 
     private void centerWorld(Group worldGroup) {
-        double worldCenterX = worldGroup.getLayoutBounds().getMinX() + (worldGroup.getLayoutBounds().getWidth() / 2.0);
-        double worldCenterY = worldGroup.getLayoutBounds().getMinY() + (worldGroup.getLayoutBounds().getHeight() / 2.0);
+        double availableWidth = getWidth();
+        double availableHeight = getHeight();
+        double worldWidth = worldGroup.getLayoutBounds().getWidth();
+        double worldHeight = worldGroup.getLayoutBounds().getHeight();
 
-        worldGroup.setLayoutX((getWidth() / 2.0) - worldCenterX);
-        worldGroup.setLayoutY((getHeight() / 2.0) - worldCenterY);
+        if (availableWidth <= 0 || availableHeight <= 0 || worldWidth <= 0 || worldHeight <= 0) {
+            return;
+        }
+
+        double usableWidth = Math.max(1, availableWidth - (HORIZONTAL_MARGIN * 2));
+        double usableHeight = Math.max(1, availableHeight - TOP_MARGIN - BOTTOM_MARGIN);
+
+        double scaleX = (usableWidth * 0.82) / worldWidth;
+        double scaleY = (usableHeight * 0.82) / worldHeight;
+        double scale = Math.min(1.0, Math.min(scaleX, scaleY));
+
+        worldGroup.setScaleX(scale);
+        worldGroup.setScaleY(scale);
+
+        double worldCenterX = worldGroup.getLayoutBounds().getMinX() + (worldWidth / 2.0);
+        double worldCenterY = worldGroup.getLayoutBounds().getMinY() + (worldHeight / 2.0);
+        double targetCenterX = availableWidth / 2.0;
+        double targetCenterY = TOP_MARGIN + (usableHeight * WORLD_VERTICAL_BIAS);
+
+        worldGroup.setLayoutX(targetCenterX - (worldCenterX * scale));
+        worldGroup.setLayoutY(targetCenterY - (worldCenterY * scale));
     }
 
     private double distanceFromPlanetCenter(double x, double y) {
