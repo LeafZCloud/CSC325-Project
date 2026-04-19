@@ -5,8 +5,6 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -181,30 +179,30 @@ public class PlanetCreationView extends StackPane {
 
         ImageView question = createStepImage("HowManyMoons.png", 520);
 
-        Spinner<Integer> spinner = new Spinner<>(0, 3, moons);
+        HBox choices = new HBox(16);
+        choices.setAlignment(Pos.CENTER);
 
-        Button start = createStartButton();
+        for (int i = 0; i <= 3; i++) {
+            int value = i;
+            Button choice = createMoonChoiceButton(value + ".png");
+            choice.setOnAction(e -> {
+                moons = value;
 
-        start.setOnAction(e -> {
+                createdConfig = new PlanetConfig(
+                        planetName,
+                        continents,
+                        selectedType != null ? selectedType : "terran",
+                        moons
+                );
 
-            moons = spinner.getValue();
+                if (onSimulationStart != null) {
+                    onSimulationStart.run();
+                }
+            });
+            choices.getChildren().add(choice);
+        }
 
-            createdConfig = new PlanetConfig(
-                    planetName,
-                    continents,
-                    selectedType != null ? selectedType : "terran",
-                    moons
-            );
-
-            if (onSimulationStart != null) {
-                onSimulationStart.run();
-            }
-        });
-
-        HBox nav = new HBox(10, start);
-        nav.setAlignment(Pos.CENTER);
-
-        content.getChildren().addAll(question, spinner, nav);
+        content.getChildren().addAll(question, choices);
     }
 
     // Next Button UI Update
@@ -227,6 +225,15 @@ public class PlanetCreationView extends StackPane {
 
     private Button createImageButton(String imageName, double fitWidth) {
         ImageView imageView = createStepImage(imageName, fitWidth);
+
+        Button button = new Button();
+        button.setGraphic(imageView);
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
+        return button;
+    }
+
+    private Button createMoonChoiceButton(String imageName) {
+        ImageView imageView = createStepImage(imageName, 110);
 
         Button button = new Button();
         button.setGraphic(imageView);
