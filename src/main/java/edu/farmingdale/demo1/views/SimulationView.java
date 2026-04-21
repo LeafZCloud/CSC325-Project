@@ -22,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -44,18 +45,18 @@ public class SimulationView extends BorderPane {
             "technology", "Technology",
             "society", "Society"
     );
-    private static final Map<String, String> EVENT_BUTTON_IMAGES = Map.of(
-            "meteor", "/images/commandsAndEvents/AsteroidButton.png",
-            "earthquakes", "/images/commandsAndEvents/EarthquakeButton.png",
-            "ice_age", "/images/commandsAndEvents/BlizzardButton.png",
-            "volcanic_eruptions", "/images/commandsAndEvents/EruptionButton.png",
-            "drought", "/images/commandsAndEvents/DroughtButton.png",
-            "plague", "/images/commandsAndEvents/PlagueButton.png",
-            "nuke", "/images/commandsAndEvents/NukeButton.png",
-            "world_war", "/images/commandsAndEvents/WorldWarButton.png"
-    );
-    private static final Map<String, Double> EVENT_BUTTON_HEIGHTS = Map.of(
-            "nuke", 72.0
+    private static final Map<String, String> EVENT_BUTTON_IMAGES = Map.ofEntries(
+            Map.entry("meteor", "/images/commandsAndEvents/AsteroidButton.png"),
+            Map.entry("earthquakes", "/images/commandsAndEvents/EarthquakeButton.png"),
+            Map.entry("ice_age", "/images/commandsAndEvents/BlizzardButton.png"),
+            Map.entry("volcanic_eruptions", "/images/commandsAndEvents/EruptionButton.png"),
+            Map.entry("drought", "/images/commandsAndEvents/DroughtButton.png"),
+            Map.entry("plague", "/images/commandsAndEvents/PlagueButton.png"),
+            Map.entry("nuke", "/images/commandsAndEvents/Nuke.png"),
+            Map.entry("world_war", "/images/commandsAndEvents/WorldWarButton.png"),
+            Map.entry("industrial_revolution", "/images/commandsAndEvents/IndustrializeButton.png"),
+            Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakThrough.png"),
+            Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
     );
 
     private GameState state;
@@ -363,11 +364,17 @@ public class SimulationView extends BorderPane {
         String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
         if (imagePath != null) {
             try {
+                String imageUrl = getClass().getResource(imagePath).toExternalForm();
+                Image image = new Image(imageUrl);
+                if (image.isError() || image.getWidth() <= 0 || image.getHeight() <= 0) {
+                    return createFallbackEventCard(event);
+                }
+
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/event-image-button.fxml"));
                 Node imageButton = loader.load();
                 EventImageButtonController controller = loader.getController();
-                controller.setImage(getClass().getResource(imagePath).toExternalForm());
-                controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
+                controller.setImage(imageUrl);
+                // controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
                 controller.setOnAction(e -> triggerEvent(event));
                 return imageButton;
             } catch (IOException e) {
@@ -375,6 +382,10 @@ public class SimulationView extends BorderPane {
             }
         }
 
+        return createFallbackEventCard(event);
+    }
+
+    private EventCard createFallbackEventCard(GameEventDef event) {
         EventCard card = new EventCard(event);
         card.setOnAction(e -> triggerEvent(event));
         return card;

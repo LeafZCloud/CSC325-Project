@@ -14,7 +14,7 @@
                 style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
             <graphic>
                 <ImageView fx:id="buttonImage"
-                           fitHeight="84.0"
+                           fitHeight="85.0"
                            preserveRatio="true"
                            smooth="true" />
             </graphic>
