@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1.views;
 
+import edu.farmingdale.demo1.components.EventImageButtonController;
 import edu.farmingdale.demo1.components.EventCard;
 import edu.farmingdale.demo1.components.RegionCard;
 import edu.farmingdale.demo1.components.SocialFeedView;
@@ -14,8 +15,10 @@ import edu.farmingdale.demo1.simulation.SimulationModel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -29,6 +32,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 
 public class SimulationView extends BorderPane {
 
@@ -39,6 +43,19 @@ public class SimulationView extends BorderPane {
             "conflict", "Conflicts",
             "technology", "Technology",
             "society", "Society"
+    );
+    private static final Map<String, String> EVENT_BUTTON_IMAGES = Map.of(
+            "meteor", "/images/commandsAndEvents/AsteroidButton.png",
+            "earthquakes", "/images/commandsAndEvents/EarthquakeButton.png",
+            "ice_age", "/images/commandsAndEvents/BlizzardButton.png",
+            "volcanic_eruptions", "/images/commandsAndEvents/EruptionButton.png",
+            "drought", "/images/commandsAndEvents/DroughtButton.png",
+            "plague", "/images/commandsAndEvents/PlagueButton.png",
+            "nuke", "/images/commandsAndEvents/NukeButton.png",
+            "world_war", "/images/commandsAndEvents/WorldWarButton.png"
+    );
+    private static final Map<String, Double> EVENT_BUTTON_HEIGHTS = Map.of(
+            "nuke", 72.0
     );
 
     private GameState state;
@@ -308,9 +325,7 @@ public class SimulationView extends BorderPane {
         }
 
         for (GameEventDef event : filteredEvents) {
-            EventCard card = new EventCard(event);
-            card.setOnAction(e -> triggerEvent(event));
-            eventCards.getChildren().add(card);
+            eventCards.getChildren().add(createEventTrigger(event));
         }
 
         if (filteredEvents.isEmpty()) {
@@ -321,10 +336,12 @@ public class SimulationView extends BorderPane {
 
         ScrollPane eventScroller = new ScrollPane(eventCards);
         eventScroller.setFitToHeight(true);
+        eventScroller.setPrefViewportHeight(120);
+        eventScroller.setMinViewportHeight(120);
         eventScroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         eventScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         eventScroller.setPannable(true);
-        eventScroller.setStyle("-fx-background:#0f172a; -fx-background-color:transparent;");
+        eventScroller.getStyleClass().add("event-browser-scroller");
 
         Label sectionTitle = new Label(EVENT_TAB_LABELS.get(activeEventTab));
         sectionTitle.setStyle("-fx-text-fill:white; -fx-font-size:16px; -fx-font-weight:bold;");
@@ -340,6 +357,27 @@ public class SimulationView extends BorderPane {
             selectedEventId = state.eventLog.get(0).id;
         }
         buildUI();
+    }
+
+    private Node createEventTrigger(GameEventDef event) {
+        String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
+        if (imagePath != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/event-image-button.fxml"));
+                Node imageButton = loader.load();
+                EventImageButtonController controller = loader.getController();
+                controller.setImage(getClass().getResource(imagePath).toExternalForm());
+                controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
+                controller.setOnAction(e -> triggerEvent(event));
+                return imageButton;
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load event image button for " + event.id + ".", e);
+            }
+        }
+
+        EventCard card = new EventCard(event);
+        card.setOnAction(e -> triggerEvent(event));
+        return card;
     }
 
     private void ensureSelectedEvent() {
