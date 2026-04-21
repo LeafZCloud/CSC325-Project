@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="edu.farmingdale.demo1.components.EventImageButtonController">
+    <children>
+        <Button fx:id="triggerButton"
+                contentDisplay="GRAPHIC_ONLY"
+                pickOnBounds="false"
+                style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+            <graphic>
+                <ImageView fx:id="buttonImage"
+                           fitHeight="85.0"
+                           preserveRatio="true"
+                           smooth="true" />
+            </graphic>
+        </Button>
+    </children>
+</StackPane>
