@@ -4,11 +4,10 @@ import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
  /*region card showing region name, stability label,
   a health bar, and compact stats line. */
@@ -25,6 +24,7 @@ public class RegionCard extends VBox {
     public RegionCard(Region r) {
         setSpacing(8);
         setPadding(new Insets(12));
+        setMaxWidth(Double.MAX_VALUE);
         setStyle("""
             -fx-background-color:#0b1220;
             -fx-background-radius:12;
@@ -49,25 +49,22 @@ public class RegionCard extends VBox {
 
         header.getChildren().addAll(name, spacer, status);
 
-        // Bar: represent stress level, color-coded (red/yellow)
-        Rectangle background = new Rectangle(260, 8);
-        background.setArcHeight(6);
-        background.setArcWidth(6);
-        background.setFill(Color.web("#1e293b"));
-
         double pct = Math.max(0, Math.min(100, r.stress));
-        double width = pct * 2.6; // 260px max
-        Rectangle fill = new Rectangle(width, 8);
-        fill.setArcHeight(6);
-        fill.setArcWidth(6);
         String barColor = pct > 75 ? "#ef4444" : (pct > 45 ? "#f59e0b" : "#22c55e");
-        fill.setFill(Color.web(barColor));
-
-        javafx.scene.layout.StackPane bar = new javafx.scene.layout.StackPane(background, fill);
+        ProgressBar bar = new ProgressBar(pct / 100.0);
+        bar.setMaxWidth(Double.MAX_VALUE);
+        bar.setPrefHeight(8);
+        bar.setStyle("""
+            -fx-accent:%s;
+            -fx-control-inner-background:#1e293b;
+            -fx-background-insets:0;
+            -fx-padding:0;
+        """.formatted(barColor));
 
         // Footer compact stats
         String popPct = String.valueOf(Math.round(r.populationShare * 100)) + "%";
         Label small = new Label("Pop " + popPct + "    Stress " + r.stress + "%    Econ " + r.economicHealth + "%");
+        small.setWrapText(true);
         small.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:11px;");
 
         getChildren().addAll(header, bar, small);

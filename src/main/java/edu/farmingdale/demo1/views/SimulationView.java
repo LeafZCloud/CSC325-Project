@@ -135,7 +135,9 @@ public class SimulationView extends BorderPane {
         ensureSelectedEvent();
 
         VBox sidebar = new VBox(12);
-        sidebar.setPrefWidth(380);
+        sidebar.setMinWidth(300);
+        sidebar.setPrefWidth(360);
+        sidebar.setMaxWidth(420);
         sidebar.setPadding(new Insets(14));
         sidebar.setStyle("""
             -fx-background-color:#020617;
@@ -157,7 +159,9 @@ public class SimulationView extends BorderPane {
         contentScroller.setFitToWidth(true);
         contentScroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         contentScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        contentScroller.setMaxWidth(Double.MAX_VALUE);
         contentScroller.setStyle("-fx-background:#020617; -fx-background-color:transparent;");
+        contentScroller.getStyleClass().add("sidebar-scroller");
 
         VBox.setVgrow(contentScroller, Priority.ALWAYS);
         sidebar.getChildren().addAll(title, tabs, contentScroller);
@@ -184,12 +188,15 @@ public class SimulationView extends BorderPane {
 
     private VBox buildStatsSidebar() {
         VBox content = new VBox(14);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
 
         Label summary = new Label("Global systems status across population, pressure, economy, and exposure.");
         summary.setWrapText(true);
         summary.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
 
         VBox stats = new VBox(10);
+        stats.setMaxWidth(Double.MAX_VALUE);
         stats.getChildren().addAll(
                 new StatBar("Population", state.globalStats.population),
                 new StatBar("Stress", state.globalStats.stress),
@@ -199,8 +206,11 @@ public class SimulationView extends BorderPane {
 
         Label regionsTitle = sectionLabel("Regions");
         VBox regionList = new VBox(10);
+        regionList.setMaxWidth(Double.MAX_VALUE);
         for (GameTypes.Region region : state.regions) {
-            regionList.getChildren().add(new RegionCard(region));
+            RegionCard card = new RegionCard(region);
+            card.setMaxWidth(Double.MAX_VALUE);
+            regionList.getChildren().add(card);
         }
 
         content.getChildren().addAll(summary, stats, regionsTitle, regionList);
@@ -209,6 +219,8 @@ public class SimulationView extends BorderPane {
 
     private VBox buildEventsSidebar() {
         VBox content = new VBox(12);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
 
         if (state.eventLog.isEmpty()) {
             Label empty = new Label("Trigger an event to see the event log and detailed breakdown here.");
@@ -222,6 +234,7 @@ public class SimulationView extends BorderPane {
         if (selected != null) {
             GameEventDef definition = findEventDef(selected);
             VBox detail = new VBox(8);
+            detail.setMaxWidth(Double.MAX_VALUE);
             detail.setPadding(new Insets(12));
             detail.setStyle("""
                 -fx-background-color:#0b1220;
@@ -269,6 +282,7 @@ public class SimulationView extends BorderPane {
 
         Label logTitle = sectionLabel("Event Log");
         VBox logList = new VBox(8);
+        logList.setMaxWidth(Double.MAX_VALUE);
         for (EventLogEntry entry : state.eventLog) {
             Button item = new Button(entry.eventName + " · Year " + entry.year);
             item.setMaxWidth(Double.MAX_VALUE);
@@ -288,6 +302,8 @@ public class SimulationView extends BorderPane {
 
     private VBox buildFeedSidebar() {
         VBox content = new VBox(12);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
         Label title = sectionLabel("World Feed");
         Label subtitle = new Label("Live reactions from citizens, analysts, and reporters across the planet.");
         subtitle.setWrapText(true);
