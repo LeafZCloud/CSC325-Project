@@ -6,7 +6,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class PlanetCreationView extends StackPane {
 
@@ -75,21 +75,29 @@ public class PlanetCreationView extends StackPane {
         TextField nameField = new TextField();
         nameField.setMaxWidth(300);
 
+        Label errorLabel = createErrorLabel();
+        nameField.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (!newValue.trim().isEmpty()) {
+                errorLabel.setText("");
+            }
+        });
+
         Button next = createNextButton();
 
         next.setOnAction(e -> {
 
-            planetName = nameField.getText();
+            planetName = nameField.getText().trim();
 
             if (planetName.isEmpty()) {
-                planetName = "Unnamed";
+                errorLabel.setText("Please enter a planet name.");
+                return;
             }
 
             step++;
             renderStep();
         });
 
-        content.getChildren().addAll(question, nameField, next);
+        content.getChildren().addAll(question, nameField, errorLabel, next);
     }
 
     private void renderTypeStep() {
@@ -106,9 +114,15 @@ public class PlanetCreationView extends StackPane {
 
         types.getChildren().addAll(terran, arid, oceanic, volcanic);
 
+        Label errorLabel = createErrorLabel();
+
         Button next = createNextButton();
 
         next.setOnAction(e -> {
+            if (selectedType == null) {
+                errorLabel.setText("Please select a planet type.");
+                return;
+            }
             step++;
             renderStep();
         });
@@ -116,7 +130,7 @@ public class PlanetCreationView extends StackPane {
         HBox nav = new HBox(10, next);
         nav.setAlignment(Pos.CENTER);
 
-        content.getChildren().addAll(question, types, nav);
+        content.getChildren().addAll(question, types, errorLabel, nav);
     }
 
     private Button createTypeButton(String text, String type) {
@@ -133,6 +147,8 @@ public class PlanetCreationView extends StackPane {
         btn.setOnAction(e -> {
 
             selectedType = type;
+
+            clearStepErrors();
 
             for (Node node : ((HBox) btn.getParent()).getChildren()) {
                 node.setStyle("""
@@ -181,30 +197,30 @@ public class PlanetCreationView extends StackPane {
 
         ImageView question = createStepImage("HowManyMoons.png", 520);
 
-        Spinner<Integer> spinner = new Spinner<>(0, 3, moons);
+        HBox choices = new HBox(16);
+        choices.setAlignment(Pos.CENTER);
 
-        Button start = createStartButton();
+        for (int i = 0; i <= 3; i++) {
+            int value = i;
+            Button choice = createMoonChoiceButton(value + ".png");
+            choice.setOnAction(e -> {
+                moons = value;
 
-        start.setOnAction(e -> {
+                createdConfig = new PlanetConfig(
+                        planetName,
+                        continents,
+                        selectedType != null ? selectedType : "terran",
+                        moons
+                );
 
-            moons = spinner.getValue();
+                if (onSimulationStart != null) {
+                    onSimulationStart.run();
+                }
+            });
+            choices.getChildren().add(choice);
+        }
 
-            createdConfig = new PlanetConfig(
-                    planetName,
-                    continents,
-                    selectedType != null ? selectedType : "terran",
-                    moons
-            );
-
-            if (onSimulationStart != null) {
-                onSimulationStart.run();
-            }
-        });
-
-        HBox nav = new HBox(10, start);
-        nav.setAlignment(Pos.CENTER);
-
-        content.getChildren().addAll(question, spinner, nav);
+        content.getChildren().addAll(question, choices);
     }
 
     // Next Button UI Update
@@ -227,6 +243,31 @@ public class PlanetCreationView extends StackPane {
 
     private Button createImageButton(String imageName, double fitWidth) {
         ImageView imageView = createStepImage(imageName, fitWidth);
+
+        Button button = new Button();
+        button.setGraphic(imageView);
+        button.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
+        return button;
+    }
+
+    // Error for Planet Creation pages
+    private Label createErrorLabel() {
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Color.web("#dc2626"));
+        errorLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        return errorLabel;
+    }
+
+    private void clearStepErrors() {
+        for (Node node : content.getChildren()) {
+            if (node instanceof Label label) {
+                label.setText("");
+            }
+        }
+    }
+
+    private Button createMoonChoiceButton(String imageName) {
+        ImageView imageView = createStepImage(imageName, 110);
 
         Button button = new Button();
         button.setGraphic(imageView);
