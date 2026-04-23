@@ -16,16 +16,18 @@ public class GameTypes {
     public static class Region {
         public String id;
         public String name;
+        public double population;
         public double populationShare;
         public int stress;
         public int economicHealth;
         public int exposure;
         public int polygonIndex;
 
-        public Region(String id, String name, double populationShare, int stress,
+        public Region(String id, String name, double population, double populationShare, int stress,
                       int economicHealth, int exposure, int polygonIndex) {
             this.id = id;
             this.name = name;
+            this.population = population;
             this.populationShare = populationShare;
             this.stress = stress;
             this.economicHealth = economicHealth;

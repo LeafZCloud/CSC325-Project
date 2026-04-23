@@ -538,7 +538,7 @@ public class SimulationView extends BorderPane {
     }
 
     private String formatPopulationDelta(double value) {
-        return String.format("%+.0f%%", value);
+        return String.format("%+.1fB", value);
     }
 
     private void advanceYear() {
