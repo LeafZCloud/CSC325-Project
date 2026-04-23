@@ -66,8 +66,13 @@ public class RegionCard extends VBox {
         javafx.scene.layout.StackPane bar = new javafx.scene.layout.StackPane(background, fill);
 
         // Footer compact stats
-        String popPct = String.valueOf(Math.round(r.populationShare * 100)) + "%";
-        Label small = new Label("Pop " + popPct + "    Stress " + r.stress + "%    Econ " + r.economicHealth + "%");
+        String popFormatted;
+        if (r.population >= 1.0) {
+            popFormatted = String.format("%.2fB", r.population);
+        } else {
+            popFormatted = String.format("%.0fM", r.population * 1000);
+        }
+        Label small = new Label(String.format("Pop %s    Stress %d%%    Econ %d%%", popFormatted, r.stress, r.economicHealth));
         small.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:11px;");
 
         getChildren().addAll(header, bar, small);
