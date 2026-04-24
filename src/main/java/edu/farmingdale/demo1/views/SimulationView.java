@@ -114,6 +114,8 @@ public class SimulationView extends BorderPane {
         """);
         end.setOnAction(e -> {
             yearTimeline.stop();
+            System.out.println("IDToken: " + authService.getSaveIdToken());
+            System.out.println("LocalId: " + authService.getSaveLocalIdToken());
             databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
             if (onSimulationEnd != null) {
                 onSimulationEnd.run();

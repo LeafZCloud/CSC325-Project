@@ -36,9 +36,8 @@ public class DatabaseController extends GameTypes
         //Creation of the actual request being made
         RequestBody requestBody = RequestBody.create(body.toString(), JSON);
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + SaveLocalIdToken + "/slot_" + slotNumber)
+                .url(FIRESTORE_URL + SaveLocalIdToken + "_slot_" + slotNumber)
                 .patch(requestBody)
-                .addHeader("Authorization", "Bearer " + SaveLocalIdToken)  //Bearer is the authorization header in a request like this
                 .build();
 
         try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
@@ -62,9 +61,8 @@ public class DatabaseController extends GameTypes
 
         //Firestore authorization header for verification of the user
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + SaveLocalIdToken + "/slot_" + slotNumber)
+                .url(FIRESTORE_URL + SaveLocalIdToken + "_slot_" + slotNumber)
                 .get()
-                .addHeader("Authorization", "Bearer " + SaveLocalIdToken)
                 .build();
 
         //Try with resources for the database request

@@ -53,6 +53,8 @@ public class LoginController {
 
         // Simple login check (replace with real auth later)
         if (authService.login(email, password)) {
+            System.out.println("After login - IDToken: " + authService.getSaveIdToken());
+            System.out.println("After login - LocalId: " + authService.getSaveLocalIdToken());
             statusLabel.setText("Login successful!");
 
             //This now gets the ID tokens from The firebase auth instance and uses them in the database controller to form the request
