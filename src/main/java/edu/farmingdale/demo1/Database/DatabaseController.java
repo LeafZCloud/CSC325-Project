@@ -86,6 +86,8 @@ public class DatabaseController extends GameTypes
             //Returns the GSON from the database so that we can use it in java again
             return gson.fromJson(gameStateJson, GameState.class);
 
+
+
         } catch (Exception e) {
             System.out.println("Load error: " + e.getMessage());
             return null;
