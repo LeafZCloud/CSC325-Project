@@ -82,6 +82,10 @@ public class PlanetCreationView extends StackPane {
             }
         });
 
+        Button saveGame1 = loadSaveGame1();
+        Button saveGame2 = loadSaveGame2();
+        Button saveGame3 = loadSaveGame3();
+
         Button next = createNextButton();
 
         next.setOnAction(e -> {
@@ -97,7 +101,32 @@ public class PlanetCreationView extends StackPane {
             renderStep();
         });
 
-        content.getChildren().addAll(question, nameField, errorLabel, next);
+        HBox saveSlots = new HBox(20); //creates the icons for the save slots, just a temporary model
+        saveSlots.setAlignment(Pos.CENTER);
+        saveSlots.getChildren().addAll(saveGame1, saveGame2, saveGame3);
+        content.getChildren().addAll(question, nameField, errorLabel, next, saveSlots);
+    }
+    // Next Button UI Update
+    private Button createNextButton() {
+        return createImageButton("Next.png", 180);
+    }
+
+    //These are the load game methods, when a button is pressed it will load that instance of the game from the database
+    private Button loadSaveGame1(){
+
+        return createImageButton("saveGame.png", 50);
+    }
+
+    private Button loadSaveGame2(){
+
+
+        return createImageButton("saveGame.png", 50);
+    }
+
+    private Button loadSaveGame3(){
+
+
+        return createImageButton("saveGame.png", 50);
     }
 
     private void renderTypeStep() {
@@ -223,10 +252,7 @@ public class PlanetCreationView extends StackPane {
         content.getChildren().addAll(question, choices);
     }
 
-    // Next Button UI Update
-    private Button createNextButton() {
-        return createImageButton("Next.png", 180);
-    }
+
 
     private Button createStartButton() {
         return createImageButton("StartButton.png", 220);
