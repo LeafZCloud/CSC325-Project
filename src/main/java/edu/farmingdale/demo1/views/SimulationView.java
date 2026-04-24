@@ -1,5 +1,7 @@
 package edu.farmingdale.demo1.views;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
 import edu.farmingdale.demo1.components.EventImageButtonController;
 import edu.farmingdale.demo1.components.EventCard;
 import edu.farmingdale.demo1.components.RegionCard;
@@ -59,15 +61,19 @@ public class SimulationView extends BorderPane {
             Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
     );
 
+
     private GameState state;
     private String activeEventTab = "all";
     private String activeSidebarTab = "stats";
     private String selectedEventId;
     private final Timeline yearTimeline;
-
+    private final FirebaseAuthService authService;
+    private final DatabaseController databaseController;
     private Runnable onSimulationEnd;
 
-    public SimulationView(PlanetConfig config) {
+    public SimulationView(PlanetConfig config, FirebaseAuthService authService, DatabaseController databaseController) {
+        this.authService = authService;
+        this.databaseController = databaseController;
         state = SimulationModel.buildInitialState(config);
         yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
@@ -108,6 +114,7 @@ public class SimulationView extends BorderPane {
         """);
         end.setOnAction(e -> {
             yearTimeline.stop();
+            databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
             if (onSimulationEnd != null) {
                 onSimulationEnd.run();
             }

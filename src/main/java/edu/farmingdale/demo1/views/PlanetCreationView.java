@@ -1,5 +1,8 @@
 package edu.farmingdale.demo1.views;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
+import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 
 import javafx.geometry.Pos;
@@ -29,7 +32,13 @@ public class PlanetCreationView extends StackPane {
     private Runnable onSimulationStart;
     private PlanetConfig createdConfig;
 
-    public PlanetCreationView() {
+    private FirebaseAuthService authService;
+    private DatabaseController databaseController;
+
+    public PlanetCreationView(FirebaseAuthService authService, DatabaseController databaseController) {
+
+        this.authService = authService;
+        this.databaseController = databaseController;
 
         // updated image background to match the game's interface
         ImageView background = new ImageView(
@@ -112,21 +121,46 @@ public class PlanetCreationView extends StackPane {
     }
 
     //These are the load game methods, when a button is pressed it will load that instance of the game from the database
-    private Button loadSaveGame1(){
-
-        return createImageButton("saveGame.png", 50);
+    private Button loadSaveGame1() {
+        Button btn = createImageButton("saveGame.png", 50);
+        btn.setOnAction(e -> {
+            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
+            if (state != null) {
+                createdConfig = state.planet;
+                if (onSimulationStart != null) onSimulationStart.run();
+            } else {
+                System.out.println("Slot 1 is empty");
+            }
+        });
+        return btn;
     }
 
-    private Button loadSaveGame2(){
-
-
-        return createImageButton("saveGame.png", 50);
+    private Button loadSaveGame2() {
+        Button btn = createImageButton("saveGame.png", 50);
+        btn.setOnAction(e -> {
+            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 2);
+            if (state != null) {
+                createdConfig = state.planet;
+                if (onSimulationStart != null) onSimulationStart.run();
+            } else {
+                System.out.println("Slot 2 is empty");
+            }
+        });
+        return btn;
     }
 
-    private Button loadSaveGame3(){
-
-
-        return createImageButton("saveGame.png", 50);
+    private Button loadSaveGame3() {
+        Button btn = createImageButton("saveGame.png", 50);
+        btn.setOnAction(e -> {
+            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 3);
+            if (state != null) {
+                createdConfig = state.planet;
+                if (onSimulationStart != null) onSimulationStart.run();
+            } else {
+                System.out.println("Slot 3 is empty");
+            }
+        });
+        return btn;
     }
 
     private void renderTypeStep() {

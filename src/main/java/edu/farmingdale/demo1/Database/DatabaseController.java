@@ -10,7 +10,6 @@ public class DatabaseController extends GameTypes
 {
 
     private final OkHttpClient OK_HTTP_CLIENT = HttpClientResource.get();
-
     private final Gson gson = new Gson();
     public static final MediaType JSON = MediaType.get("application/json");
 
@@ -19,7 +18,7 @@ public class DatabaseController extends GameTypes
 
     //This methods will save the users game state when the trigger of either Exiting the game, Closing the game
     //or using the save button
-    public boolean saveGameState(GameState gameState, String SaveIdToken, String SaveLocalIdToken)
+    public boolean saveGameState(GameState gameState, String SaveIdToken, String SaveLocalIdToken, int slotNumber)
     {
 
         String gameStateJson = gson.toJson(gameState);
@@ -37,7 +36,7 @@ public class DatabaseController extends GameTypes
         //Creation of the actual request being made
         RequestBody requestBody = RequestBody.create(body.toString(), JSON);
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + SaveIdToken)
+                .url(FIRESTORE_URL + SaveLocalIdToken + "/slot_" + slotNumber)
                 .patch(requestBody)
                 .addHeader("Authorization", "Bearer " + SaveLocalIdToken)  //Bearer is the authorization header in a request like this
                 .build();
@@ -58,12 +57,12 @@ public class DatabaseController extends GameTypes
     }
 
     //Loading the game state from firestore, creating the request using the active user IdToken
-    public GameState loadGameState(String SaveIdToken, String SaveLocalIdToken)
+    public GameState loadGameState(String SaveIdToken, String SaveLocalIdToken, int slotNumber)
     {
 
         //Firestore authorization header for verification of the user
         Request request = new Request.Builder()
-                .url(FIRESTORE_URL + SaveIdToken)
+                .url(FIRESTORE_URL + SaveLocalIdToken + "/slot_" + slotNumber)
                 .get()
                 .addHeader("Authorization", "Bearer " + SaveLocalIdToken)
                 .build();
