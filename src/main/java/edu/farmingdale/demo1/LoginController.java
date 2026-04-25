@@ -35,7 +35,7 @@ public class LoginController {
     private Label statusLabel;        // Status label\
 
     DatabaseController databaseController = new  DatabaseController();
-    FirebaseAuthService service = new FirebaseAuthService();
+    FirebaseAuthService authService = new FirebaseAuthService();
 
     // This method is called when FXML is loaded
     @FXML
@@ -52,13 +52,14 @@ public class LoginController {
         String password = passwordField.getText();
 
         // Simple login check (replace with real auth later)
-        if (service.login(email, password)) {
+        if (authService.login(email, password)) {
+            System.out.println("After login - IDToken: " + authService.getSaveIdToken());
+            System.out.println("After login - LocalId: " + authService.getSaveLocalIdToken());
             statusLabel.setText("Login successful!");
 
             //This now gets the ID tokens from The firebase auth instance and uses them in the database controller to form the request
-            String SaveIdToken = service.getSaveIdToken();
-            String SaveLocalIdToken = service.getSaveLocalIdToken();
-            GameState gameState = databaseController.loadGameState(SaveIdToken, SaveLocalIdToken);
+            String SaveIdToken = authService.getSaveIdToken();
+            String SaveLocalIdToken = authService.getSaveLocalIdToken();
             goToGame();
         } else {
             statusLabel.setText("Invalid username or password.");
@@ -108,7 +109,7 @@ public class LoginController {
     }
 
     private void showPlanetCreation(StackPane gameRoot) {
-        PlanetCreationView view = new PlanetCreationView();
+        PlanetCreationView view = new PlanetCreationView(authService, databaseController);
         view.setOnSimulationStart(() -> {
             PlanetConfig config = view.getCreatedConfig();
             showSimulation(gameRoot, config);
@@ -117,7 +118,7 @@ public class LoginController {
     }
 
     private void showSimulation(StackPane gameRoot, PlanetConfig config) {
-        SimulationView view = new SimulationView(config);
+        SimulationView view = new SimulationView(config, authService, databaseController);
         view.setOnSimulationEnd(() -> {
             GameState state = view.getState();
             showSummary(gameRoot, state);
