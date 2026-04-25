@@ -31,10 +31,9 @@ public class FirebaseAuthService
     private String SaveIdToken;
     private String SaveLocalIdToken;
 
-    public void storeTokens(JsonObject json)
-    {
+    public void storeTokens(JsonObject json) {
         this.SaveIdToken = json.get("idToken").getAsString();
-        this.SaveLocalIdToken = json.get("idToken").getAsString();
+        this.SaveLocalIdToken = json.get("localId").getAsString();
     }
 
     public String getSaveIdToken()

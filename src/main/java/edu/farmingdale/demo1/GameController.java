@@ -1,5 +1,7 @@
 package edu.farmingdale.demo1;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -15,6 +17,9 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.GameState;
 
 public class GameController {
+
+    private FirebaseAuthService authService = new FirebaseAuthService();
+    private DatabaseController databaseController = new DatabaseController();
 
     @FXML
     private StackPane rootPane;
@@ -34,7 +39,8 @@ public class GameController {
     // -----------------------------
     private void handlePlanetSim() {
 
-        PlanetCreationView view = new PlanetCreationView();
+
+        PlanetCreationView view = new PlanetCreationView(authService, databaseController);
 
         view.setOnSimulationStart(() -> {
 
@@ -51,7 +57,7 @@ public class GameController {
     // -----------------------------
     private void showSimulation(PlanetConfig config) {
 
-        SimulationView view = new SimulationView(config);
+        SimulationView view = new SimulationView(config, authService, databaseController);
 
         view.setOnSimulationEnd(() -> {
 
