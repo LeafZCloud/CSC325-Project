@@ -14,6 +14,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.SimulationModel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -23,10 +24,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -58,12 +61,23 @@ public class SimulationView extends BorderPane {
             Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakThrough.png"),
             Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
     );
+    private static final Map<String, String> TRIGGERED_EVENT_IMAGES = Map.ofEntries(
+            Map.entry("tsunami", "/images/commandsAndEvents/TsunamiEvent.png"),
+            Map.entry("virus", "/images/commandsAndEvents/VirusEvent.png"),
+            Map.entry("depression", "/images/commandsAndEvents/DepressionEvent.png"),
+            Map.entry("ice_age", "/images/commandsAndEvents/IceAgeEvent.png"),
+            Map.entry("famine", "/images/commandsAndEvents/FamineEvent.png"),
+            Map.entry("rebellion", "/images/commandsAndEvents/RebellionEvent.png"),
+            Map.entry("economic_boom", "/images/commandsAndEvents/EcoBoomEvent.png")
+    );
 
     private GameState state;
     private String activeEventTab = "all";
     private String activeSidebarTab = "stats";
     private String selectedEventId;
     private final Timeline yearTimeline;
+    private final PauseTransition popupTimer;
+    private String activePopupEventId;
 
     private Runnable onSimulationEnd;
 
@@ -72,6 +86,8 @@ public class SimulationView extends BorderPane {
         yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
         yearTimeline.play();
+        popupTimer = new PauseTransition(Duration.seconds(5));
+        popupTimer.setOnFinished(e -> clearPopup());
         buildUI();
     }
 
@@ -90,7 +106,18 @@ public class SimulationView extends BorderPane {
                 state.flashingRegions,
                 state.lastEventId
         );
-        setCenter(map);
+        StackPane centerLayer = new StackPane(map);
+        centerLayer.setPickOnBounds(false);
+
+        if (activePopupEventId != null) {
+            Node popup = buildTriggeredEventPopup(activePopupEventId);
+            centerLayer.getChildren().add(popup);
+            StackPane.setAlignment(popup, Pos.TOP_CENTER);
+            popup.setTranslateY(-215);
+            popup.setTranslateX(160);
+        }
+
+        setCenter(centerLayer);
 
         setRight(buildSidebar());
         setBottom(buildEventBrowser());
@@ -368,7 +395,8 @@ public class SimulationView extends BorderPane {
     }
 
     private void triggerEvent(GameEventDef event) {
-        state = SimulationModel.applyEvent(state, event);
+        state = SimulationModel.applyPlayerCommand(state, event);
+        showPopup(state.pendingTriggeredEventId);
         activeSidebarTab = "events";
         if (!state.eventLog.isEmpty()) {
             selectedEventId = state.eventLog.get(0).id;
@@ -433,7 +461,7 @@ public class SimulationView extends BorderPane {
     }
 
     private GameEventDef findEventDef(EventLogEntry entry) {
-        for (GameEventDef event : GameTypes.GAME_EVENTS) {
+        for (GameEventDef event : GameTypes.allEvents()) {
             if (event.id.equals(entry.id) || event.name.equals(entry.eventName)) {
                 return event;
             }
@@ -544,5 +572,49 @@ public class SimulationView extends BorderPane {
     private void advanceYear() {
         state.year += 1;
         buildUI();
+    }
+
+    private void showPopup(String eventId) {
+        popupTimer.stop();
+        activePopupEventId = eventId;
+
+        if (eventId != null) {
+            popupTimer.playFromStart();
+        }
+    }
+
+    private void clearPopup() {
+        activePopupEventId = null;
+        buildUI();
+    }
+
+    private Node buildTriggeredEventPopup(String eventId) {
+        VBox popupBox = new VBox();
+        popupBox.setAlignment(Pos.CENTER);
+        popupBox.setMouseTransparent(true);
+        popupBox.setMaxWidth(280);
+        popupBox.setPadding(new Insets(0));
+
+        String imagePath = TRIGGERED_EVENT_IMAGES.get(eventId);
+        if (imagePath != null && getClass().getResource(imagePath) != null) {
+            ImageView imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
+            imageView.setPreserveRatio(true);
+            imageView.setFitWidth(250);
+            popupBox.getChildren().add(imageView);
+            return popupBox;
+        }
+
+        GameEventDef event = GameTypes.findEventById(eventId);
+        Label fallback = new Label(event != null ? event.name : "Event Triggered");
+        fallback.setStyle("""
+            -fx-background-color:#7f1d1d;
+            -fx-text-fill:white;
+            -fx-font-size:14px;
+            -fx-font-weight:bold;
+            -fx-background-radius:12;
+            -fx-padding:10 16 10 16;
+        """);
+        popupBox.getChildren().add(fallback);
+        return popupBox;
     }
 }
