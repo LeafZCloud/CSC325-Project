@@ -51,9 +51,11 @@ public class SimulationModel {
 
         for (int i = 0; i < continents; i++) {
 
+            double regionPop = 7.2 * shares[i];
             regions.add(new Region(
                     "region-" + i,
                     shuffled.get(i),
+                    regionPop,
                     shares[i],
                     random.nextInt(20) + 10,
                     random.nextInt(30) + 55,
@@ -152,12 +154,14 @@ public class SimulationModel {
 
         for (int i = 0; i < state.regions.size(); i++) {
             Region r = state.regions.get(i);
-            double newPopShare = regionPopulations.get(i) / totalNewPopulation;
+            double newPop = regionPopulations.get(i);
+            double newPopShare = newPop / totalNewPopulation;
 
             if (!affectedRegions.contains(r.id)) {
                 Region unchanged = new Region(
                         r.id,
                         r.name,
+                        newPop,
                         newPopShare,
                         r.stress,
                         r.economicHealth,
@@ -172,6 +176,7 @@ public class SimulationModel {
             Region updated = new Region(
                     r.id,
                     r.name,
+                    newPop,
                     newPopShare,
                     GameTypes.clamp(r.stress + re.stress, 0, 100),
                     GameTypes.clamp(r.economicHealth + re.economicHealth, 0, 100),
@@ -184,6 +189,7 @@ public class SimulationModel {
         }
 
         gs.population = totalNewPopulation;
+        double populationDelta = totalNewPopulation - state.globalStats.population;
 
         // Recalculate global weighted averages from the new regional states
         double totalStress = 0;
@@ -210,10 +216,10 @@ public class SimulationModel {
                 event.category,
                 affectedRegions,
                 new GlobalStats(
-                        g.population * 100,
-                        g.stress,
-                        g.economicHealth,
-                        g.exposure
+                        populationDelta,
+                        event.regionEffects.stress,
+                        event.regionEffects.economicHealth,
+                        event.regionEffects.exposure
                 )
         );
 

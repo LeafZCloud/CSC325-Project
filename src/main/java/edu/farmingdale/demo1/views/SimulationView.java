@@ -1,5 +1,8 @@
 package edu.farmingdale.demo1.views;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
+import edu.farmingdale.demo1.Database.FirebaseAuthService;
+import edu.farmingdale.demo1.components.EventImageButtonController;
 import edu.farmingdale.demo1.components.EventCard;
 import edu.farmingdale.demo1.components.RegionCard;
 import edu.farmingdale.demo1.components.SocialFeedView;
@@ -14,11 +17,14 @@ import edu.farmingdale.demo1.simulation.SimulationModel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -29,6 +35,7 @@ import javafx.util.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 
 public class SimulationView extends BorderPane {
 
@@ -40,16 +47,33 @@ public class SimulationView extends BorderPane {
             "technology", "Technology",
             "society", "Society"
     );
+    private static final Map<String, String> EVENT_BUTTON_IMAGES = Map.ofEntries(
+            Map.entry("meteor", "/images/commandsAndEvents/AsteroidButton.png"),
+            Map.entry("earthquakes", "/images/commandsAndEvents/EarthquakeButton.png"),
+            Map.entry("ice_age", "/images/commandsAndEvents/BlizzardButton.png"),
+            Map.entry("volcanic_eruptions", "/images/commandsAndEvents/EruptionButton.png"),
+            Map.entry("drought", "/images/commandsAndEvents/DroughtButton.png"),
+            Map.entry("plague", "/images/commandsAndEvents/PlagueButton.png"),
+            Map.entry("nuke", "/images/commandsAndEvents/Nuke.png"),
+            Map.entry("world_war", "/images/commandsAndEvents/WorldWarButton.png"),
+            Map.entry("industrial_revolution", "/images/commandsAndEvents/IndustrializeButton.png"),
+            Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakThrough.png"),
+            Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
+    );
+
 
     private GameState state;
     private String activeEventTab = "all";
     private String activeSidebarTab = "stats";
     private String selectedEventId;
     private final Timeline yearTimeline;
-
+    private final FirebaseAuthService authService;
+    private final DatabaseController databaseController;
     private Runnable onSimulationEnd;
 
-    public SimulationView(PlanetConfig config) {
+    public SimulationView(PlanetConfig config, FirebaseAuthService authService, DatabaseController databaseController) {
+        this.authService = authService;
+        this.databaseController = databaseController;
         state = SimulationModel.buildInitialState(config);
         yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
@@ -90,6 +114,9 @@ public class SimulationView extends BorderPane {
         """);
         end.setOnAction(e -> {
             yearTimeline.stop();
+            System.out.println("IDToken: " + authService.getSaveIdToken());
+            System.out.println("LocalId: " + authService.getSaveLocalIdToken());
+            databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
             if (onSimulationEnd != null) {
                 onSimulationEnd.run();
             }
@@ -117,7 +144,9 @@ public class SimulationView extends BorderPane {
         ensureSelectedEvent();
 
         VBox sidebar = new VBox(12);
-        sidebar.setPrefWidth(380);
+        sidebar.setMinWidth(300);
+        sidebar.setPrefWidth(360);
+        sidebar.setMaxWidth(420);
         sidebar.setPadding(new Insets(14));
         sidebar.setStyle("""
             -fx-background-color:#020617;
@@ -139,7 +168,9 @@ public class SimulationView extends BorderPane {
         contentScroller.setFitToWidth(true);
         contentScroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         contentScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        contentScroller.setMaxWidth(Double.MAX_VALUE);
         contentScroller.setStyle("-fx-background:#020617; -fx-background-color:transparent;");
+        contentScroller.getStyleClass().add("sidebar-scroller");
 
         VBox.setVgrow(contentScroller, Priority.ALWAYS);
         sidebar.getChildren().addAll(title, tabs, contentScroller);
@@ -166,12 +197,15 @@ public class SimulationView extends BorderPane {
 
     private VBox buildStatsSidebar() {
         VBox content = new VBox(14);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
 
         Label summary = new Label("Global systems status across population, pressure, economy, and exposure.");
         summary.setWrapText(true);
         summary.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
 
         VBox stats = new VBox(10);
+        stats.setMaxWidth(Double.MAX_VALUE);
         stats.getChildren().addAll(
                 new StatBar("Population", state.globalStats.population),
                 new StatBar("Stress", state.globalStats.stress),
@@ -181,8 +215,11 @@ public class SimulationView extends BorderPane {
 
         Label regionsTitle = sectionLabel("Regions");
         VBox regionList = new VBox(10);
+        regionList.setMaxWidth(Double.MAX_VALUE);
         for (GameTypes.Region region : state.regions) {
-            regionList.getChildren().add(new RegionCard(region));
+            RegionCard card = new RegionCard(region);
+            card.setMaxWidth(Double.MAX_VALUE);
+            regionList.getChildren().add(card);
         }
 
         content.getChildren().addAll(summary, stats, regionsTitle, regionList);
@@ -191,6 +228,8 @@ public class SimulationView extends BorderPane {
 
     private VBox buildEventsSidebar() {
         VBox content = new VBox(12);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
 
         if (state.eventLog.isEmpty()) {
             Label empty = new Label("Trigger an event to see the event log and detailed breakdown here.");
@@ -204,6 +243,7 @@ public class SimulationView extends BorderPane {
         if (selected != null) {
             GameEventDef definition = findEventDef(selected);
             VBox detail = new VBox(8);
+            detail.setMaxWidth(Double.MAX_VALUE);
             detail.setPadding(new Insets(12));
             detail.setStyle("""
                 -fx-background-color:#0b1220;
@@ -251,6 +291,7 @@ public class SimulationView extends BorderPane {
 
         Label logTitle = sectionLabel("Event Log");
         VBox logList = new VBox(8);
+        logList.setMaxWidth(Double.MAX_VALUE);
         for (EventLogEntry entry : state.eventLog) {
             Button item = new Button(entry.eventName + " · Year " + entry.year);
             item.setMaxWidth(Double.MAX_VALUE);
@@ -270,6 +311,8 @@ public class SimulationView extends BorderPane {
 
     private VBox buildFeedSidebar() {
         VBox content = new VBox(12);
+        content.setMaxWidth(Double.MAX_VALUE);
+        content.setPadding(new Insets(0, 10, 0, 0));
         Label title = sectionLabel("World Feed");
         Label subtitle = new Label("Live reactions from citizens, analysts, and reporters across the planet.");
         subtitle.setWrapText(true);
@@ -308,9 +351,7 @@ public class SimulationView extends BorderPane {
         }
 
         for (GameEventDef event : filteredEvents) {
-            EventCard card = new EventCard(event);
-            card.setOnAction(e -> triggerEvent(event));
-            eventCards.getChildren().add(card);
+            eventCards.getChildren().add(createEventTrigger(event));
         }
 
         if (filteredEvents.isEmpty()) {
@@ -321,10 +362,12 @@ public class SimulationView extends BorderPane {
 
         ScrollPane eventScroller = new ScrollPane(eventCards);
         eventScroller.setFitToHeight(true);
+        eventScroller.setPrefViewportHeight(120);
+        eventScroller.setMinViewportHeight(120);
         eventScroller.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         eventScroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         eventScroller.setPannable(true);
-        eventScroller.setStyle("-fx-background:#0f172a; -fx-background-color:transparent;");
+        eventScroller.getStyleClass().add("event-browser-scroller");
 
         Label sectionTitle = new Label(EVENT_TAB_LABELS.get(activeEventTab));
         sectionTitle.setStyle("-fx-text-fill:white; -fx-font-size:16px; -fx-font-weight:bold;");
@@ -340,6 +383,37 @@ public class SimulationView extends BorderPane {
             selectedEventId = state.eventLog.get(0).id;
         }
         buildUI();
+    }
+
+    private Node createEventTrigger(GameEventDef event) {
+        String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
+        if (imagePath != null) {
+            try {
+                String imageUrl = getClass().getResource(imagePath).toExternalForm();
+                Image image = new Image(imageUrl);
+                if (image.isError() || image.getWidth() <= 0 || image.getHeight() <= 0) {
+                    return createFallbackEventCard(event);
+                }
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/event-image-button.fxml"));
+                Node imageButton = loader.load();
+                EventImageButtonController controller = loader.getController();
+                controller.setImage(imageUrl);
+                // controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
+                controller.setOnAction(e -> triggerEvent(event));
+                return imageButton;
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to load event image button for " + event.id + ".", e);
+            }
+        }
+
+        return createFallbackEventCard(event);
+    }
+
+    private EventCard createFallbackEventCard(GameEventDef event) {
+        EventCard card = new EventCard(event);
+        card.setOnAction(e -> triggerEvent(event));
+        return card;
     }
 
     private void ensureSelectedEvent() {
@@ -473,7 +547,7 @@ public class SimulationView extends BorderPane {
     }
 
     private String formatPopulationDelta(double value) {
-        return String.format("%+.0f%%", value);
+        return String.format("%+.1fB", value);
     }
 
     private void advanceYear() {

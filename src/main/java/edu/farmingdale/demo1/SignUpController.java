@@ -1,6 +1,11 @@
 package edu.farmingdale.demo1;
 
+import edu.farmingdale.demo1.Database.DatabaseController;
 import edu.farmingdale.demo1.Database.FirebaseAuthService;
+import edu.farmingdale.demo1.simulation.GameTypes;
+import edu.farmingdale.demo1.views.PlanetCreationView;
+import edu.farmingdale.demo1.views.SimulationView;
+import edu.farmingdale.demo1.views.SummaryView;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -52,7 +57,41 @@ public class SignUpController extends StartController{
 
         if (inputResponse == null) {
             if (service.signUp(email, password, username)) {
-                startForController(emailField);
+                // Auto login after signup
+                service.login(email, password);
+
+                // Go straight to game using same service instance
+                try {
+                    StackPane gameRoot = new StackPane();
+                    DatabaseController db = new DatabaseController();
+                    PlanetCreationView view = new PlanetCreationView(service, db);
+                    view.setOnSimulationStart(() -> {
+                        GameTypes.PlanetConfig config = view.getCreatedConfig();
+                        SimulationView sim = new SimulationView(config, service, db);
+                        sim.setOnSimulationEnd(() -> {
+                            GameTypes.GameState state = sim.getState();
+                            SummaryView summary = new SummaryView(state);
+                            summary.setOnRestart(() -> {
+                                PlanetCreationView restart = new PlanetCreationView(service, db);
+                                gameRoot.getChildren().setAll(restart);
+                            });
+                            gameRoot.getChildren().setAll(summary);
+                        });
+                        gameRoot.getChildren().setAll(sim);
+                    });
+                    gameRoot.getChildren().setAll(view);
+
+                    Scene scene = new Scene(gameRoot, 1000, 700);
+                    String stylesheet = getClass().getResource("/styles/dark-theme.css").toExternalForm();
+                    scene.getStylesheets().add(stylesheet);
+
+                    Stage stage = (Stage) rootPane.getScene().getWindow();
+                    stage.setScene(scene);
+                    stage.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    statusLabel.setText("Game load failed.");
+                }
                 return;
             }
             statusLabel.setText("Something went wrong, during the startup");
