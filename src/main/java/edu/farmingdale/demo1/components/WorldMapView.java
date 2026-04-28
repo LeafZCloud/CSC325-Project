@@ -75,6 +75,7 @@ public class WorldMapView extends Pane {
         ImagePattern planetWaterPattern = new ImagePattern(planetWater);
             // (this is a plain color used in testing) planet.setFill(Color.web("#1c6087"));
             // (this is a water texture used in testing) planet.setFill(planetWaterPattern);
+
         planet.setFill(planetWaterPattern);
         planet.setStroke(Color.BLACK);
         planet.setStrokeWidth(8);
@@ -103,11 +104,32 @@ public class WorldMapView extends Pane {
             Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
             Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.PNG").toExternalForm());
             Image forestMeteorImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
+            Image forestQuakeImage = new Image (getClass().getResource("/images/forestBiomeImages/earthquakeEventForest.PNG").toExternalForm());
+            Image forestIndustImage = new Image (getClass().getResource("/images/forestBiomeImages/industrializationEventForest.PNG").toExternalForm());
+            Image forestVolcanicImage = new Image (getClass().getResource("/images/forestBiomeImages/volcanicerruptionEventForest.PNG").toExternalForm());
+            Image forestDroughtImage = new Image (getClass().getResource("/images/forestBiomeImages/droughtEventForest.PNG").toExternalForm());
+            Image forestPlagueImage = new Image (getClass().getResource("/images/forestBiomeImages/plagueEventForest.PNG").toExternalForm());
+            Image forestNukeImage = new Image (getClass().getResource("/images/forestBiomeImages/nukeEventForest.PNG").toExternalForm());
+            Image forestWarImage = new Image (getClass().getResource("/images/forestBiomeImages/worldWarEventForest.PNG").toExternalForm());
+            Image forestMedicalImage = new Image (getClass().getResource("/images/forestBiomeImages/medicalBreakthroughEventForest.PNG").toExternalForm());
+            Image forestgoldenImage = new Image (getClass().getResource("/images/forestBiomeImages/goldenAgeEventForest.PNG").toExternalForm());
+
+
+
 
             //creating the image patterns
             ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
             ImagePattern forestBlizzPattern = new ImagePattern(forestBlizzImage);
             ImagePattern forestMeteorPattern = new ImagePattern(forestMeteorImage);
+            ImagePattern forestQuakePattern = new ImagePattern(forestQuakeImage);
+            ImagePattern forestIndustPattern = new ImagePattern(forestIndustImage);
+            ImagePattern forestVolcanicPattern = new ImagePattern(forestVolcanicImage);
+            ImagePattern forestDroughtPattern = new ImagePattern(forestDroughtImage);
+            ImagePattern forestPlaguePattern = new ImagePattern(forestPlagueImage);
+            ImagePattern forestNukePattern = new ImagePattern(forestNukeImage);
+            ImagePattern forestWarPattern = new ImagePattern(forestWarImage);
+            ImagePattern forestMedicalPattern = new ImagePattern(forestMedicalImage);
+            ImagePattern forestGoldenPattern = new ImagePattern(forestgoldenImage);
 
             //application of forestNorm
             poly.setFill(forestNormPattern);
@@ -130,15 +152,56 @@ public class WorldMapView extends Pane {
             if ("ice_age".equals(lastEventId)) {
                 poly.setFill(forestBlizzPattern);
                 poly.setStroke(Color.WHITE);
-            } else if (flashingRegions.contains(region.id)) {
-                color = Color.RED;
             }
 
             if ("meteor".equals(lastEventId)) {
                 poly.setFill(forestMeteorPattern);
                 poly.setStroke(Color.RED);
-            } else if (flashingRegions.contains(region.id)) {
-                color = Color.RED;
+            }
+
+            if ("earthquake".equals(lastEventId)) {
+                poly.setFill(forestQuakePattern);
+                poly.setStroke(Color.BROWN);
+            }
+
+            if ("industrial_revolution".equals(lastEventId)) {
+                poly.setFill(forestIndustPattern);
+                poly.setStroke(Color.BLACK);
+            }
+
+            if ("volcanic_eruptions".equals(lastEventId)) {
+                poly.setFill(forestVolcanicPattern);
+                poly.setStroke(Color.ORANGE);
+            }
+
+            if ("drought".equals(lastEventId)) {
+                poly.setFill(forestDroughtPattern);
+                poly.setStroke(Color.DARKORANGE);
+            }
+
+            if ("plague".equals(lastEventId)) {
+                poly.setFill(forestPlaguePattern);
+                poly.setStroke(Color.DARKGREEN);
+            }
+
+            if ("nuke".equals(lastEventId)) {
+                poly.setFill(forestNukePattern);
+                poly.setStroke(Color.DARKRED);
+            }
+
+            if ("world_war".equals(lastEventId)) {
+                poly.setFill(forestWarPattern);
+                poly.setStroke(Color.CRIMSON);
+            }
+
+            if ("medical_breakthrough".equals(lastEventId)) {
+                poly.setFill(forestMedicalPattern);
+                poly.setStroke(Color.LIGHTBLUE);
+            }
+
+            if ("golden_age".equals(lastEventId)) {
+                poly.setFill(forestGoldenPattern);
+                poly.setStroke(Color.GOLD);
             }
 
             poly.setOpacity(0.85);
