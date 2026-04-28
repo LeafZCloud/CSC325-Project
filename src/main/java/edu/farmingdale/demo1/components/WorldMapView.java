@@ -121,7 +121,7 @@ public class WorldMapView extends Pane {
             switch (lastEventId) {
                 case "ice_age" -> poly.setFill(FOREST_BLIZZ_PATTERN);
                 case "meteor" -> poly.setFill(FOREST_METEOR_PATTERN);
-                case "earthquake" -> poly.setFill(FOREST_QUAKE_PATTERN);
+                case "earthquakes" -> poly.setFill(FOREST_QUAKE_PATTERN);
                 case "industrial_revolution" -> poly.setFill(FOREST_INDUST_PATTERN);
                 case "volcanic_eruptions" -> poly.setFill(FOREST_VOLCANIC_PATTERN);
                 case "drought" -> poly.setFill(FOREST_DROUGHT_PATTERN);
