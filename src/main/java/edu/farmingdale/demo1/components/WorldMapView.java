@@ -28,8 +28,8 @@ import javafx.util.Duration;
 
 import javafx.scene.effect.DropShadow;
 
-
 public class WorldMapView extends Pane {
+
     private static final double PLANET_CENTER_X = 400;
     private static final double PLANET_CENTER_Y = 400;
     private static final double PLANET_RADIUS = 340;
@@ -38,28 +38,53 @@ public class WorldMapView extends Pane {
     private static final double BOTTOM_MARGIN = 120;
     private static final double WORLD_VERTICAL_BIAS = 0.43;
 
+    private static Image load(String path) {
+        return new Image(WorldMapView.class.getResource(path).toExternalForm());
+    }
+
+    private static final Image PLANET_WATER = load("/images/waterTexture2.JPG");
+
+    private static final Image FOREST_NORMAL = load("/images/forestBiomeImages/forestBiomeNormal.PNG");
+    private static final Image FOREST_BLIZZ = load("/images/forestBiomeImages/blizzardEventForest.PNG");
+    private static final Image FOREST_METEOR = load("/images/forestBiomeImages/meteorEventForest.PNG");
+    private static final Image FOREST_QUAKE = load("/images/forestBiomeImages/earthquakeEventForest.PNG");
+    private static final Image FOREST_INDUST = load("/images/forestBiomeImages/industrializationEventForest.PNG");
+    private static final Image FOREST_VOLCANIC = load("/images/forestBiomeImages/volcanicerruptionEventForest.PNG");
+    private static final Image FOREST_DROUGHT = load("/images/forestBiomeImages/droughtEventForest.PNG");
+    private static final Image FOREST_PLAGUE = load("/images/forestBiomeImages/plagueEventForest.PNG");
+    private static final Image FOREST_NUKE = load("/images/forestBiomeImages/nukeEventForest.PNG");
+    private static final Image FOREST_WAR = load("/images/forestBiomeImages/worldWarEventForest.PNG");
+    private static final Image FOREST_MEDICAL = load("/images/forestBiomeImages/medicalBreakthroughEventForest.PNG");
+    private static final Image FOREST_GOLDEN = load("/images/forestBiomeImages/goldenAgeEventForest.PNG");
+
+    private static final ImagePattern FOREST_NORMAL_PATTERN = new ImagePattern(FOREST_NORMAL);
+    private static final ImagePattern FOREST_BLIZZ_PATTERN = new ImagePattern(FOREST_BLIZZ);
+    private static final ImagePattern FOREST_METEOR_PATTERN = new ImagePattern(FOREST_METEOR);
+    private static final ImagePattern FOREST_QUAKE_PATTERN = new ImagePattern(FOREST_QUAKE);
+    private static final ImagePattern FOREST_INDUST_PATTERN = new ImagePattern(FOREST_INDUST);
+    private static final ImagePattern FOREST_VOLCANIC_PATTERN = new ImagePattern(FOREST_VOLCANIC);
+    private static final ImagePattern FOREST_DROUGHT_PATTERN = new ImagePattern(FOREST_DROUGHT);
+    private static final ImagePattern FOREST_PLAGUE_PATTERN = new ImagePattern(FOREST_PLAGUE);
+    private static final ImagePattern FOREST_NUKE_PATTERN = new ImagePattern(FOREST_NUKE);
+    private static final ImagePattern FOREST_WAR_PATTERN = new ImagePattern(FOREST_WAR);
+    private static final ImagePattern FOREST_MEDICAL_PATTERN = new ImagePattern(FOREST_MEDICAL);
+    private static final ImagePattern FOREST_GOLDEN_PATTERN = new ImagePattern(FOREST_GOLDEN);
+
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
         setPrefSize(1500, 1500);
         Group worldGroup = new Group();
 
-        // Stars
         List<WorldMapModel.Star> stars = WorldMapModel.generateStars(42);
 
         for (WorldMapModel.Star s : stars) {
             Circle star = new Circle(s.x, s.y, s.radius);
             star.setFill(Color.WHITE);
-
-            // base opacity
             star.setOpacity(s.opacity);
 
             Timeline twinkle = new Timeline(
-                    new KeyFrame(Duration.seconds(0), e -> {
-                        star.setOpacity(s.opacity);
-                    }),
-                    new KeyFrame(Duration.seconds(.2), e -> {
-                        star.setOpacity(s.opacity * (0.5 + Math.random()));
-                    })
+                    new KeyFrame(Duration.seconds(0), e -> star.setOpacity(s.opacity)),
+                    new KeyFrame(Duration.seconds(.2), e -> star.setOpacity(s.opacity * (0.5 + Math.random())))
             );
 
             twinkle.setCycleCount(Animation.INDEFINITE);
@@ -69,30 +94,21 @@ public class WorldMapView extends Pane {
             getChildren().add(star);
         }
 
-        // Planet base
         Circle planet = new Circle(PLANET_CENTER_X, PLANET_CENTER_Y, PLANET_RADIUS);
-        Image planetWater = new Image (getClass().getResource("/images/waterTexture2.JPG").toExternalForm());
-        ImagePattern planetWaterPattern = new ImagePattern(planetWater);
-            // (this is a plain color used in testing) planet.setFill(Color.web("#1c6087"));
-            // (this is a water texture used in testing) planet.setFill(planetWaterPattern);
-
-        planet.setFill(planetWaterPattern);
+        planet.setFill(new ImagePattern(PLANET_WATER));
         planet.setStroke(Color.BLACK);
         planet.setStrokeWidth(8);
         worldGroup.getChildren().add(planet);
 
         addMoons(worldGroup, config);
 
-        // Continents / Regions
         for (Region region : regions) {
 
             String pts = GameTypes.CONTINENT_POLYGONS[region.polygonIndex];
 
             Polygon poly = new Polygon();
 
-            String[] pairs = pts.split(" ");
-
-            for (String pair : pairs) {
+            for (String pair : pts.split(" ")) {
                 String[] xy = pair.split(",");
                 poly.getPoints().addAll(
                         Double.parseDouble(xy[0]),
@@ -100,119 +116,39 @@ public class WorldMapView extends Pane {
                 );
             }
 
-            //loading the images
-            Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
-            Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.PNG").toExternalForm());
-            Image forestMeteorImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
-            Image forestQuakeImage = new Image (getClass().getResource("/images/forestBiomeImages/earthquakeEventForest.PNG").toExternalForm());
-            Image forestIndustImage = new Image (getClass().getResource("/images/forestBiomeImages/industrializationEventForest.PNG").toExternalForm());
-            Image forestVolcanicImage = new Image (getClass().getResource("/images/forestBiomeImages/volcanicerruptionEventForest.PNG").toExternalForm());
-            Image forestDroughtImage = new Image (getClass().getResource("/images/forestBiomeImages/droughtEventForest.PNG").toExternalForm());
-            Image forestPlagueImage = new Image (getClass().getResource("/images/forestBiomeImages/plagueEventForest.PNG").toExternalForm());
-            Image forestNukeImage = new Image (getClass().getResource("/images/forestBiomeImages/nukeEventForest.PNG").toExternalForm());
-            Image forestWarImage = new Image (getClass().getResource("/images/forestBiomeImages/worldWarEventForest.PNG").toExternalForm());
-            Image forestMedicalImage = new Image (getClass().getResource("/images/forestBiomeImages/medicalBreakthroughEventForest.PNG").toExternalForm());
-            Image forestgoldenImage = new Image (getClass().getResource("/images/forestBiomeImages/goldenAgeEventForest.PNG").toExternalForm());
+            poly.setFill(FOREST_NORMAL_PATTERN);
 
+            switch (lastEventId) {
+                case "ice_age" -> poly.setFill(FOREST_BLIZZ_PATTERN);
+                case "meteor" -> poly.setFill(FOREST_METEOR_PATTERN);
+                case "earthquake" -> poly.setFill(FOREST_QUAKE_PATTERN);
+                case "industrial_revolution" -> poly.setFill(FOREST_INDUST_PATTERN);
+                case "volcanic_eruptions" -> poly.setFill(FOREST_VOLCANIC_PATTERN);
+                case "drought" -> poly.setFill(FOREST_DROUGHT_PATTERN);
+                case "plague" -> poly.setFill(FOREST_PLAGUE_PATTERN);
+                case "nuke" -> poly.setFill(FOREST_NUKE_PATTERN);
+                case "world_war" -> poly.setFill(FOREST_WAR_PATTERN);
+                case "medical_breakthrough" -> poly.setFill(FOREST_MEDICAL_PATTERN);
+                case "golden_age" -> poly.setFill(FOREST_GOLDEN_PATTERN);
+            }
 
-
-
-            //creating the image patterns
-            ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
-            ImagePattern forestBlizzPattern = new ImagePattern(forestBlizzImage);
-            ImagePattern forestMeteorPattern = new ImagePattern(forestMeteorImage);
-            ImagePattern forestQuakePattern = new ImagePattern(forestQuakeImage);
-            ImagePattern forestIndustPattern = new ImagePattern(forestIndustImage);
-            ImagePattern forestVolcanicPattern = new ImagePattern(forestVolcanicImage);
-            ImagePattern forestDroughtPattern = new ImagePattern(forestDroughtImage);
-            ImagePattern forestPlaguePattern = new ImagePattern(forestPlagueImage);
-            ImagePattern forestNukePattern = new ImagePattern(forestNukeImage);
-            ImagePattern forestWarPattern = new ImagePattern(forestWarImage);
-            ImagePattern forestMedicalPattern = new ImagePattern(forestMedicalImage);
-            ImagePattern forestGoldenPattern = new ImagePattern(forestgoldenImage);
-
-            //application of forestNorm
-            poly.setFill(forestNormPattern);
-            // (used in testing dark green vs. black) poly.setStroke(Color.web("#123808"));
             poly.setStroke(Color.BLACK);
             poly.setStrokeWidth(2);
+            poly.setOpacity(0.85);
 
-            //shadow for the continents
             DropShadow shadow = new DropShadow();
             shadow.setRadius(18);
             shadow.setOffsetX(5);
             shadow.setOffsetY(5);
             shadow.setColor(Color.rgb(0, 0, 0, 0.6));
-
             poly.setEffect(shadow);
-
-
-            Color color = Color.web(GameTypes.regionHealthColor(region));
-
-            if ("ice_age".equals(lastEventId)) {
-                poly.setFill(forestBlizzPattern);
-                poly.setStroke(Color.WHITE);
-            }
-
-            if ("meteor".equals(lastEventId)) {
-                poly.setFill(forestMeteorPattern);
-                poly.setStroke(Color.RED);
-            }
-
-            if ("earthquake".equals(lastEventId)) {
-                poly.setFill(forestQuakePattern);
-                poly.setStroke(Color.BROWN);
-            }
-
-            if ("industrial_revolution".equals(lastEventId)) {
-                poly.setFill(forestIndustPattern);
-                poly.setStroke(Color.BLACK);
-            }
-
-            if ("volcanic_eruptions".equals(lastEventId)) {
-                poly.setFill(forestVolcanicPattern);
-                poly.setStroke(Color.ORANGE);
-            }
-
-            if ("drought".equals(lastEventId)) {
-                poly.setFill(forestDroughtPattern);
-                poly.setStroke(Color.DARKORANGE);
-            }
-
-            if ("plague".equals(lastEventId)) {
-                poly.setFill(forestPlaguePattern);
-                poly.setStroke(Color.DARKGREEN);
-            }
-
-            if ("nuke".equals(lastEventId)) {
-                poly.setFill(forestNukePattern);
-                poly.setStroke(Color.DARKRED);
-            }
-
-            if ("world_war".equals(lastEventId)) {
-                poly.setFill(forestWarPattern);
-                poly.setStroke(Color.CRIMSON);
-            }
-
-            if ("medical_breakthrough".equals(lastEventId)) {
-                poly.setFill(forestMedicalPattern);
-                poly.setStroke(Color.LIGHTBLUE);
-            }
-
-            if ("golden_age".equals(lastEventId)) {
-                poly.setFill(forestGoldenPattern);
-                poly.setStroke(Color.GOLD);
-            }
-
-            poly.setOpacity(0.85);
 
             worldGroup.getChildren().add(poly);
 
-            // Region label
             double[] centroid = WorldMapModel.getCentroid(pts);
 
             Text label = new Text(region.name);
-            label.setFill(Color.web("#ffffff"));
+            label.setFill(Color.WHITE);
             label.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 18));
             label.setStroke(Color.rgb(0, 0, 0, 0.95));
             label.setStrokeType(StrokeType.OUTSIDE);
