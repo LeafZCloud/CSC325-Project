@@ -93,16 +93,40 @@ public class SimulationModel {
 
         state.year = 2157;
         state.feedPosts = generateOpeningFeedPosts(state);
+        state.lastTriggeredCheckYear = state.year;
 
         return state;
     }
 
     public static GameState applyEvent(GameState state, GameEventDef event) {
+        return applySingleEvent(state, event, true);
+    }
+
+    public static GameState applyPlayerCommand(GameState state, GameEventDef event) {
+        GameState updatedState = applySingleEvent(state, event, true);
+        updatedState.commandHistory.add(event.id);
+        updatedState.pendingTriggeredEventId = null;
+
+        if (updatedState.year - updatedState.lastTriggeredCheckYear >= 5) {
+            GameEventDef triggeredEvent = determineTriggeredEvent(updatedState);
+            updatedState.lastTriggeredCheckYear = updatedState.year;
+
+            if (triggeredEvent != null) {
+                updatedState = applySingleEvent(updatedState, triggeredEvent, false);
+                updatedState.pendingTriggeredEventId = triggeredEvent.id;
+                updatedState.lastTriggeredCheckYear = updatedState.year;
+            }
+        }
+
+        return updatedState;
+    }
+
+    private static GameState applySingleEvent(GameState state, GameEventDef event, boolean advanceYear) {
 
         GameState newState = new GameState();
 
         newState.planet = state.planet;
-        newState.year = state.year + 1;
+        newState.year = state.year + (advanceYear ? 1 : 0);
 
         newState.regions = new ArrayList<>();
         newState.eventLog = new ArrayList<>(state.eventLog);
@@ -110,6 +134,11 @@ public class SimulationModel {
         newState.cooldowns = new HashMap<>(state.cooldowns);
         newState.flashingRegions = new HashSet<>();
         newState.lastEventId = event.id;
+        newState.commandHistory = new ArrayList<>(state.commandHistory);
+        newState.lowEconomyStreak = state.lowEconomyStreak;
+        newState.temperatureVolatility = state.temperatureVolatility;
+        newState.pendingTriggeredEventId = state.pendingTriggeredEventId;
+        newState.lastTriggeredCheckYear = state.lastTriggeredCheckYear;
 
         // Start with a copy of the previous global stats
         GlobalStats gs = new GlobalStats(
@@ -207,10 +236,11 @@ public class SimulationModel {
         gs.exposure = (int) Math.round(totalExposure);
 
         newState.globalStats = gs;
+        updateTrendTrackers(newState, event);
 
         EventLogEntry logEntry = new EventLogEntry(
                 generateId(),
-                state.year,
+                newState.year,
                 event.name,
                 event.emoji,
                 event.category,
@@ -224,10 +254,150 @@ public class SimulationModel {
         );
 
         newState.eventLog.add(0, logEntry);
-        newState.cooldowns.put(event.id, state.year + event.cooldown);
+        newState.cooldowns.put(event.id, newState.year + event.cooldown);
         newState.feedPosts.addAll(0, generateEventFeedPosts(newState, event, affectedRegions));
 
         return newState;
+    }
+
+    private static void updateTrendTrackers(GameState state, GameEventDef event) {
+        if (state.globalStats.economicHealth <= 35) {
+            state.lowEconomyStreak += 1;
+        } else {
+            state.lowEconomyStreak = 0;
+        }
+
+        int volatilityShift = switch (event.id) {
+            case "ice_age" -> 45;
+            case "drought" -> 30;
+            case "volcanic_eruptions" -> 22;
+            case "meteor" -> 12;
+            case "industrial_revolution" -> 4;
+            case "medical_breakthrough", "economic_boom" -> -16;
+            default -> -8;
+        };
+
+        state.temperatureVolatility = Math.max(0, Math.min(100, state.temperatureVolatility + volatilityShift));
+    }
+
+    private static GameEventDef determineTriggeredEvent(GameState state) {
+        if (shouldTriggerTsunami(state)) {
+            return GameTypes.findEventById("tsunami");
+        }
+
+        if (shouldTriggerIceAge(state)) {
+            return GameTypes.findEventById("ice_age");
+        }
+
+        if (shouldTriggerVirus(state)) {
+            return GameTypes.findEventById("virus");
+        }
+
+        if (shouldTriggerFamine(state)) {
+            return GameTypes.findEventById("famine");
+        }
+
+        if (shouldTriggerRebellion(state)) {
+            return GameTypes.findEventById("rebellion");
+        }
+
+        if (shouldTriggerDepression(state)) {
+            return GameTypes.findEventById("depression");
+        }
+
+        if (shouldTriggerEconomicBoom(state)) {
+            return GameTypes.findEventById("economic_boom");
+        }
+
+        return null;
+    }
+
+    private static boolean shouldTriggerTsunami(GameState state) {
+        return state.planet != null
+                && state.planet.moons >= 3
+                && isAvailable(state, "tsunami");
+    }
+
+    private static boolean shouldTriggerIceAge(GameState state) {
+        int meteorCount = 0;
+        int startIndex = Math.max(0, state.commandHistory.size() - 3);
+
+        for (int i = startIndex; i < state.commandHistory.size(); i++) {
+            if ("meteor".equals(state.commandHistory.get(i))) {
+                meteorCount += 1;
+            }
+        }
+
+        return meteorCount >= 2 && isAvailable(state, "ice_age");
+    }
+
+    private static boolean shouldTriggerVirus(GameState state) {
+        return state.temperatureVolatility >= 60 && isAvailable(state, "virus");
+    }
+
+    private static boolean shouldTriggerFamine(GameState state) {
+        return (hasRecentEvent(state, "Ice Age", 2) || hasRecentEvent(state, "Drought", 2))
+                && isAvailable(state, "famine");
+    }
+
+    private static boolean shouldTriggerRebellion(GameState state) {
+        return state.globalStats.stress >= 70
+                && state.globalStats.economicHealth <= 35
+                && isAvailable(state, "rebellion");
+    }
+
+    private static boolean shouldTriggerDepression(GameState state) {
+        return state.globalStats.economicHealth <= 35
+                && (state.lowEconomyStreak >= 2 || countRecentDisasters(state, 4) >= 3)
+                && isAvailable(state, "depression");
+    }
+
+    private static boolean shouldTriggerEconomicBoom(GameState state) {
+        return state.globalStats.economicHealth >= 72
+                && state.globalStats.stress <= 28
+                && isAvailable(state, "economic_boom");
+    }
+
+    private static boolean isAvailable(GameState state, String eventId) {
+        Integer nextAvailableYear = state.cooldowns.get(eventId);
+        return nextAvailableYear == null || state.year >= nextAvailableYear;
+    }
+
+    private static int countRecentDisasters(GameState state, int limit) {
+        int disasterCount = 0;
+        int checked = 0;
+
+        for (EventLogEntry entry : state.eventLog) {
+            if (checked >= limit) {
+                break;
+            }
+
+            if ("disaster".equals(entry.category) || "conflict".equals(entry.category)) {
+                disasterCount += 1;
+            }
+
+            checked += 1;
+        }
+
+        return disasterCount;
+    }
+
+    private static boolean hasRecentEvent(GameState state, String eventName, int limit) {
+        int checked = 0;
+
+        for (EventLogEntry entry : state.eventLog) {
+            if (checked >= limit) {
+                break;
+            }
+
+            if (eventName.equals(entry.eventName)) {
+                return true;
+            }
+
+            checked += 1;
+        }
+
+        return false;
     }
 
     private static List<GameTypes.FeedPost> generateOpeningFeedPosts(GameState state) {

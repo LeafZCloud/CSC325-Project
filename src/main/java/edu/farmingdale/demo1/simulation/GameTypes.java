@@ -1,6 +1,7 @@
 package edu.farmingdale.demo1.simulation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -185,6 +186,11 @@ public class GameTypes {
         public Map<String, Integer> cooldowns;
         public Set<String> flashingRegions;
         public String lastEventId;
+        public List<String> commandHistory;
+        public int lowEconomyStreak;
+        public int temperatureVolatility;
+        public String pendingTriggeredEventId;
+        public int lastTriggeredCheckYear;
 
         public GameState() {
             regions = new ArrayList<>();
@@ -193,6 +199,11 @@ public class GameTypes {
             cooldowns = new HashMap<>();
             flashingRegions = new HashSet<>();
             lastEventId = "";
+            commandHistory = new ArrayList<>();
+            lowEconomyStreak = 0;
+            temperatureVolatility = 0;
+            pendingTriggeredEventId = null;
+            lastTriggeredCheckYear = 0;
         }
     }
 
@@ -266,6 +277,7 @@ public class GameTypes {
      ------------------------- */
 
     public static final List<GameEventDef> GAME_EVENTS = new ArrayList<>();
+    public static final List<GameEventDef> TRIGGERED_EVENTS = new ArrayList<>();
 
     static {
 
@@ -466,5 +478,142 @@ public class GameTypes {
                         7
                 )
         );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "tsunami",
+                        "Tsunami",
+                        "disaster",
+                        "",
+                        "A massive wave floods coastal regions and destroys infrastructure.",
+                        "The extra moons drag the oceans into chaos.",
+                        new EventEffect(-0.05, 18, -14, 18),
+                        new EventEffect(-0.14, 28, -22, 20),
+                        "random",
+                        2,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "virus",
+                        "Virus",
+                        "disaster",
+                        "",
+                        "Rapid environmental changes unleash a deadly global virus.",
+                        "The biosphere mutates faster than medicine can react.",
+                        new EventEffect(-0.09, 24, -15, 12),
+                        new EventEffect(-0.12, 32, -18, 14),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        6
+                )
+        );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "depression",
+                        "Depression",
+                        "society",
+                        "",
+                        "The economy collapses, leading to job loss and instability.",
+                        "Confidence disappears and markets freeze.",
+                        new EventEffect(-0.03, 20, -20, 6),
+                        new EventEffect(-0.04, 24, -24, 8),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        7
+                )
+        );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "famine",
+                        "Famine",
+                        "disaster",
+                        "",
+                        "Food shortages spread and population begins to decline.",
+                        "Fields fail, storage empties, and hunger takes over.",
+                        new EventEffect(-0.10, 16, -12, 8),
+                        new EventEffect(-0.14, 20, -16, 10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        5
+                )
+        );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "rebellion",
+                        "Rebellion",
+                        "conflict",
+                        "",
+                        "High stress and a failing economy push citizens into revolt.",
+                        "Order breaks down as the population turns on leadership.",
+                        new EventEffect(-0.04, 22, -12, 8),
+                        new EventEffect(-0.06, 30, -16, 10),
+                        "random",
+                        3,
+                        new ArrayList<>(),
+                        6
+                )
+        );
+
+        TRIGGERED_EVENTS.add(
+                new GameEventDef(
+                        "economic_boom",
+                        "Economic Boom",
+                        "technology",
+                        "",
+                        "Strong growth boosts jobs, production, and morale.",
+                        "Stable systems open the door to rapid expansion.",
+                        new EventEffect(0.06, -10, 18, -8),
+                        new EventEffect(0.08, -12, 20, -10),
+                        "all",
+                        0,
+                        new ArrayList<>(),
+                        6
+                )
+        );
+    }
+
+    public static GameEventDef findEventById(String id) {
+        for (GameEventDef event : GAME_EVENTS) {
+            if (event.id.equals(id)) {
+                return event;
+            }
+        }
+
+        for (GameEventDef event : TRIGGERED_EVENTS) {
+            if (event.id.equals(id)) {
+                return event;
+            }
+        }
+
+        return null;
+    }
+
+    public static List<GameEventDef> allEvents() {
+        List<GameEventDef> events = new ArrayList<>(GAME_EVENTS);
+        events.addAll(TRIGGERED_EVENTS);
+        return events;
+    }
+
+    public static List<GameEventDef> playerCommandEvents() {
+        List<GameEventDef> events = new ArrayList<>();
+
+        for (GameEventDef event : GAME_EVENTS) {
+            if ("ice_age".equals(event.id) || "world_war".equals(event.id) || "golden_age".equals(event.id)) {
+                continue;
+            }
+            events.add(event);
+        }
+
+        return Collections.unmodifiableList(events);
     }
 }
