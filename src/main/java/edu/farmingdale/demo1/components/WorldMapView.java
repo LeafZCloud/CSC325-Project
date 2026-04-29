@@ -35,8 +35,9 @@ public class WorldMapView extends Pane {
     private static final double PLANET_RADIUS = 340;
     private static final double HORIZONTAL_MARGIN = 48;
     private static final double TOP_MARGIN = 36;
-    private static final double BOTTOM_MARGIN = 120;
-    private static final double WORLD_VERTICAL_BIAS = 0.43;
+    private static final double BOTTOM_MARGIN = 36;
+    private static final double WORLD_FILL = 0.9;
+    private static final double MAX_WORLD_SCALE = 1.08;
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
@@ -226,9 +227,9 @@ public class WorldMapView extends Pane {
         double usableWidth = Math.max(1, availableWidth - (HORIZONTAL_MARGIN * 2));
         double usableHeight = Math.max(1, availableHeight - TOP_MARGIN - BOTTOM_MARGIN);
 
-        double scaleX = (usableWidth * 0.82) / worldWidth;
-        double scaleY = (usableHeight * 0.82) / worldHeight;
-        double scale = Math.min(1.0, Math.min(scaleX, scaleY));
+        double scaleX = (usableWidth * WORLD_FILL) / worldWidth;
+        double scaleY = (usableHeight * WORLD_FILL) / worldHeight;
+        double scale = Math.min(MAX_WORLD_SCALE, Math.min(scaleX, scaleY));
 
         worldGroup.setScaleX(scale);
         worldGroup.setScaleY(scale);
@@ -236,10 +237,13 @@ public class WorldMapView extends Pane {
         double worldCenterX = worldGroup.getLayoutBounds().getMinX() + (worldWidth / 2.0);
         double worldCenterY = worldGroup.getLayoutBounds().getMinY() + (worldHeight / 2.0);
         double targetCenterX = availableWidth / 2.0;
-        double targetCenterY = TOP_MARGIN + (usableHeight * WORLD_VERTICAL_BIAS);
+        double targetCenterY = availableHeight / 2.0;
 
-        worldGroup.setLayoutX(targetCenterX - (worldCenterX * scale));
-        worldGroup.setLayoutY(targetCenterY - (worldCenterY * scale));
+        double scaledPlanetCenterX = worldCenterX + ((PLANET_CENTER_X - worldCenterX) * scale);
+        double scaledPlanetCenterY = worldCenterY + ((PLANET_CENTER_Y - worldCenterY) * scale);
+
+        worldGroup.setLayoutX(targetCenterX - scaledPlanetCenterX);
+        worldGroup.setLayoutY(targetCenterY - scaledPlanetCenterY);
     }
 
     private double distanceFromPlanetCenter(double x, double y) {
