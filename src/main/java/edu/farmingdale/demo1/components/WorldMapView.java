@@ -145,6 +145,10 @@ public class WorldMapView extends Pane {
 
             worldGroup.getChildren().add(poly);
 
+            if (lastEventId.equals("earthquakes")) {
+                shakePolygon(poly);
+            }
+
             double[] centroid = WorldMapModel.getCentroid(pts);
 
             Text label = new Text(region.name);
@@ -178,6 +182,24 @@ public class WorldMapView extends Pane {
 
         centerWorld(worldGroup);
     }
+
+    private void shakePolygon(Polygon poly) {
+        Timeline shake = new Timeline(
+                new KeyFrame(Duration.millis(0), e -> poly.setTranslateX(0)),
+                new KeyFrame(Duration.millis(25), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(50), e -> poly.setTranslateX(5)),
+                new KeyFrame(Duration.millis(75), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(100), e -> poly.setTranslateX(5))
+        );
+
+        shake.setCycleCount(8); // faster total duration
+        shake.setAutoReverse(false);
+
+        shake.setOnFinished(e -> poly.setTranslateX(0));
+
+        shake.play();
+    }
+
 
     private void addMoons(Group worldGroup, PlanetConfig config) {
         int moonCount = Math.max(0, Math.min(3, config != null ? config.moons : 0));
