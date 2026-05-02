@@ -120,17 +120,32 @@ public class WorldMapView extends Pane {
 
             switch (lastEventId) {
                 case "ice_age" -> poly.setFill(FOREST_BLIZZ_PATTERN);
-                case "meteor" -> poly.setFill(FOREST_METEOR_PATTERN);
-                case "earthquakes" -> poly.setFill(FOREST_QUAKE_PATTERN);
-                case "industrial_revolution" -> poly.setFill(FOREST_INDUST_PATTERN);
-                case "volcanic_eruptions" -> poly.setFill(FOREST_VOLCANIC_PATTERN);
-                case "drought" -> poly.setFill(FOREST_DROUGHT_PATTERN);
-                case "plague" -> poly.setFill(FOREST_PLAGUE_PATTERN);
-                case "nuke" -> poly.setFill(FOREST_NUKE_PATTERN);
-                case "world_war" -> poly.setFill(FOREST_WAR_PATTERN);
-                case "medical_breakthrough" -> poly.setFill(FOREST_MEDICAL_PATTERN);
-                case "golden_age" -> poly.setFill(FOREST_GOLDEN_PATTERN);
-            }
+                    case "earthquake", "earthquakes" -> {
+                        poly.setFill(FOREST_QUAKE_PATTERN);
+                        shakePolygon(poly);
+                    }
+                        case "meteor" -> {
+                        poly.setFill(FOREST_METEOR_PATTERN);
+                        shakePolygon(poly);
+                        }
+                            case "industrial_revolution" -> poly.setFill(FOREST_INDUST_PATTERN);
+                                case "volcanic_eruptions" -> {
+                                    poly.setFill(FOREST_VOLCANIC_PATTERN);
+                                    shakePolygon(poly);
+                                    }
+                                        case "drought" -> poly.setFill(FOREST_DROUGHT_PATTERN);
+                                            case "plague" -> poly.setFill(FOREST_PLAGUE_PATTERN);
+                                                case "nuke" -> {
+                                                    poly.setFill(FOREST_NUKE_PATTERN);
+                                                    shakePolygon(poly);
+                                                    }
+                                                        case "world_war" -> {
+                                                        poly.setFill(FOREST_WAR_PATTERN);
+                                                        shakePolygon(poly);
+                                                        }
+                                                            case "medical_breakthrough" -> poly.setFill(FOREST_MEDICAL_PATTERN);
+                                                                case "golden_age" -> poly.setFill(FOREST_GOLDEN_PATTERN);
+                                                                }
 
             poly.setStroke(Color.BLACK);
             poly.setStrokeWidth(2);
@@ -144,10 +159,6 @@ public class WorldMapView extends Pane {
             poly.setEffect(shadow);
 
             worldGroup.getChildren().add(poly);
-
-            if (lastEventId.equals("earthquakes")) {
-                shakePolygon(poly);
-            }
 
             double[] centroid = WorldMapModel.getCentroid(pts);
 
