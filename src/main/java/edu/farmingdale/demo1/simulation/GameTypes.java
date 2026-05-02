@@ -280,6 +280,8 @@ public class GameTypes {
     public static final List<GameEventDef> TRIGGERED_EVENTS = new ArrayList<>();
 
     static {
+
+        //applied image for meteor event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "meteor",
@@ -297,6 +299,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for earthquake event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "earthquakes",
@@ -314,6 +317,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for ice age event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "ice_age",
@@ -331,6 +335,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for volcanic eruption event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "volcanic_eruptions",
@@ -348,6 +353,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for volcanic eruption event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "drought",
@@ -365,6 +371,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for plague event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "plague",
@@ -382,6 +389,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for nuke event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "nuke",
@@ -399,6 +407,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for world_war event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "world_war",
@@ -416,6 +425,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for industrial_revolution event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "industrial_revolution",
@@ -433,6 +443,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for medical_breakthrough event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "medical_breakthrough",
@@ -450,6 +461,7 @@ public class GameTypes {
                 )
         );
 
+        //applied image for golden_age event
         GAME_EVENTS.add(
                 new GameEventDef(
                         "golden_age",
