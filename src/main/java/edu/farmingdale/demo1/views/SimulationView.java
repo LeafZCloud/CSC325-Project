@@ -30,7 +30,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -72,6 +71,7 @@ public class SimulationView extends BorderPane {
             Map.entry("rebellion", "/images/commandsAndEvents/RebellionEvent.png"),
             Map.entry("economic_boom", "/images/commandsAndEvents/EcoBoomEvent.png")
     );
+    private static final int MAX_FEED_POSTS = 50;
 
 
     private GameState state;
@@ -84,6 +84,7 @@ public class SimulationView extends BorderPane {
 
     private final FirebaseAuthService authService;
     private final DatabaseController databaseController;
+    private final Timeline liveFeedTimeline;
     private Runnable onSimulationEnd;
 
     public SimulationView(PlanetConfig config, FirebaseAuthService authService, DatabaseController databaseController) {
@@ -93,6 +94,9 @@ public class SimulationView extends BorderPane {
         yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
         yearTimeline.play();
+        liveFeedTimeline = new Timeline(new KeyFrame(Duration.seconds(5), e -> addLiveFeedPost()));
+        liveFeedTimeline.setCycleCount(Animation.INDEFINITE);
+        liveFeedTimeline.play();
         popupTimer = new PauseTransition(Duration.seconds(5));
         popupTimer.setOnFinished(e -> clearPopup());
         buildUI();
@@ -131,7 +135,7 @@ public class SimulationView extends BorderPane {
         setTop(buildTopBar());
     }
 
-    private HBox buildTopBar() {
+    private Node buildTopBar() {
         Button end = new Button("End Simulation");
         end.setStyle("""
             -fx-background-color:#ef4444;
@@ -142,6 +146,7 @@ public class SimulationView extends BorderPane {
         """);
         end.setOnAction(e -> {
             yearTimeline.stop();
+            liveFeedTimeline.stop();
             System.out.println("IDToken: " + authService.getSaveIdToken());
             System.out.println("LocalId: " + authService.getSaveLocalIdToken());
             databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
@@ -158,14 +163,56 @@ public class SimulationView extends BorderPane {
 
         VBox titleBlock = new VBox(2, year, world);
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox topStats = buildTopStatsSummary();
 
-        HBox topBar = new HBox(12, titleBlock, spacer, end);
+        StackPane topBar = new StackPane(titleBlock, topStats, end);
         topBar.setPadding(new Insets(14, 18, 8, 18));
-        topBar.setAlignment(Pos.CENTER_LEFT);
+        StackPane.setAlignment(titleBlock, Pos.CENTER_LEFT);
+        StackPane.setAlignment(topStats, Pos.CENTER);
+        StackPane.setAlignment(end, Pos.CENTER_RIGHT);
         topBar.setStyle("-fx-background-color:rgba(2,6,23,0.72);");
         return topBar;
+    }
+
+    private HBox buildTopStatsSummary() {
+        HBox stats = new HBox(18);
+        stats.setAlignment(Pos.CENTER);
+        stats.setMouseTransparent(true);
+        stats.getChildren().addAll(
+                createTopStat("Pop", String.format("%.1fB", state.globalStats.population), "#ef4444"),
+                createTopStat("Stress", state.globalStats.stress + "%", statStatusColor("Stress", state.globalStats.stress)),
+                createTopStat("Economy", state.globalStats.economicHealth + "%", statStatusColor("Economic Health", state.globalStats.economicHealth)),
+                createTopStat("Exposure", state.globalStats.exposure + "%", statStatusColor("Exposure to Events", state.globalStats.exposure))
+        );
+        return stats;
+    }
+
+    private HBox createTopStat(String label, String value, String valueColor) {
+        Label title = new Label(label);
+        title.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
+
+        Label amount = new Label(value);
+        amount.setStyle("-fx-text-fill:" + valueColor + "; -fx-font-size:12px; -fx-font-weight:bold;");
+
+        HBox stat = new HBox(4, title, amount);
+        stat.setAlignment(Pos.CENTER);
+        return stat;
+    }
+
+    private String statStatusColor(String label, double value) {
+        if (label.equalsIgnoreCase("Stress") || label.equalsIgnoreCase("Exposure to Events")) {
+            if (value > 75) return "#ef4444";
+            if (value > 45) return "#f59e0b";
+            return "#22c55e";
+        }
+
+        if (label.equalsIgnoreCase("Economic Health")) {
+            if (value < 35) return "#ef4444";
+            if (value < 60) return "#f59e0b";
+            return "#22c55e";
+        }
+
+        return "#e2e8f0";
     }
 
     private VBox buildSidebar() {
@@ -341,13 +388,30 @@ public class SimulationView extends BorderPane {
         VBox content = new VBox(12);
         content.setMaxWidth(Double.MAX_VALUE);
         content.setPadding(new Insets(0, 10, 0, 0));
+        HBox titleRow = new HBox(8);
+        titleRow.setAlignment(Pos.CENTER_LEFT);
+
         Label title = sectionLabel("World Feed");
-        Label subtitle = new Label("Live reactions from citizens, analysts, and reporters across the planet.");
+        Label liveBadge = new Label("LIVE");
+        liveBadge.setStyle("""
+            -fx-text-fill:#020617;
+            -fx-font-size:10px;
+            -fx-font-weight:bold;
+            -fx-padding:3 7 3 7;
+            -fx-background-radius:999;
+            -fx-background-color:#22c55e;
+        """);
+        titleRow.getChildren().addAll(title, liveBadge);
+
+        Label subtitle = new Label("Citizens, analysts, reporters, and local leaders are posting as the world changes.");
         subtitle.setWrapText(true);
         subtitle.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
 
+        Label count = new Label(state.feedPosts.size() + " recent posts");
+        count.setStyle("-fx-text-fill:#64748b; -fx-font-size:11px;");
+
         SocialFeedView feedView = new SocialFeedView(state.feedPosts);
-        content.getChildren().addAll(title, subtitle, feedView);
+        content.getChildren().addAll(titleRow, subtitle, count, feedView);
         return content;
     }
 
@@ -582,6 +646,17 @@ public class SimulationView extends BorderPane {
     private void advanceYear() {
         state.year += 1;
         buildUI();
+    }
+
+    private void addLiveFeedPost() {
+        state.feedPosts.add(0, SimulationModel.generateLiveFeedPost(state));
+        while (state.feedPosts.size() > MAX_FEED_POSTS) {
+            state.feedPosts.remove(state.feedPosts.size() - 1);
+        }
+
+        if ("feed".equals(activeSidebarTab)) {
+            buildUI();
+        }
     }
 
     private void showPopup(String eventId) {
