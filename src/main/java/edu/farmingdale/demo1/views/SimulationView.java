@@ -77,6 +77,7 @@ public class SimulationView extends BorderPane {
     private GameState state;
     private String activeEventTab = "all";
     private String activeSidebarTab = "stats";
+    private double sidebarScrollPosition = 0.0;
     private String selectedEventId;
     private final Timeline yearTimeline;
     private final PauseTransition popupTimer;
@@ -199,6 +200,9 @@ public class SimulationView extends BorderPane {
         contentScroller.setMaxWidth(Double.MAX_VALUE);
         contentScroller.setStyle("-fx-background:#020617; -fx-background-color:transparent;");
         contentScroller.getStyleClass().add("sidebar-scroller");
+        contentScroller.setVvalue(sidebarScrollPosition);
+        contentScroller.vvalueProperty().addListener((obs, oldValue, newValue) ->
+                sidebarScrollPosition = newValue.doubleValue());
 
         VBox.setVgrow(contentScroller, Priority.ALWAYS);
         sidebar.getChildren().addAll(title, tabs, contentScroller);
