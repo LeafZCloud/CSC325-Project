@@ -2,7 +2,6 @@ package edu.farmingdale.demo1.simulation;
 
 import java.util.*;
 
-import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 import edu.farmingdale.demo1.simulation.GameTypes.GameState;
 import edu.farmingdale.demo1.simulation.GameTypes.GameEventDef;
@@ -14,6 +13,9 @@ import edu.farmingdale.demo1.simulation.GameTypes.EventLogEntry;
 public class SimulationModel {
 
     private static final Random random = new Random();
+    private static final int EVENT_REUSE_COOLDOWN_EVENTS = 3;
+    private static final int RECENT_FAMINE_EVENT_LIMIT = 2;
+    private static final int RECENT_DISASTER_LIMIT = 4;
     private static final String[] FEED_USERNAMES = {
             "Ava Sol", "Orion Vale", "Mira Quill", "Juno Hart", "Soren Pike", "Lena Frost",
             "Kai Ember", "Nia Pulse", "Ezra Bloom", "Tala Reed", "Iris Voss", "Noah Skye"
@@ -67,7 +69,7 @@ public class SimulationModel {
         return regions;
     }
 
-    public static GameState  buildInitialState(PlanetConfig config) {
+    public static GameState buildInitialState(PlanetConfig config) {
 
         GameState state = new GameState();
 
@@ -103,6 +105,10 @@ public class SimulationModel {
     }
 
     public static GameState applyPlayerCommand(GameState state, GameEventDef event) {
+        if (!isAvailable(state, event.id)) {
+            return state;
+        }
+
         GameState updatedState = applySingleEvent(state, event, true);
         updatedState.commandHistory.add(event.id);
         updatedState.pendingTriggeredEventId = null;
@@ -152,7 +158,7 @@ public class SimulationModel {
 
         List<String> affectedRegions = new ArrayList<>();
 
-        if (event.affectedRegions.equals("all")) {
+        if ("all".equals(event.affectedRegions)) {
             for (Region r : state.regions) {
                 affectedRegions.add(r.id);
             }
@@ -254,7 +260,19 @@ public class SimulationModel {
         );
 
         newState.eventLog.add(0, logEntry);
-        newState.cooldowns.put(event.id, newState.year + event.cooldown);
+        Map<String, Integer> nextCooldowns = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : newState.cooldowns.entrySet()) {
+            if (event.id.equals(entry.getKey())) {
+                continue;
+            }
+
+            int remainingTriggers = entry.getValue() - 1;
+            if (remainingTriggers > 0) {
+                nextCooldowns.put(entry.getKey(), remainingTriggers);
+            }
+        }
+        nextCooldowns.put(event.id, EVENT_REUSE_COOLDOWN_EVENTS);
+        newState.cooldowns = nextCooldowns;
         newState.feedPosts.addAll(0, generateEventFeedPosts(newState, event, affectedRegions));
 
         return newState;
@@ -336,7 +354,7 @@ public class SimulationModel {
     }
 
     private static boolean shouldTriggerFamine(GameState state) {
-        return (hasRecentEvent(state, "Ice Age", 2) || hasRecentEvent(state, "Drought", 2))
+        return (hasRecentEvent(state, "Ice Age") || hasRecentEvent(state, "Drought"))
                 && isAvailable(state, "famine");
     }
 
@@ -348,7 +366,7 @@ public class SimulationModel {
 
     private static boolean shouldTriggerDepression(GameState state) {
         return state.globalStats.economicHealth <= 35
-                && (state.lowEconomyStreak >= 2 || countRecentDisasters(state, 4) >= 3)
+                && (state.lowEconomyStreak >= 2 || countRecentDisasters(state) >= 3)
                 && isAvailable(state, "depression");
     }
 
@@ -358,17 +376,21 @@ public class SimulationModel {
                 && isAvailable(state, "economic_boom");
     }
 
-    private static boolean isAvailable(GameState state, String eventId) {
-        Integer nextAvailableYear = state.cooldowns.get(eventId);
-        return nextAvailableYear == null || state.year >= nextAvailableYear;
+    public static boolean isEventAvailableForPlayer(GameState state, String eventId) {
+        return isAvailable(state, eventId);
     }
 
-    private static int countRecentDisasters(GameState state, int limit) {
+    private static boolean isAvailable(GameState state, String eventId) {
+        Integer remainingTriggers = state.cooldowns.get(eventId);
+        return remainingTriggers == null || remainingTriggers <= 0;
+    }
+
+    private static int countRecentDisasters(GameState state) {
         int disasterCount = 0;
         int checked = 0;
 
         for (EventLogEntry entry : state.eventLog) {
-            if (checked >= limit) {
+            if (checked >= RECENT_DISASTER_LIMIT) {
                 break;
             }
 
@@ -382,11 +404,11 @@ public class SimulationModel {
         return disasterCount;
     }
 
-    private static boolean hasRecentEvent(GameState state, String eventName, int limit) {
+    private static boolean hasRecentEvent(GameState state, String eventName) {
         int checked = 0;
 
         for (EventLogEntry entry : state.eventLog) {
-            if (checked >= limit) {
+            if (checked >= RECENT_FAMINE_EVENT_LIMIT) {
                 break;
             }
 
@@ -475,7 +497,7 @@ public class SimulationModel {
 
         posts.add(createFeedPost(
                 random.nextInt(FEED_USERNAMES.length),
-                "Planet update: population " + String.format("%.1fB", state.globalStats.population)
+                "Planet update: population " + String.format(Locale.US, "%.1fB", state.globalStats.population)
                         + ", stress " + state.globalStats.stress + "%, economy " + state.globalStats.economicHealth + "%.",
                 "neutral",
                 "7m",
@@ -483,6 +505,91 @@ public class SimulationModel {
         ));
 
         return posts;
+    }
+
+    public static GameTypes.FeedPost generateLiveFeedPost(GameState state) {
+        Region region = pickRegion(state);
+        String regionName = region != null ? region.name : "the capital";
+        GlobalStats stats = state.globalStats;
+
+        List<LiveFeedTemplate> templates = new ArrayList<>();
+        templates.add(new LiveFeedTemplate(
+                "Just checked the public dashboard. Population is holding around "
+                        + String.format(Locale.US, "%.1fB", stats.population) + ".",
+                "neutral"
+        ));
+        templates.add(new LiveFeedTemplate(
+                "People in " + regionName + " are talking about the next big policy move. Everyone is watching the numbers.",
+                "neutral"
+        ));
+        templates.add(new LiveFeedTemplate(
+                "Local markets in " + regionName + " are busy today. Economy score is sitting at " + stats.economicHealth + "%.",
+                stats.economicHealth >= 60 ? "positive" : "negative"
+        ));
+        templates.add(new LiveFeedTemplate(
+                "Exposure reports are at " + stats.exposure + "%. Emergency crews say preparation matters more than panic.",
+                stats.exposure >= 55 ? "negative" : "neutral"
+        ));
+        templates.add(new LiveFeedTemplate(
+                "The mood in " + regionName + " feels different this year. Stress is at " + stats.stress + "% and people notice it.",
+                stats.stress >= 65 ? "panic" : stats.stress >= 40 ? "negative" : "positive"
+        ));
+        templates.add(new LiveFeedTemplate(
+                "Schools in " + regionName + " are running debates about the planet's future. The younger crowd is very tuned in.",
+                "positive"
+        ));
+
+        if (stats.stress >= 70) {
+            templates.add(new LiveFeedTemplate(
+                    "Hard to sleep with stress this high. People want answers from leadership tonight.",
+                    "panic"
+            ));
+        }
+        if (stats.economicHealth <= 40) {
+            templates.add(new LiveFeedTemplate(
+                    "Small businesses are worried. A weak economy is starting to show up in everyday life.",
+                    "negative"
+            ));
+        }
+        if (stats.economicHealth >= 75 && stats.stress <= 35) {
+            templates.add(new LiveFeedTemplate(
+                    "This is the most optimistic the feed has felt in years. Growth is up and people are calmer.",
+                    "positive"
+            ));
+        }
+        if (state.lastEventId != null && !state.lastEventId.isBlank()) {
+            templates.add(new LiveFeedTemplate(
+                    "Still seeing reactions to the latest event. The planet feed has not slowed down.",
+                    stats.stress >= 55 ? "negative" : "neutral"
+            ));
+        }
+
+        LiveFeedTemplate template = templates.get(random.nextInt(templates.size()));
+        return createFeedPost(
+                random.nextInt(FEED_USERNAMES.length),
+                template.content,
+                template.sentiment,
+                "now",
+                state.lastEventId == null || state.lastEventId.isBlank() ? null : state.lastEventId
+        );
+    }
+
+    private static Region pickRegion(GameState state) {
+        if (state == null || state.regions == null || state.regions.isEmpty()) {
+            return null;
+        }
+
+        return state.regions.get(random.nextInt(state.regions.size()));
+    }
+
+    private static final class LiveFeedTemplate {
+        private final String content;
+        private final String sentiment;
+
+        LiveFeedTemplate(String content, String sentiment) {
+            this.content = content;
+            this.sentiment = sentiment;
+        }
     }
 
     private static GameTypes.FeedPost createFeedPost(int identityIndex, String content, String sentiment, String timeAgo, String eventId) {
