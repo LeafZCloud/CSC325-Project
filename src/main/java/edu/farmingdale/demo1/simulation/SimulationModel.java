@@ -107,7 +107,7 @@ public class SimulationModel {
             return state;
         }
 
-        GameState updatedState = applySingleEvent(state, event, true);
+        GameState updatedState = applyEvent(state, event);
         updatedState.commandHistory.add(event.id);
         updatedState.pendingTriggeredEventId = null;
 
@@ -257,7 +257,7 @@ public class SimulationModel {
                 )
         );
 
-        newState.eventLog.add(0, logEntry);
+        newState.eventLog.addFirst(logEntry);
         Map<String, Integer> nextCooldowns = new HashMap<>();
         for (Map.Entry<String, Integer> entry : newState.cooldowns.entrySet()) {
             if (event.id.equals(entry.getKey())) {
@@ -293,7 +293,7 @@ public class SimulationModel {
             default -> -8;
         };
 
-        state.temperatureVolatility = Math.max(0, Math.min(100, state.temperatureVolatility + volatilityShift));
+        state.temperatureVolatility = Math.clamp(state.temperatureVolatility + volatilityShift, 0, 100);
     }
 
     private static GameEventDef determineTriggeredEvent(GameState state) {
@@ -352,7 +352,7 @@ public class SimulationModel {
     }
 
     private static boolean shouldTriggerFamine(GameState state) {
-        return (hasRecentEvent(state, "Ice Age", 2) || hasRecentEvent(state, "Drought", 2))
+        return (hasRecentEvent(state, "Ice Age") || hasRecentEvent(state, "Drought"))
                 && isAvailable(state, "famine");
     }
 
@@ -364,7 +364,7 @@ public class SimulationModel {
 
     private static boolean shouldTriggerDepression(GameState state) {
         return state.globalStats.economicHealth <= 35
-                && (state.lowEconomyStreak >= 2 || countRecentDisasters(state, 4) >= 3)
+                && (state.lowEconomyStreak >= 2 || countRecentDisasters(state) >= 3)
                 && isAvailable(state, "depression");
     }
 
@@ -383,7 +383,8 @@ public class SimulationModel {
         return remainingTriggers == null || remainingTriggers <= 0;
     }
 
-    private static int countRecentDisasters(GameState state, int limit) {
+    private static int countRecentDisasters(GameState state) {
+        final int limit = 4;
         int disasterCount = 0;
         int checked = 0;
 
@@ -402,7 +403,8 @@ public class SimulationModel {
         return disasterCount;
     }
 
-    private static boolean hasRecentEvent(GameState state, String eventName, int limit) {
+    private static boolean hasRecentEvent(GameState state, String eventName) {
+        final int limit = 2;
         int checked = 0;
 
         for (EventLogEntry entry : state.eventLog) {
