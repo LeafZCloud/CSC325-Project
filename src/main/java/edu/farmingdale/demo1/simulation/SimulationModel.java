@@ -2,7 +2,6 @@ package edu.farmingdale.demo1.simulation;
 
 import java.util.*;
 
-import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 import edu.farmingdale.demo1.simulation.GameTypes.GameState;
 import edu.farmingdale.demo1.simulation.GameTypes.GameEventDef;
@@ -14,6 +13,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.EventLogEntry;
 public class SimulationModel {
 
     private static final Random random = new Random();
+    private static final int EVENT_REUSE_COOLDOWN_EVENTS = 3;
     private static final String[] FEED_USERNAMES = {
             "Ava Sol", "Orion Vale", "Mira Quill", "Juno Hart", "Soren Pike", "Lena Frost",
             "Kai Ember", "Nia Pulse", "Ezra Bloom", "Tala Reed", "Iris Voss", "Noah Skye"
@@ -103,6 +103,10 @@ public class SimulationModel {
     }
 
     public static GameState applyPlayerCommand(GameState state, GameEventDef event) {
+        if (!isAvailable(state, event.id)) {
+            return state;
+        }
+
         GameState updatedState = applySingleEvent(state, event, true);
         updatedState.commandHistory.add(event.id);
         updatedState.pendingTriggeredEventId = null;
@@ -254,7 +258,19 @@ public class SimulationModel {
         );
 
         newState.eventLog.add(0, logEntry);
-        newState.cooldowns.put(event.id, newState.year + event.cooldown);
+        Map<String, Integer> nextCooldowns = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : newState.cooldowns.entrySet()) {
+            if (event.id.equals(entry.getKey())) {
+                continue;
+            }
+
+            int remainingTriggers = entry.getValue() - 1;
+            if (remainingTriggers > 0) {
+                nextCooldowns.put(entry.getKey(), remainingTriggers);
+            }
+        }
+        nextCooldowns.put(event.id, EVENT_REUSE_COOLDOWN_EVENTS);
+        newState.cooldowns = nextCooldowns;
         newState.feedPosts.addAll(0, generateEventFeedPosts(newState, event, affectedRegions));
 
         return newState;
@@ -358,9 +374,13 @@ public class SimulationModel {
                 && isAvailable(state, "economic_boom");
     }
 
+    public static boolean isEventAvailableForPlayer(GameState state, String eventId) {
+        return isAvailable(state, eventId);
+    }
+
     private static boolean isAvailable(GameState state, String eventId) {
-        Integer nextAvailableYear = state.cooldowns.get(eventId);
-        return nextAvailableYear == null || state.year >= nextAvailableYear;
+        Integer remainingTriggers = state.cooldowns.get(eventId);
+        return remainingTriggers == null || remainingTriggers <= 0;
     }
 
     private static int countRecentDisasters(GameState state, int limit) {

@@ -409,6 +409,10 @@ public class SimulationView extends BorderPane {
     }
 
     private void triggerEvent(GameEventDef event) {
+        if (!SimulationModel.isEventAvailableForPlayer(state, event.id)) {
+            return;
+        }
+
         state = SimulationModel.applyPlayerCommand(state, event);
         showPopup(state.pendingTriggeredEventId);
         activeSidebarTab = "events";
@@ -419,6 +423,7 @@ public class SimulationView extends BorderPane {
     }
 
     private Node createEventTrigger(GameEventDef event) {
+        boolean available = SimulationModel.isEventAvailableForPlayer(state, event.id);
         String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
         if (imagePath != null) {
             try {
@@ -434,6 +439,8 @@ public class SimulationView extends BorderPane {
                 controller.setImage(imageUrl);
                 // controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
                 controller.setOnAction(e -> triggerEvent(event));
+                imageButton.setDisable(!available);
+                imageButton.setOpacity(available ? 1.0 : 0.45);
                 return imageButton;
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to load event image button for " + event.id + ".", e);
@@ -446,6 +453,7 @@ public class SimulationView extends BorderPane {
     private EventCard createFallbackEventCard(GameEventDef event) {
         EventCard card = new EventCard(event);
         card.setOnAction(e -> triggerEvent(event));
+        card.setDisable(!SimulationModel.isEventAvailableForPlayer(state, event.id));
         return card;
     }
 
