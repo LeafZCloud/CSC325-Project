@@ -35,10 +35,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.io.IOException;
 
 public class SimulationView extends BorderPane {
 
@@ -77,6 +78,7 @@ public class SimulationView extends BorderPane {
     private GameState state;
     private String activeEventTab = "all";
     private String activeSidebarTab = "stats";
+    private double sidebarScrollPosition = 0.0;
     private String selectedEventId;
     private final Timeline yearTimeline;
     private final PauseTransition popupTimer;
@@ -90,11 +92,11 @@ public class SimulationView extends BorderPane {
         this.authService = authService;
         this.databaseController = databaseController;
         state = SimulationModel.buildInitialState(config);
-        yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
+        yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), ignored -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
         yearTimeline.play();
         popupTimer = new PauseTransition(Duration.seconds(5));
-        popupTimer.setOnFinished(e -> clearPopup());
+        popupTimer.setOnFinished(ignored -> clearPopup());
         buildUI();
     }
 
@@ -140,7 +142,7 @@ public class SimulationView extends BorderPane {
             -fx-background-radius:10;
             -fx-padding:10 18 10 18;
         """);
-        end.setOnAction(e -> {
+        end.setOnAction(ignored -> {
             yearTimeline.stop();
             System.out.println("IDToken: " + authService.getSaveIdToken());
             System.out.println("LocalId: " + authService.getSaveLocalIdToken());
@@ -199,6 +201,9 @@ public class SimulationView extends BorderPane {
         contentScroller.setMaxWidth(Double.MAX_VALUE);
         contentScroller.setStyle("-fx-background:#020617; -fx-background-color:transparent;");
         contentScroller.getStyleClass().add("sidebar-scroller");
+        contentScroller.setVvalue(sidebarScrollPosition);
+        contentScroller.vvalueProperty().addListener(observable ->
+                sidebarScrollPosition = ((javafx.beans.value.ObservableDoubleValue) observable).get());
 
         VBox.setVgrow(contentScroller, Priority.ALWAYS);
         sidebar.getChildren().addAll(title, tabs, contentScroller);
@@ -208,7 +213,7 @@ public class SimulationView extends BorderPane {
     private Button createSidebarTab(String tabId, String label) {
         Button tab = new Button(label);
         tab.setStyle(sidebarTabStyle(tabId.equals(activeSidebarTab)));
-        tab.setOnAction(e -> {
+        tab.setOnAction(ignored -> {
             activeSidebarTab = tabId;
             buildUI();
         });
@@ -325,7 +330,7 @@ public class SimulationView extends BorderPane {
             item.setMaxWidth(Double.MAX_VALUE);
             item.setAlignment(Pos.CENTER_LEFT);
             item.setStyle(eventLogItemStyle(entry.id.equals(selectedEventId)));
-            item.setOnAction(e -> {
+            item.setOnAction(ignored -> {
                 selectedEventId = entry.id;
                 buildUI();
             });
@@ -361,7 +366,7 @@ public class SimulationView extends BorderPane {
         for (String tab : EVENT_TABS) {
             Button tabButton = new Button(EVENT_TAB_LABELS.get(tab));
             tabButton.setStyle(tabButtonStyle(tab.equals(activeEventTab)));
-            tabButton.setOnAction(e -> {
+            tabButton.setOnAction(ignored -> {
                 activeEventTab = tab;
                 buildUI();
             });
@@ -405,20 +410,29 @@ public class SimulationView extends BorderPane {
     }
 
     private void triggerEvent(GameEventDef event) {
+        if (!SimulationModel.isEventAvailableForPlayer(state, event.id)) {
+            return;
+        }
+
         state = SimulationModel.applyPlayerCommand(state, event);
         showPopup(state.pendingTriggeredEventId);
         activeSidebarTab = "events";
         if (!state.eventLog.isEmpty()) {
-            selectedEventId = state.eventLog.get(0).id;
+            selectedEventId = state.eventLog.getFirst().id;
         }
         buildUI();
     }
 
     private Node createEventTrigger(GameEventDef event) {
+        boolean available = SimulationModel.isEventAvailableForPlayer(state, event.id);
         String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
         if (imagePath != null) {
             try {
-                String imageUrl = getClass().getResource(imagePath).toExternalForm();
+                URL imageResource = getClass().getResource(imagePath);
+                if (imageResource == null) {
+                    return createFallbackEventCard(event);
+                }
+                String imageUrl = imageResource.toExternalForm();
                 Image image = new Image(imageUrl);
                 if (image.isError() || image.getWidth() <= 0 || image.getHeight() <= 0) {
                     return createFallbackEventCard(event);
@@ -429,7 +443,9 @@ public class SimulationView extends BorderPane {
                 EventImageButtonController controller = loader.getController();
                 controller.setImage(imageUrl);
                 // controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
-                controller.setOnAction(e -> triggerEvent(event));
+                controller.setOnAction(ignored -> triggerEvent(event));
+                imageButton.setDisable(!available);
+                imageButton.setOpacity(available ? 1.0 : 0.45);
                 return imageButton;
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to load event image button for " + event.id + ".", e);
@@ -441,7 +457,8 @@ public class SimulationView extends BorderPane {
 
     private EventCard createFallbackEventCard(GameEventDef event) {
         EventCard card = new EventCard(event);
-        card.setOnAction(e -> triggerEvent(event));
+        card.setOnAction(ignored -> triggerEvent(event));
+        card.setDisable(!SimulationModel.isEventAvailableForPlayer(state, event.id));
         return card;
     }
 
@@ -452,7 +469,7 @@ public class SimulationView extends BorderPane {
         }
 
         if (selectedEventId == null || findSelectedEventEntry() == null) {
-            selectedEventId = state.eventLog.get(0).id;
+            selectedEventId = state.eventLog.getFirst().id;
         }
     }
 
@@ -606,8 +623,9 @@ public class SimulationView extends BorderPane {
         popupBox.setPadding(new Insets(0));
 
         String imagePath = TRIGGERED_EVENT_IMAGES.get(eventId);
-        if (imagePath != null && getClass().getResource(imagePath) != null) {
-            ImageView imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
+        URL imageResource = imagePath != null ? getClass().getResource(imagePath) : null;
+        if (imageResource != null) {
+            ImageView imageView = new ImageView(new Image(imageResource.toExternalForm()));
             imageView.setPreserveRatio(true);
             imageView.setFitWidth(250);
             popupBox.getChildren().add(imageView);
