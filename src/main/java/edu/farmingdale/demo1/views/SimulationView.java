@@ -2,8 +2,8 @@ package edu.farmingdale.demo1.views;
 
 import edu.farmingdale.demo1.Database.DatabaseController;
 import edu.farmingdale.demo1.Database.FirebaseAuthService;
-import edu.farmingdale.demo1.components.EventCard;
 import edu.farmingdale.demo1.components.EventImageButtonController;
+import edu.farmingdale.demo1.components.EventCard;
 import edu.farmingdale.demo1.components.RegionCard;
 import edu.farmingdale.demo1.components.SocialFeedView;
 import edu.farmingdale.demo1.components.StatBar;
@@ -30,23 +30,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.io.IOException;
 
-public class SimulationView extends BorderPane {
+public class SimulationView extends StackPane {
 
-    private static final Random RANDOM = new Random();
     private static final List<String> EVENT_TABS = List.of("all", "disaster", "conflict", "technology", "society");
     private static final Map<String, String> EVENT_TAB_LABELS = Map.of(
             "all", "All Events",
@@ -69,19 +64,25 @@ public class SimulationView extends BorderPane {
             Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
     );
     private static final Map<String, String> TRIGGERED_EVENT_IMAGES = Map.ofEntries(
+            Map.entry("meteor", "/images/commandsAndEvents/AsteroidNotification.png"),
+            Map.entry("earthquakes", "/images/commandsAndEvents/EarthquakeNotification.png"),
+            Map.entry("volcanic_eruptions", "/images/commandsAndEvents/EruptionNotification.png"),
+            Map.entry("drought", "/images/commandsAndEvents/DroughtNotification.png"),
+            Map.entry("plague", "/images/commandsAndEvents/PlagueNotification.png"),
+            Map.entry("nuke", "/images/commandsAndEvents/NukeNotification.png"),
+            Map.entry("world_war", "/images/commandsAndEvents/WorldWarNotification.png"),
+            Map.entry("industrial_revolution", "/images/commandsAndEvents/IndustrializeNotification.png"),
+            Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakthroughNotification.png"),
+            Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeNotification.png"),
             Map.entry("tsunami", "/images/commandsAndEvents/TsunamiEvent.png"),
             Map.entry("virus", "/images/commandsAndEvents/VirusEvent.png"),
             Map.entry("depression", "/images/commandsAndEvents/DepressionEvent.png"),
-            Map.entry("ice_age", "/images/commandsAndEvents/IceAgeEvent.png"),
+            Map.entry("ice_age", "/images/commandsAndEvents/BlizzardNotification.png"),
             Map.entry("famine", "/images/commandsAndEvents/FamineEvent.png"),
             Map.entry("rebellion", "/images/commandsAndEvents/RebellionEvent.png"),
             Map.entry("economic_boom", "/images/commandsAndEvents/EcoBoomEvent.png")
     );
-    private static final int MAX_FEED_POSTS = 50;
-    private static final Duration EVENT_BUTTON_COOLDOWN = Duration.seconds(15);
-    private static final int MIN_RANDOM_BAD_EVENT_DELAY_SECONDS = 20;
-    private static final int MAX_RANDOM_BAD_EVENT_DELAY_SECONDS = 25;
-    private static final double EXTINCTION_POPULATION_THRESHOLD = 0.5;
+
 
     private GameState state;
     private String activeEventTab = "all";
@@ -90,29 +91,27 @@ public class SimulationView extends BorderPane {
     private final Timeline yearTimeline;
     private final PauseTransition popupTimer;
     private String activePopupEventId;
+    private String queuedPopupEventId;
+    private final BorderPane layoutRoot = new BorderPane();
+    private final StackPane notificationLayer = new StackPane();
 
     private final FirebaseAuthService authService;
     private final DatabaseController databaseController;
-    private final Timeline liveFeedTimeline;
-    private final PauseTransition randomBadEventTimer = new PauseTransition();
-    private final Map<String, PauseTransition> eventCooldownTimers = new HashMap<>();
-    private boolean simulationEnded;
     private Runnable onSimulationEnd;
 
     public SimulationView(PlanetConfig config, FirebaseAuthService authService, DatabaseController databaseController) {
         this.authService = authService;
         this.databaseController = databaseController;
         state = SimulationModel.buildInitialState(config);
-        yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), _ -> advanceYear()));
+        yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
         yearTimeline.play();
-        liveFeedTimeline = new Timeline(new KeyFrame(Duration.seconds(5), _ -> addLiveFeedPost()));
-        liveFeedTimeline.setCycleCount(Animation.INDEFINITE);
-        liveFeedTimeline.play();
-        popupTimer = new PauseTransition(Duration.seconds(5));
-        popupTimer.setOnFinished(_ -> clearPopup());
-        randomBadEventTimer.setOnFinished(_ -> triggerRandomBadEvent());
-        scheduleRandomBadEvent();
+        popupTimer = new PauseTransition(Duration.seconds(3));
+        popupTimer.setOnFinished(e -> clearPopup());
+        notificationLayer.setMouseTransparent(true);
+        notificationLayer.setPickOnBounds(false);
+        notificationLayer.setViewOrder(-1);
+        layoutRoot.setViewOrder(0);
         buildUI();
     }
 
@@ -134,35 +133,27 @@ public class SimulationView extends BorderPane {
         StackPane centerLayer = new StackPane(map);
         centerLayer.setPickOnBounds(false);
 
+        layoutRoot.setCenter(centerLayer);
+        layoutRoot.setRight(buildSidebar());
+        layoutRoot.setBottom(buildEventBrowser());
+        layoutRoot.setTop(buildTopBar());
+
+        notificationLayer.getChildren().clear();
         if (activePopupEventId != null) {
             Node popup = buildTriggeredEventPopup(activePopupEventId);
-            centerLayer.getChildren().add(popup);
-            StackPane.setAlignment(popup, Pos.TOP_CENTER);
-            popup.setTranslateY(-215);
-            popup.setTranslateX(160);
+            notificationLayer.getChildren().add(popup);
+            StackPane.setAlignment(popup, Pos.TOP_LEFT);
+            StackPane.setMargin(popup, new Insets(76, 0, 0, 24));
+            popup.toFront();
         }
 
-        setCenter(centerLayer);
-        setRight(buildSidebar());
-        setBottom(buildEventBrowser());
-        setTop(buildTopBar());
+        if (getChildren().isEmpty()) {
+            getChildren().addAll(layoutRoot, notificationLayer);
+        }
+        notificationLayer.toFront();
     }
 
-    private Node buildTopBar() {
-        Button end = buildEndSimulationButton();
-        VBox titleBlock = buildTopTitleBlock();
-        HBox topStats = buildTopStatsSummary();
-
-        StackPane topBar = new StackPane(titleBlock, topStats, end);
-        topBar.setPadding(new Insets(14, 18, 8, 18));
-        StackPane.setAlignment(titleBlock, Pos.CENTER_LEFT);
-        StackPane.setAlignment(topStats, Pos.CENTER);
-        StackPane.setAlignment(end, Pos.CENTER_RIGHT);
-        topBar.setStyle("-fx-background-color:rgba(2,6,23,0.72);");
-        return topBar;
-    }
-
-    private Button buildEndSimulationButton() {
+    private HBox buildTopBar() {
         Button end = new Button("End Simulation");
         end.setStyle("""
             -fx-background-color:#ef4444;
@@ -171,90 +162,32 @@ public class SimulationView extends BorderPane {
             -fx-background-radius:10;
             -fx-padding:10 18 10 18;
         """);
-        end.setOnAction(_ -> endSimulation());
-        return end;
-    }
+        end.setOnAction(e -> {
+            yearTimeline.stop();
+            System.out.println("IDToken: " + authService.getSaveIdToken());
+            System.out.println("LocalId: " + authService.getSaveLocalIdToken());
+            databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
+            if (onSimulationEnd != null) {
+                onSimulationEnd.run();
+            }
+        });
 
-    private void endSimulation() {
-        if (simulationEnded) {
-            return;
-        }
-
-        saveGameState();
-        finishSimulation();
-    }
-
-    private void finishSimulation() {
-        if (simulationEnded) {
-            return;
-        }
-
-        simulationEnded = true;
-        yearTimeline.stop();
-        liveFeedTimeline.stop();
-        popupTimer.stop();
-        randomBadEventTimer.stop();
-        stopEventCooldownTimers();
-        if (onSimulationEnd != null) {
-            onSimulationEnd.run();
-        }
-    }
-
-    private void saveGameState() {
-        System.out.println("IDToken: " + authService.getSaveIdToken());
-        System.out.println("LocalId: " + authService.getSaveLocalIdToken());
-        databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
-    }
-
-    private VBox buildTopTitleBlock() {
         Label year = new Label("Year " + state.year);
         year.setStyle("-fx-text-fill:#e2e8f0; -fx-font-size:18px; -fx-font-weight:bold;");
 
         Label world = new Label(state.planet.name);
         world.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:13px;");
 
-        return new VBox(2, year, world);
-    }
+        VBox titleBlock = new VBox(2, year, world);
 
-    private HBox buildTopStatsSummary() {
-        HBox stats = new HBox(18);
-        stats.setAlignment(Pos.CENTER);
-        stats.setMouseTransparent(true);
-        stats.getChildren().addAll(
-                createTopStat("Pop", String.format(Locale.US, "%.1fB", state.globalStats.population), "#ef4444"),
-                createTopStat("Stress", state.globalStats.stress + "%", statStatusColor("Stress", state.globalStats.stress)),
-                createTopStat("Economy", state.globalStats.economicHealth + "%", statStatusColor("Economic Health", state.globalStats.economicHealth)),
-                createTopStat("Exposure", state.globalStats.exposure + "%", statStatusColor("Exposure to Events", state.globalStats.exposure))
-        );
-        return stats;
-    }
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
 
-    private HBox createTopStat(String label, String value, String valueColor) {
-        Label title = new Label(label);
-        title.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
-
-        Label amount = new Label(value);
-        amount.setStyle("-fx-text-fill:" + valueColor + "; -fx-font-size:12px; -fx-font-weight:bold;");
-
-        HBox stat = new HBox(4, title, amount);
-        stat.setAlignment(Pos.CENTER);
-        return stat;
-    }
-
-    private String statStatusColor(String label, double value) {
-        if (label.equalsIgnoreCase("Stress") || label.equalsIgnoreCase("Exposure to Events")) {
-            if (value > 75) return "#ef4444";
-            if (value > 45) return "#f59e0b";
-            return "#22c55e";
-        }
-
-        if (label.equalsIgnoreCase("Economic Health")) {
-            if (value < 35) return "#ef4444";
-            if (value < 60) return "#f59e0b";
-            return "#22c55e";
-        }
-
-        return "#e2e8f0";
+        HBox topBar = new HBox(12, titleBlock, spacer, end);
+        topBar.setPadding(new Insets(14, 18, 8, 18));
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        topBar.setStyle("-fx-background-color:rgba(2,6,23,0.72);");
+        return topBar;
     }
 
     private VBox buildSidebar() {
@@ -297,7 +230,7 @@ public class SimulationView extends BorderPane {
     private Button createSidebarTab(String tabId, String label) {
         Button tab = new Button(label);
         tab.setStyle(sidebarTabStyle(tabId.equals(activeSidebarTab)));
-        tab.setOnAction(_ -> {
+        tab.setOnAction(e -> {
             activeSidebarTab = tabId;
             buildUI();
         });
@@ -358,18 +291,63 @@ public class SimulationView extends BorderPane {
 
         EventLogEntry selected = findSelectedEventEntry();
         if (selected != null) {
-            content.getChildren().addAll(sectionLabel("Selected Event"), buildSelectedEventDetail(selected));
+            GameEventDef definition = findEventDef(selected);
+            VBox detail = new VBox(8);
+            detail.setMaxWidth(Double.MAX_VALUE);
+            detail.setPadding(new Insets(12));
+            detail.setStyle("""
+                -fx-background-color:#0b1220;
+                -fx-background-radius:12;
+                -fx-border-color:#1f2a37;
+                -fx-border-radius:12;
+            """);
+
+            Label title = new Label(selected.emoji + " " + selected.eventName);
+            title.setWrapText(true);
+            title.setStyle("-fx-text-fill:#f8fafc; -fx-font-size:16px; -fx-font-weight:bold;");
+
+            Label meta = new Label("Category: " + capitalize(selected.category) + " · Year " + selected.year);
+            meta.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:11px;");
+
+            Label description = new Label(definition != null ? definition.description : "No description available.");
+            description.setWrapText(true);
+            description.setStyle("-fx-text-fill:#dbe4f0; -fx-font-size:13px;");
+
+            Label flavor = new Label(definition != null ? "\"" + definition.flavour + "\"" : "");
+            flavor.setWrapText(true);
+            flavor.setStyle("-fx-text-fill:#7dd3fc; -fx-font-size:12px;");
+
+            Label affected = new Label("Affected Regions: " + describeAffectedRegions(selected));
+            affected.setWrapText(true);
+            affected.setStyle("-fx-text-fill:#cbd5e1; -fx-font-size:12px;");
+
+            Label effects = new Label(
+                    "Impact: Population " + formatPopulationDelta(selected.effects.population)
+                            + " · Stress " + signedPercent(selected.effects.stress)
+                            + " · Economy " + signedPercent(selected.effects.economicHealth)
+                            + " · Exposure " + signedPercent(selected.effects.exposure)
+            );
+            effects.setWrapText(true);
+            effects.setStyle("-fx-text-fill:#cbd5e1; -fx-font-size:12px;");
+
+            detail.getChildren().addAll(title, meta, description);
+            if (definition != null) {
+                detail.getChildren().add(flavor);
+            }
+            detail.getChildren().addAll(affected, effects);
+
+            content.getChildren().addAll(sectionLabel("Selected Event"), detail);
         }
 
         Label logTitle = sectionLabel("Event Log");
         VBox logList = new VBox(8);
         logList.setMaxWidth(Double.MAX_VALUE);
         for (EventLogEntry entry : state.eventLog) {
-            Button item = new Button(entry.eventName + " - Year " + entry.year);
+            Button item = new Button(entry.eventName + " · Year " + entry.year);
             item.setMaxWidth(Double.MAX_VALUE);
             item.setAlignment(Pos.CENTER_LEFT);
             item.setStyle(eventLogItemStyle(entry.id.equals(selectedEventId)));
-            item.setOnAction(_ -> {
+            item.setOnAction(e -> {
                 selectedEventId = entry.id;
                 buildUI();
             });
@@ -377,75 +355,21 @@ public class SimulationView extends BorderPane {
         }
 
         content.getChildren().addAll(logTitle, logList);
+
         return content;
-    }
-
-    private VBox buildSelectedEventDetail(EventLogEntry selected) {
-        GameEventDef definition = findEventDef(selected);
-        VBox detail = new VBox(8);
-        detail.setMaxWidth(Double.MAX_VALUE);
-        detail.setPadding(new Insets(12));
-        detail.setStyle("""
-            -fx-background-color:#0b1220;
-            -fx-background-radius:12;
-            -fx-border-color:#1f2a37;
-            -fx-border-radius:12;
-        """);
-
-        Label title = new Label(selected.emoji + " " + selected.eventName);
-        title.setWrapText(true);
-        title.setStyle("-fx-text-fill:#f8fafc; -fx-font-size:16px; -fx-font-weight:bold;");
-
-        Label meta = new Label("Category: " + capitalize(selected.category) + " - Year " + selected.year);
-        meta.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:11px;");
-
-        Label description = new Label(definition != null ? definition.description : "No description available.");
-        description.setWrapText(true);
-        description.setStyle("-fx-text-fill:#dbe4f0; -fx-font-size:13px;");
-
-        Label affected = new Label("Affected Regions: " + describeAffectedRegions(selected));
-        affected.setWrapText(true);
-        affected.setStyle("-fx-text-fill:#cbd5e1; -fx-font-size:12px;");
-
-        detail.getChildren().addAll(title, meta, description);
-        if (definition != null) {
-            Label flavor = new Label("\"" + definition.flavour + "\"");
-            flavor.setWrapText(true);
-            flavor.setStyle("-fx-text-fill:#7dd3fc; -fx-font-size:12px;");
-            detail.getChildren().add(flavor);
-        }
-        detail.getChildren().addAll(affected, buildEffectsLabel(selected));
-        return detail;
     }
 
     private VBox buildFeedSidebar() {
         VBox content = new VBox(12);
         content.setMaxWidth(Double.MAX_VALUE);
         content.setPadding(new Insets(0, 10, 0, 0));
-        HBox titleRow = new HBox(8);
-        titleRow.setAlignment(Pos.CENTER_LEFT);
-
         Label title = sectionLabel("World Feed");
-        Label liveBadge = new Label("LIVE");
-        liveBadge.setStyle("""
-            -fx-text-fill:#020617;
-            -fx-font-size:10px;
-            -fx-font-weight:bold;
-            -fx-padding:3 7 3 7;
-            -fx-background-radius:999;
-            -fx-background-color:#22c55e;
-        """);
-        titleRow.getChildren().addAll(title, liveBadge);
-
-        Label subtitle = new Label("Citizens, analysts, reporters, and local leaders are posting as the world changes.");
+        Label subtitle = new Label("Live reactions from citizens, analysts, and reporters across the planet.");
         subtitle.setWrapText(true);
         subtitle.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:12px;");
 
-        Label count = new Label(state.feedPosts.size() + " recent posts");
-        count.setStyle("-fx-text-fill:#64748b; -fx-font-size:11px;");
-
         SocialFeedView feedView = new SocialFeedView(state.feedPosts);
-        content.getChildren().addAll(titleRow, subtitle, count, feedView);
+        content.getChildren().addAll(title, subtitle, feedView);
         return content;
     }
 
@@ -459,7 +383,7 @@ public class SimulationView extends BorderPane {
         for (String tab : EVENT_TABS) {
             Button tabButton = new Button(EVENT_TAB_LABELS.get(tab));
             tabButton.setStyle(tabButtonStyle(tab.equals(activeEventTab)));
-            tabButton.setOnAction(_ -> {
+            tabButton.setOnAction(e -> {
                 activeEventTab = tab;
                 buildUI();
             });
@@ -503,20 +427,11 @@ public class SimulationView extends BorderPane {
     }
 
     private void triggerEvent(GameEventDef event) {
-        if (isEventCoolingDown(event.id)) {
-            return;
-        }
-
         state = SimulationModel.applyPlayerCommand(state, event);
-        startEventCooldown(event.id);
-        showPopup(state.pendingTriggeredEventId);
+        showPopup(event.id, state.pendingTriggeredEventId);
         activeSidebarTab = "events";
         if (!state.eventLog.isEmpty()) {
-            selectedEventId = state.eventLog.getFirst().id;
-        }
-        if (shouldEndForExtinction()) {
-            finishSimulation();
-            return;
+            selectedEventId = state.eventLog.get(0).id;
         }
         buildUI();
     }
@@ -525,27 +440,18 @@ public class SimulationView extends BorderPane {
         String imagePath = EVENT_BUTTON_IMAGES.get(event.id);
         if (imagePath != null) {
             try {
-                URL imageResource = getClass().getResource(imagePath);
-                if (imageResource == null) {
-                    return createFallbackEventCard(event);
-                }
-
-                String imageUrl = imageResource.toExternalForm();
+                String imageUrl = getClass().getResource(imagePath).toExternalForm();
                 Image image = new Image(imageUrl);
                 if (image.isError() || image.getWidth() <= 0 || image.getHeight() <= 0) {
                     return createFallbackEventCard(event);
                 }
 
-                URL fxmlResource = Objects.requireNonNull(
-                        getClass().getResource("/event-image-button.fxml"),
-                        "Missing event-image-button.fxml"
-                );
-                FXMLLoader loader = new FXMLLoader(fxmlResource);
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/event-image-button.fxml"));
                 Node imageButton = loader.load();
                 EventImageButtonController controller = loader.getController();
                 controller.setImage(imageUrl);
-                controller.setCoolingDown(isEventCoolingDown(event.id));
-                controller.setOnAction(_ -> triggerEvent(event));
+                // controller.setFitHeight(EVENT_BUTTON_HEIGHTS.getOrDefault(event.id, 84.0));
+                controller.setOnAction(e -> triggerEvent(event));
                 return imageButton;
             } catch (IOException e) {
                 throw new IllegalStateException("Failed to load event image button for " + event.id + ".", e);
@@ -557,97 +463,8 @@ public class SimulationView extends BorderPane {
 
     private EventCard createFallbackEventCard(GameEventDef event) {
         EventCard card = new EventCard(event);
-        if (isEventCoolingDown(event.id)) {
-            card.setDisable(true);
-            card.setStyle("""
-                -fx-background-color:#991b1b;
-                -fx-text-fill:white;
-                -fx-border-color:#fecaca;
-                -fx-border-radius:8;
-                -fx-background-radius:8;
-                -fx-padding:12;
-                -fx-font-size:12px;
-                -fx-alignment:top-left;
-                -fx-opacity:1;
-            """);
-        }
-        card.setOnAction(_ -> triggerEvent(event));
+        card.setOnAction(e -> triggerEvent(event));
         return card;
-    }
-
-    private boolean isEventCoolingDown(String eventId) {
-        PauseTransition timer = eventCooldownTimers.get(eventId);
-        return timer != null && timer.getStatus() == Animation.Status.RUNNING;
-    }
-
-    private void startEventCooldown(String eventId) {
-        PauseTransition oldTimer = eventCooldownTimers.remove(eventId);
-        if (oldTimer != null) {
-            oldTimer.stop();
-        }
-
-        PauseTransition timer = new PauseTransition(EVENT_BUTTON_COOLDOWN);
-        eventCooldownTimers.put(eventId, timer);
-        timer.setOnFinished(_ -> {
-            eventCooldownTimers.remove(eventId);
-            if (!simulationEnded) {
-                buildUI();
-            }
-        });
-        timer.playFromStart();
-    }
-
-    private void stopEventCooldownTimers() {
-        for (PauseTransition timer : eventCooldownTimers.values()) {
-            timer.stop();
-        }
-        eventCooldownTimers.clear();
-    }
-
-    private void scheduleRandomBadEvent() {
-        if (simulationEnded) {
-            return;
-        }
-
-        int delayRange = MAX_RANDOM_BAD_EVENT_DELAY_SECONDS - MIN_RANDOM_BAD_EVENT_DELAY_SECONDS + 1;
-        int delaySeconds = MIN_RANDOM_BAD_EVENT_DELAY_SECONDS + RANDOM.nextInt(delayRange);
-        randomBadEventTimer.setDuration(Duration.seconds(delaySeconds));
-        randomBadEventTimer.playFromStart();
-    }
-
-    private void triggerRandomBadEvent() {
-        List<GameEventDef> candidates = new ArrayList<>();
-        for (GameEventDef event : GameTypes.allEvents()) {
-            if (isBadRandomEvent(event) && SimulationModel.isEventAvailableForPlayer(state, event.id)) {
-                candidates.add(event);
-            }
-        }
-
-        if (!candidates.isEmpty()) {
-            GameEventDef event = candidates.get(RANDOM.nextInt(candidates.size()));
-            state = SimulationModel.applyEvent(state, event);
-            startEventCooldown(event.id);
-            showPopup(event.id);
-            activeSidebarTab = "events";
-            selectedEventId = state.eventLog.isEmpty() ? null : state.eventLog.getFirst().id;
-            if (shouldEndForExtinction()) {
-                finishSimulation();
-                return;
-            }
-            buildUI();
-        }
-
-        scheduleRandomBadEvent();
-    }
-
-    private boolean isBadRandomEvent(GameEventDef event) {
-        return "disaster".equals(event.category)
-                || "conflict".equals(event.category)
-                || "depression".equals(event.id);
-    }
-
-    private boolean shouldEndForExtinction() {
-        return state.globalStats.population < EXTINCTION_POPULATION_THRESHOLD;
     }
 
     private void ensureSelectedEvent() {
@@ -657,7 +474,7 @@ public class SimulationView extends BorderPane {
         }
 
         if (selectedEventId == null || findSelectedEventEntry() == null) {
-            selectedEventId = state.eventLog.getFirst().id;
+            selectedEventId = state.eventLog.get(0).id;
         }
     }
 
@@ -696,18 +513,6 @@ public class SimulationView extends BorderPane {
         }
 
         return names.isEmpty() ? "Planet-wide" : String.join(", ", names);
-    }
-
-    private Label buildEffectsLabel(EventLogEntry selected) {
-        Label effects = new Label(
-                "Impact: Population " + formatPopulationDelta(selected.effects.population)
-                        + " - Stress " + signedPercent(selected.effects.stress)
-                        + " - Economy " + signedPercent(selected.effects.economicHealth)
-                        + " - Exposure " + signedPercent(selected.effects.exposure)
-        );
-        effects.setWrapText(true);
-        effects.setStyle("-fx-text-fill:#cbd5e1; -fx-font-size:12px;");
-        return effects;
     }
 
     private Label sectionLabel(String text) {
@@ -793,7 +598,7 @@ public class SimulationView extends BorderPane {
     }
 
     private String formatPopulationDelta(double value) {
-        return String.format(Locale.US, "%+.1fB", value);
+        return String.format("%+.1fB", value);
     }
 
     private void advanceYear() {
@@ -801,20 +606,10 @@ public class SimulationView extends BorderPane {
         buildUI();
     }
 
-    private void addLiveFeedPost() {
-        state.feedPosts.addFirst(SimulationModel.generateLiveFeedPost(state));
-        while (state.feedPosts.size() > MAX_FEED_POSTS) {
-            state.feedPosts.removeLast();
-        }
-
-        if ("feed".equals(activeSidebarTab)) {
-            buildUI();
-        }
-    }
-
-    private void showPopup(String eventId) {
+    private void showPopup(String eventId, String nextEventId) {
         popupTimer.stop();
         activePopupEventId = eventId;
+        queuedPopupEventId = nextEventId;
 
         if (eventId != null) {
             popupTimer.playFromStart();
@@ -822,6 +617,14 @@ public class SimulationView extends BorderPane {
     }
 
     private void clearPopup() {
+        if (queuedPopupEventId != null) {
+            activePopupEventId = queuedPopupEventId;
+            queuedPopupEventId = null;
+            buildUI();
+            popupTimer.playFromStart();
+            return;
+        }
+
         activePopupEventId = null;
         buildUI();
     }
@@ -834,9 +637,8 @@ public class SimulationView extends BorderPane {
         popupBox.setPadding(new Insets(0));
 
         String imagePath = TRIGGERED_EVENT_IMAGES.get(eventId);
-        URL imageResource = imagePath == null ? null : getClass().getResource(imagePath);
-        if (imageResource != null) {
-            ImageView imageView = new ImageView(new Image(imageResource.toExternalForm()));
+        if (imagePath != null && getClass().getResource(imagePath) != null) {
+            ImageView imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
             imageView.setPreserveRatio(true);
             imageView.setFitWidth(250);
             popupBox.getChildren().add(imageView);
