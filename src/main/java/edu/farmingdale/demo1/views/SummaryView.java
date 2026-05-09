@@ -6,17 +6,27 @@ import edu.farmingdale.demo1.simulation.SummaryModel;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class SummaryView extends VBox {
+public class SummaryView extends StackPane {
 
     private Runnable onRestart;
 
     public SummaryView(GameState state) {
 
-        setStyle("-fx-background-color:#0f172a;");
-        setAlignment(Pos.CENTER);
-        setSpacing(20);
+        ImageView background = new ImageView(
+                new Image(getClass().getResource("/images/EndPlanetBG.png").toExternalForm())
+        );
+        background.setPreserveRatio(false);
+        background.fitWidthProperty().bind(widthProperty());
+        background.fitHeightProperty().bind(heightProperty());
+
+        VBox content = new VBox(20);
+        content.setAlignment(Pos.CENTER);
+        content.setMaxWidth(700);
 
         SummaryModel.Outcome outcome = SummaryModel.getOutcome(state);
 
@@ -32,16 +42,15 @@ public class SummaryView extends VBox {
         Label events = new Label("Events triggered: " + state.eventLog.size());
         events.setStyle("-fx-text-fill:#cbd5e1; -fx-font-size:14px;");
 
-        Button restart = new Button("Create New Planet");
-        restart.setStyle("""
-            -fx-background-color:#1e293b;
-            -fx-text-fill:white;
-            -fx-border-color:#334155;
-            -fx-border-radius:8;
-            -fx-background-radius:8;
-            -fx-padding: 10 20;
-            -fx-font-size: 14px;
-        """);
+        ImageView restartImage = new ImageView(
+                new Image(getClass().getResource("/images/NewPlanetButton.png").toExternalForm())
+        );
+        restartImage.setFitWidth(320);
+        restartImage.setPreserveRatio(true);
+
+        Button restart = new Button();
+        restart.setGraphic(restartImage);
+        restart.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
 
         restart.setOnAction(e -> {
             if (onRestart != null) {
@@ -49,13 +58,15 @@ public class SummaryView extends VBox {
             }
         });
 
-        getChildren().addAll(
+        content.getChildren().addAll(
                 emoji,
                 title,
                 desc,
                 events,
                 restart
         );
+
+        getChildren().addAll(background, content);
     }
 
     public void setOnRestart(Runnable r) {

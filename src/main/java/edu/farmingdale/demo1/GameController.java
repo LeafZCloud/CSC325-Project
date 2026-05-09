@@ -30,6 +30,8 @@ public class GameController {
     @FXML
     public void initialize() {
 
+        AudioManager.playIntroMusic();
+
         // Start planet simulation immediately
         handlePlanetSim();
     }
@@ -57,6 +59,8 @@ public class GameController {
     // -----------------------------
     private void showSimulation(PlanetConfig config) {
 
+        AudioManager.playGameMusic();
+
         SimulationView view = new SimulationView(config, authService, databaseController);
 
         view.setOnSimulationEnd(() -> {
@@ -77,6 +81,7 @@ public class GameController {
         SummaryView view = new SummaryView(state);
 
         view.setOnRestart(() -> {
+            AudioManager.playIntroMusic();
             handlePlanetSim();
         });
 
@@ -89,6 +94,7 @@ public class GameController {
     @FXML
     private void handleBackToStart() {
         try {
+            AudioManager.playIntroMusic();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/start.fxml"));
             Scene scene = new Scene(loader.load());
 

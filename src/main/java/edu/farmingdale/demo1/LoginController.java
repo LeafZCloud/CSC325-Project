@@ -88,6 +88,7 @@ public class LoginController {
 
     private void goToGame() {
         try {
+            AudioManager.playIntroMusic();
             StackPane gameRoot = new StackPane();
             showPlanetCreation(gameRoot);
             Scene startScene = new Scene(gameRoot, 1000, 700);
@@ -118,6 +119,7 @@ public class LoginController {
     }
 
     private void showSimulation(StackPane gameRoot, PlanetConfig config) {
+        AudioManager.playGameMusic();
         SimulationView view = new SimulationView(config, authService, databaseController);
         view.setOnSimulationEnd(() -> {
             GameState state = view.getState();
@@ -128,7 +130,10 @@ public class LoginController {
 
     private void showSummary(StackPane gameRoot, GameState state) {
         SummaryView view = new SummaryView(state);
-        view.setOnRestart(() -> showPlanetCreation(gameRoot));
+        view.setOnRestart(() -> {
+            AudioManager.playIntroMusic();
+            showPlanetCreation(gameRoot);
+        });
         gameRoot.getChildren().setAll(view);
     }
 

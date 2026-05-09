@@ -1,6 +1,5 @@
 package edu.farmingdale.demo1.simulation;
 
-import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 

@@ -5,6 +5,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.FeedPost;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Locale;
 
 public class SocialFeedModel {
 
@@ -50,11 +51,11 @@ public class SocialFeedModel {
     }
 
     public static String formatLikes(int likes) {
-        return String.format("%,d", likes);
+        return String.format(Locale.US, "%,d", likes);
     }
 
     public static String formatReposts(int reposts) {
-        return String.format("%,d", reposts);
+        return String.format(Locale.US, "%,d", reposts);
     }
 
     public static boolean hasPosts(List<FeedPost> posts) {

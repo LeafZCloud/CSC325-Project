@@ -27,6 +27,7 @@ public class StartController {
     public void startForController(TextField email)
     {
         try {
+            AudioManager.playIntroMusic();
             // Load game screen
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/game.fxml"));
             Scene startScene = new Scene(loader.load());
@@ -43,6 +44,7 @@ public class StartController {
     @FXML
     private void handleStartGame() { // Actually starts the login or sign up screen now
         try {
+            AudioManager.playIntroMusic();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginOrSignUp.fxml"));
             Scene scene = new Scene(loader.load());
 
@@ -71,6 +73,7 @@ public class StartController {
 
     @FXML
     private void handleExit() {
+        AudioManager.stopMusic();
         System.exit(0);
     }
 }

@@ -25,6 +25,8 @@ public class HelloApplication extends Application {
         stage.setTitle("Planet Sim");
         stage.setScene(scene);
         fitStageToScreen(stage);
+        AudioManager.playIntroMusic();
+        stage.setOnCloseRequest(event -> AudioManager.stopMusic());
         stage.show();
     }
 

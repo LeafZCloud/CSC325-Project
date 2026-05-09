@@ -16,6 +16,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.SimulationModel;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -25,10 +26,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -37,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.IOException;
 
-public class SimulationView extends BorderPane {
+public class SimulationView extends StackPane {
 
     private static final List<String> EVENT_TABS = List.of("all", "disaster", "conflict", "technology", "society");
     private static final Map<String, String> EVENT_TAB_LABELS = Map.of(
@@ -60,6 +63,25 @@ public class SimulationView extends BorderPane {
             Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakThrough.png"),
             Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeButton.png")
     );
+    private static final Map<String, String> TRIGGERED_EVENT_IMAGES = Map.ofEntries(
+            Map.entry("meteor", "/images/commandsAndEvents/AsteroidNotification.png"),
+            Map.entry("earthquakes", "/images/commandsAndEvents/EarthquakeNotification.png"),
+            Map.entry("volcanic_eruptions", "/images/commandsAndEvents/EruptionNotification.png"),
+            Map.entry("drought", "/images/commandsAndEvents/DroughtNotification.png"),
+            Map.entry("plague", "/images/commandsAndEvents/PlagueNotification.png"),
+            Map.entry("nuke", "/images/commandsAndEvents/NukeNotification.png"),
+            Map.entry("world_war", "/images/commandsAndEvents/WorldWarNotification.png"),
+            Map.entry("industrial_revolution", "/images/commandsAndEvents/IndustrializeNotification.png"),
+            Map.entry("medical_breakthrough", "/images/commandsAndEvents/MedicalBreakthroughNotification.png"),
+            Map.entry("golden_age", "/images/commandsAndEvents/GoldenAgeNotification.png"),
+            Map.entry("tsunami", "/images/commandsAndEvents/TsunamiEvent.png"),
+            Map.entry("virus", "/images/commandsAndEvents/VirusEvent.png"),
+            Map.entry("depression", "/images/commandsAndEvents/DepressionEvent.png"),
+            Map.entry("ice_age", "/images/commandsAndEvents/BlizzardNotification.png"),
+            Map.entry("famine", "/images/commandsAndEvents/FamineEvent.png"),
+            Map.entry("rebellion", "/images/commandsAndEvents/RebellionEvent.png"),
+            Map.entry("economic_boom", "/images/commandsAndEvents/EcoBoomEvent.png")
+    );
 
 
     private GameState state;
@@ -67,6 +89,12 @@ public class SimulationView extends BorderPane {
     private String activeSidebarTab = "stats";
     private String selectedEventId;
     private final Timeline yearTimeline;
+    private final PauseTransition popupTimer;
+    private String activePopupEventId;
+    private String queuedPopupEventId;
+    private final BorderPane layoutRoot = new BorderPane();
+    private final StackPane notificationLayer = new StackPane();
+
     private final FirebaseAuthService authService;
     private final DatabaseController databaseController;
     private Runnable onSimulationEnd;
@@ -78,6 +106,12 @@ public class SimulationView extends BorderPane {
         yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
         yearTimeline.setCycleCount(Animation.INDEFINITE);
         yearTimeline.play();
+        popupTimer = new PauseTransition(Duration.seconds(3));
+        popupTimer.setOnFinished(e -> clearPopup());
+        notificationLayer.setMouseTransparent(true);
+        notificationLayer.setPickOnBounds(false);
+        notificationLayer.setViewOrder(-1);
+        layoutRoot.setViewOrder(0);
         buildUI();
     }
 
@@ -96,11 +130,27 @@ public class SimulationView extends BorderPane {
                 state.flashingRegions,
                 state.lastEventId
         );
-        setCenter(map);
+        StackPane centerLayer = new StackPane(map);
+        centerLayer.setPickOnBounds(false);
 
-        setRight(buildSidebar());
-        setBottom(buildEventBrowser());
-        setTop(buildTopBar());
+        layoutRoot.setCenter(centerLayer);
+        layoutRoot.setRight(buildSidebar());
+        layoutRoot.setBottom(buildEventBrowser());
+        layoutRoot.setTop(buildTopBar());
+
+        notificationLayer.getChildren().clear();
+        if (activePopupEventId != null) {
+            Node popup = buildTriggeredEventPopup(activePopupEventId);
+            notificationLayer.getChildren().add(popup);
+            StackPane.setAlignment(popup, Pos.TOP_LEFT);
+            StackPane.setMargin(popup, new Insets(76, 0, 0, 24));
+            popup.toFront();
+        }
+
+        if (getChildren().isEmpty()) {
+            getChildren().addAll(layoutRoot, notificationLayer);
+        }
+        notificationLayer.toFront();
     }
 
     private HBox buildTopBar() {
@@ -433,7 +483,8 @@ public class SimulationView extends BorderPane {
     }
 
     private void triggerEvent(GameEventDef event) {
-        state = SimulationModel.applyEvent(state, event);
+        state = SimulationModel.applyPlayerCommand(state, event);
+        showPopup(event.id, state.pendingTriggeredEventId);
         activeSidebarTab = "events";
         if (!state.eventLog.isEmpty()) {
             selectedEventId = state.eventLog.get(0).id;
@@ -498,7 +549,7 @@ public class SimulationView extends BorderPane {
     }
 
     private GameEventDef findEventDef(EventLogEntry entry) {
-        for (GameEventDef event : GameTypes.GAME_EVENTS) {
+        for (GameEventDef event : GameTypes.allEvents()) {
             if (event.id.equals(entry.id) || event.name.equals(entry.eventName)) {
                 return event;
             }
@@ -609,5 +660,58 @@ public class SimulationView extends BorderPane {
     private void advanceYear() {
         state.year += 1;
         buildUI();
+    }
+
+    private void showPopup(String eventId, String nextEventId) {
+        popupTimer.stop();
+        activePopupEventId = eventId;
+        queuedPopupEventId = nextEventId;
+
+        if (eventId != null) {
+            popupTimer.playFromStart();
+        }
+    }
+
+    private void clearPopup() {
+        if (queuedPopupEventId != null) {
+            activePopupEventId = queuedPopupEventId;
+            queuedPopupEventId = null;
+            buildUI();
+            popupTimer.playFromStart();
+            return;
+        }
+
+        activePopupEventId = null;
+        buildUI();
+    }
+
+    private Node buildTriggeredEventPopup(String eventId) {
+        VBox popupBox = new VBox();
+        popupBox.setAlignment(Pos.CENTER);
+        popupBox.setMouseTransparent(true);
+        popupBox.setMaxWidth(280);
+        popupBox.setPadding(new Insets(0));
+
+        String imagePath = TRIGGERED_EVENT_IMAGES.get(eventId);
+        if (imagePath != null && getClass().getResource(imagePath) != null) {
+            ImageView imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
+            imageView.setPreserveRatio(true);
+            imageView.setFitWidth(250);
+            popupBox.getChildren().add(imageView);
+            return popupBox;
+        }
+
+        GameEventDef event = GameTypes.findEventById(eventId);
+        Label fallback = new Label(event != null ? event.name : "Event Triggered");
+        fallback.setStyle("""
+            -fx-background-color:#7f1d1d;
+            -fx-text-fill:white;
+            -fx-font-size:14px;
+            -fx-font-weight:bold;
+            -fx-background-radius:12;
+            -fx-padding:10 16 10 16;
+        """);
+        popupBox.getChildren().add(fallback);
+        return popupBox;
     }
 }

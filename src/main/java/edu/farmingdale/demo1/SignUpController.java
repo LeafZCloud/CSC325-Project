@@ -62,24 +62,10 @@ public class SignUpController extends StartController{
 
                 // Go straight to game using same service instance
                 try {
+                    AudioManager.playIntroMusic();
                     StackPane gameRoot = new StackPane();
                     DatabaseController db = new DatabaseController();
-                    PlanetCreationView view = new PlanetCreationView(service, db);
-                    view.setOnSimulationStart(() -> {
-                        GameTypes.PlanetConfig config = view.getCreatedConfig();
-                        SimulationView sim = new SimulationView(config, service, db);
-                        sim.setOnSimulationEnd(() -> {
-                            GameTypes.GameState state = sim.getState();
-                            SummaryView summary = new SummaryView(state);
-                            summary.setOnRestart(() -> {
-                                PlanetCreationView restart = new PlanetCreationView(service, db);
-                                gameRoot.getChildren().setAll(restart);
-                            });
-                            gameRoot.getChildren().setAll(summary);
-                        });
-                        gameRoot.getChildren().setAll(sim);
-                    });
-                    gameRoot.getChildren().setAll(view);
+                    showPlanetCreation(gameRoot, db);
 
                     Scene scene = new Scene(gameRoot, 1000, 700);
                     String stylesheet = getClass().getResource("/styles/dark-theme.css").toExternalForm();
@@ -98,6 +84,34 @@ public class SignUpController extends StartController{
         } else {
             statusLabel.setText(inputResponse);
         }
+    }
+
+    private void showPlanetCreation(StackPane gameRoot, DatabaseController db) {
+        PlanetCreationView view = new PlanetCreationView(service, db);
+        view.setOnSimulationStart(() -> {
+            GameTypes.PlanetConfig config = view.getCreatedConfig();
+            showSimulation(gameRoot, db, config);
+        });
+        gameRoot.getChildren().setAll(view);
+    }
+
+    private void showSimulation(StackPane gameRoot, DatabaseController db, GameTypes.PlanetConfig config) {
+        AudioManager.playGameMusic();
+        SimulationView sim = new SimulationView(config, service, db);
+        sim.setOnSimulationEnd(() -> {
+            GameTypes.GameState state = sim.getState();
+            showSummary(gameRoot, db, state);
+        });
+        gameRoot.getChildren().setAll(sim);
+    }
+
+    private void showSummary(StackPane gameRoot, DatabaseController db, GameTypes.GameState state) {
+        SummaryView summary = new SummaryView(state);
+        summary.setOnRestart(() -> {
+            AudioManager.playIntroMusic();
+            showPlanetCreation(gameRoot, db);
+        });
+        gameRoot.getChildren().setAll(summary);
     }
 
 
