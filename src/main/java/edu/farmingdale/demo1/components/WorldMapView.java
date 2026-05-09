@@ -71,7 +71,7 @@ public class WorldMapView extends Pane {
 
         // Planet base
         Circle planet = new Circle(PLANET_CENTER_X, PLANET_CENTER_Y, PLANET_RADIUS);
-        Image planetWater = new Image (getClass().getResource("/images/waterTexture2.JPG").toExternalForm());
+        Image planetWater = new Image (getClass().getResource("/images/waterTexture2.jpg").toExternalForm());
         ImagePattern planetWaterPattern = new ImagePattern(planetWater);
             // (this is a plain color used in testing) planet.setFill(Color.web("#1c6087"));
             // (this is a water texture used in testing) planet.setFill(planetWaterPattern);
@@ -100,9 +100,9 @@ public class WorldMapView extends Pane {
             }
 
             //loading the images
-            Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.PNG").toExternalForm());
-            Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.PNG").toExternalForm());
-            Image forestMeteorImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.PNG").toExternalForm());
+            Image forestNormImage = new Image (getClass().getResource("/images/forestBiomeImages/forestBiomeNormal.png").toExternalForm());
+            Image forestBlizzImage = new Image (getClass().getResource("/images/forestBiomeImages/blizzardEventForest.png").toExternalForm());
+            Image forestMeteorImage = new Image (getClass().getResource("/images/forestBiomeImages/meteorEventForest.png").toExternalForm());
 
             //creating the image patterns
             ImagePattern forestNormPattern = new ImagePattern(forestNormImage);
