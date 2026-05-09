@@ -89,10 +89,11 @@ private static final String FIRESTORE_URL = "https://firestore.googleapis.com/v1
 ---
 
 ## Screenshots
-
-<img width="2554" height="1439" alt="image" src="https://github.com/user-attachments/assets/7fd52941-0a17-4b30-8c05-854ee3632219" />
+<img width="1873" height="1259" alt="image" src="https://github.com/user-attachments/assets/f1085cf0-b45e-4de5-a6ec-4a9e3dbf2a00" />
 
 <img width="235" height="212" alt="image" src="https://github.com/user-attachments/assets/65a32491-5bfc-403c-bdbf-24853849405b" />
+
+<img width="327" height="760" alt="image" src="https://github.com/user-attachments/assets/9371b840-0b0e-458c-8eb6-cf622b304fb6" />
 
 <img width="1537" height="995" alt="image" src="https://github.com/user-attachments/assets/c772a082-414f-495b-ac71-c80abff12fc5" />
 
