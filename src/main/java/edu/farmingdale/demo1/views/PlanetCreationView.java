@@ -34,6 +34,11 @@ public class PlanetCreationView extends StackPane {
 
     private FirebaseAuthService authService;
     private DatabaseController databaseController;
+    private GameTypes.GameState loadedState;
+
+    public GameTypes.GameState getLoadedState() {
+        return loadedState;
+    }
 
     public PlanetCreationView(FirebaseAuthService authService, DatabaseController databaseController) {
 
@@ -127,6 +132,7 @@ public class PlanetCreationView extends StackPane {
             GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
             if (state != null) {
                 createdConfig = state.planet;
+                loadedState = state;
                 if (onSimulationStart != null) onSimulationStart.run();
             } else {
                 System.out.println("Slot 1 is empty");
@@ -141,6 +147,7 @@ public class PlanetCreationView extends StackPane {
             GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 2);
             if (state != null) {
                 createdConfig = state.planet;
+                loadedState = state;
                 if (onSimulationStart != null) onSimulationStart.run();
             } else {
                 System.out.println("Slot 2 is empty");
@@ -155,6 +162,7 @@ public class PlanetCreationView extends StackPane {
             GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 3);
             if (state != null) {
                 createdConfig = state.planet;
+                loadedState = state;
                 if (onSimulationStart != null) onSimulationStart.run();
             } else {
                 System.out.println("Slot 3 is empty");

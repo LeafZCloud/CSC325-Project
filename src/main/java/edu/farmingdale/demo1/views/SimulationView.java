@@ -115,6 +115,22 @@ public class SimulationView extends StackPane {
         buildUI();
     }
 
+    public SimulationView(GameState loadedState, FirebaseAuthService authService, DatabaseController databaseController) {
+        this.authService = authService;
+        this.databaseController = databaseController;
+        state = loadedState;
+        yearTimeline = new Timeline(new KeyFrame(Duration.seconds(10), e -> advanceYear()));
+        yearTimeline.setCycleCount(Animation.INDEFINITE);
+        yearTimeline.play();
+        popupTimer = new PauseTransition(Duration.seconds(3));
+        popupTimer.setOnFinished(e -> clearPopup());
+        notificationLayer.setMouseTransparent(true);
+        notificationLayer.setPickOnBounds(false);
+        notificationLayer.setViewOrder(-1);
+        layoutRoot.setViewOrder(0);
+        buildUI();
+    }
+
     public void setOnSimulationEnd(Runnable r) {
         this.onSimulationEnd = r;
     }
