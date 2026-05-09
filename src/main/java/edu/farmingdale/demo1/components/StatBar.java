@@ -51,7 +51,8 @@ public class StatBar extends VBox {
             else if (percentage < 60) barColor = "#f59e0b"; // Orange/Yellow
             else barColor = "#22c55e"; // Green
         } else if (label.equalsIgnoreCase("Population")) {
-            barColor = "#ef4444"; // Red as in screenshot
+            if (percentage >= 40 && percentage <= 60) barColor = "#f59e0b"; // Orange/Yellow
+            else barColor = percentage > 60 ? "#22c55e" : "#ef4444";
         }
 
         ProgressBar bar = new ProgressBar(percentage / 100.0);

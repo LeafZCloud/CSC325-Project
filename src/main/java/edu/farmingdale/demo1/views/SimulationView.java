@@ -80,7 +80,6 @@ public class SimulationView extends BorderPane {
     private String selectedEventId;
     private final Timeline yearTimeline;
     private final PauseTransition popupTimer;
-    private final StackPane popupOverlay = new StackPane();
     private String activePopupEventId;
 
     private final FirebaseAuthService authService;
@@ -96,10 +95,6 @@ public class SimulationView extends BorderPane {
         yearTimeline.play();
         popupTimer = new PauseTransition(Duration.seconds(5));
         popupTimer.setOnFinished(e -> clearPopup());
-        popupOverlay.setManaged(false);
-        popupOverlay.setMouseTransparent(true);
-        popupOverlay.setPickOnBounds(false);
-        popupOverlay.setAlignment(Pos.TOP_LEFT);
         buildUI();
     }
 
@@ -121,21 +116,19 @@ public class SimulationView extends BorderPane {
         StackPane centerLayer = new StackPane(map);
         centerLayer.setPickOnBounds(false);
 
+        if (activePopupEventId != null) {
+            Node popup = buildTriggeredEventPopup(activePopupEventId);
+            centerLayer.getChildren().add(popup);
+            StackPane.setAlignment(popup, Pos.TOP_CENTER);
+            popup.setTranslateY(-215);
+            popup.setTranslateX(160);
+        }
+
         setCenter(centerLayer);
 
         setRight(buildSidebar());
         setBottom(buildEventBrowser());
         setTop(buildTopBar());
-        updatePopupOverlay();
-    }
-
-    @Override
-    protected void layoutChildren() {
-        super.layoutChildren();
-        if (popupOverlay.getParent() == this) {
-            popupOverlay.resizeRelocate(0, 0, getWidth(), getHeight());
-            positionPopupOverlay();
-        }
     }
 
     private HBox buildTopBar() {
@@ -605,57 +598,18 @@ public class SimulationView extends BorderPane {
         buildUI();
     }
 
-    private void updatePopupOverlay() {
-        popupOverlay.getChildren().clear();
-
-        if (activePopupEventId == null) {
-            getChildren().remove(popupOverlay);
-            return;
-        }
-
-        Node popup = buildTriggeredEventPopup(activePopupEventId);
-        popup.setManaged(false);
-        popupOverlay.getChildren().add(popup);
-
-        if (!getChildren().contains(popupOverlay)) {
-            getChildren().add(popupOverlay);
-        }
-
-        popupOverlay.toFront();
-        positionPopupOverlay();
-    }
-
-    private void positionPopupOverlay() {
-        if (popupOverlay.getChildren().isEmpty() || getCenter() == null) {
-            return;
-        }
-
-        Node popup = popupOverlay.getChildren().get(0);
-        javafx.geometry.Bounds centerBounds = getCenter().getBoundsInParent();
-        double popupWidth = popup.prefWidth(-1);
-        if (popupWidth <= 0) {
-            popupWidth = 380;
-        }
-
-        popup.resize(popupWidth, popup.prefHeight(-1));
-        popup.relocate(
-                centerBounds.getMinX() + (centerBounds.getWidth() - popupWidth) / 2,
-                centerBounds.getMinY() + 20
-        );
-    }
-
     private Node buildTriggeredEventPopup(String eventId) {
         VBox popupBox = new VBox();
         popupBox.setAlignment(Pos.CENTER);
         popupBox.setMouseTransparent(true);
-        popupBox.setMaxWidth(380);
+        popupBox.setMaxWidth(280);
         popupBox.setPadding(new Insets(0));
 
         String imagePath = TRIGGERED_EVENT_IMAGES.get(eventId);
         if (imagePath != null && getClass().getResource(imagePath) != null) {
             ImageView imageView = new ImageView(new Image(getClass().getResource(imagePath).toExternalForm()));
             imageView.setPreserveRatio(true);
-            imageView.setFitWidth(340);
+            imageView.setFitWidth(250);
             popupBox.getChildren().add(imageView);
             return popupBox;
         }
@@ -665,10 +619,10 @@ public class SimulationView extends BorderPane {
         fallback.setStyle("""
             -fx-background-color:#7f1d1d;
             -fx-text-fill:white;
-            -fx-font-size:18px;
+            -fx-font-size:14px;
             -fx-font-weight:bold;
             -fx-background-radius:12;
-            -fx-padding:14 22 14 22;
+            -fx-padding:10 16 10 16;
         """);
         popupBox.getChildren().add(fallback);
         return popupBox;
