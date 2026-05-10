@@ -219,10 +219,10 @@ public class WorldMapView extends Pane {
     private void shakePolygon(Polygon poly) {
         Timeline shake = new Timeline(
                 new KeyFrame(Duration.millis(0), e -> poly.setTranslateX(0)),
-                new KeyFrame(Duration.millis(25), e -> poly.setTranslateX(-5)),
-                new KeyFrame(Duration.millis(50), e -> poly.setTranslateX(5)),
-                new KeyFrame(Duration.millis(75), e -> poly.setTranslateX(-5)),
-                new KeyFrame(Duration.millis(100), e -> poly.setTranslateX(5))
+                new KeyFrame(Duration.millis(12), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(24), e -> poly.setTranslateX(5)),
+                new KeyFrame(Duration.millis(36), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(48), e -> poly.setTranslateX(5))
         );
 
         shake.setCycleCount(8); // faster total duration
