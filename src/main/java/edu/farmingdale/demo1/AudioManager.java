@@ -9,9 +9,11 @@ public final class AudioManager {
 
     private static final String INTRO_MUSIC = "/audios/IntroMusic.mp3";
     private static final String GAME_MUSIC = "/audios/GameMusic.mp3";
+    private static final String SNOW_EVENT = "/audios/blizzardWind.mp3";
 
     private static MediaPlayer currentPlayer;
     private static String currentTrack;
+    private static MediaPlayer currentSfxPlayer;
 
     private AudioManager() {
     }
@@ -55,4 +57,49 @@ public final class AudioManager {
         currentPlayer = player;
         currentTrack = resourcePath;
     }
+
+    public static void play(String resourcePath) {
+
+        URL audioUrl = AudioManager.class.getResource(resourcePath);
+
+        if (audioUrl == null) {
+            System.err.println("Sound not found: " + resourcePath);
+            return;
+        }
+
+        // stop previous sound effect (THIS is the key fix)
+        if (currentSfxPlayer != null) {
+            currentSfxPlayer.stop();
+            currentSfxPlayer.dispose();
+            currentSfxPlayer = null;
+        }
+
+        Media media = new Media(audioUrl.toExternalForm());
+        MediaPlayer player = new MediaPlayer(media);
+
+        player.setVolume(1.0);
+
+        player.setOnEndOfMedia(() -> {
+            player.dispose();
+            if (currentSfxPlayer == player) {
+                currentSfxPlayer = null;
+            }
+        });
+
+        currentSfxPlayer = player;
+        player.play();
+    }
+
+    public static void playSoundEffect(String eventId) {
+
+        if (eventId == null) return;
+
+        eventId = eventId.trim().toLowerCase();
+
+        switch (eventId) {
+            case "ice_age" -> play(SNOW_EVENT);
+            default -> System.out.println("No sound mapped for: " + eventId);
+        }
+    }
+
 }

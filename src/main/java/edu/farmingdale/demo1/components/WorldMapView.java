@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1.components;
 
+import edu.farmingdale.demo1.AudioManager;
 import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
@@ -70,6 +71,8 @@ public class WorldMapView extends Pane {
     private static final ImagePattern FOREST_WAR_PATTERN = new ImagePattern(FOREST_WAR);
     private static final ImagePattern FOREST_MEDICAL_PATTERN = new ImagePattern(FOREST_MEDICAL);
     private static final ImagePattern FOREST_GOLDEN_PATTERN = new ImagePattern(FOREST_GOLDEN);
+
+    private static String lastPlayedEvent;
 
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
@@ -205,6 +208,11 @@ public class WorldMapView extends Pane {
             label.setY(centroid[1] + (textHeight / 4.0));
 
             worldGroup.getChildren().add(label);
+        }
+
+        if (lastEventId != null && !lastEventId.equals(lastPlayedEvent)) {
+            AudioManager.playSoundEffect(lastEventId);
+            lastPlayedEvent = lastEventId;
         }
 
         getChildren().add(worldGroup);
