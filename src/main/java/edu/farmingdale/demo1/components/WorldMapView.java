@@ -1,5 +1,6 @@
 package edu.farmingdale.demo1.components;
 
+import edu.farmingdale.demo1.AudioManager;
 import edu.farmingdale.demo1.simulation.GameTypes;
 import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
@@ -71,6 +72,8 @@ public class WorldMapView extends Pane {
     private static final ImagePattern FOREST_MEDICAL_PATTERN = new ImagePattern(FOREST_MEDICAL);
     private static final ImagePattern FOREST_GOLDEN_PATTERN = new ImagePattern(FOREST_GOLDEN);
 
+    private static String lastPlayedEvent;
+
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
         setPrefSize(1500, 1500);
@@ -117,36 +120,57 @@ public class WorldMapView extends Pane {
                 );
             }
 
+            boolean affected = flashingRegions.contains(region.id);
+
             poly.setFill(FOREST_NORMAL_PATTERN);
 
-            switch (lastEventId) {
-                case "ice_age" -> poly.setFill(FOREST_BLIZZ_PATTERN);
-                    case "earthquake", "earthquakes" -> {
+            if (affected) {
+
+                switch (lastEventId) {
+
+                    case "ice_age" -> poly.setFill(FOREST_BLIZZ_PATTERN);
+
+                    case "earthquakes" -> {
                         poly.setFill(FOREST_QUAKE_PATTERN);
                         shakePolygon(poly);
                     }
-                        case "meteor" -> {
+
+                    case "meteor" -> {
                         poly.setFill(FOREST_METEOR_PATTERN);
                         shakePolygon(poly);
-                        }
-                            case "industrial_revolution" -> poly.setFill(FOREST_INDUST_PATTERN);
-                                case "volcanic_eruptions" -> {
-                                    poly.setFill(FOREST_VOLCANIC_PATTERN);
-                                    shakePolygon(poly);
-                                    }
-                                        case "drought" -> poly.setFill(FOREST_DROUGHT_PATTERN);
-                                            case "plague" -> poly.setFill(FOREST_PLAGUE_PATTERN);
-                                                case "nuke" -> {
-                                                    poly.setFill(FOREST_NUKE_PATTERN);
-                                                    shakePolygon(poly);
-                                                    }
-                                                        case "world_war" -> {
-                                                        poly.setFill(FOREST_WAR_PATTERN);
-                                                        shakePolygon(poly);
-                                                        }
-                                                            case "medical_breakthrough" -> poly.setFill(FOREST_MEDICAL_PATTERN);
-                                                                case "golden_age" -> poly.setFill(FOREST_GOLDEN_PATTERN);
-                                                                }
+                    }
+
+                    case "industrial_revolution" ->
+                            poly.setFill(FOREST_INDUST_PATTERN);
+
+                    case "volcanic_eruptions" -> {
+                        poly.setFill(FOREST_VOLCANIC_PATTERN);
+                        shakePolygon(poly);
+                    }
+
+                    case "drought" ->
+                            poly.setFill(FOREST_DROUGHT_PATTERN);
+
+                    case "plague" ->
+                            poly.setFill(FOREST_PLAGUE_PATTERN);
+
+                    case "nuke" -> {
+                        poly.setFill(FOREST_NUKE_PATTERN);
+                        shakePolygon(poly);
+                    }
+
+                    case "world_war" -> {
+                        poly.setFill(FOREST_WAR_PATTERN);
+                        shakePolygon(poly);
+                    }
+
+                    case "medical_breakthrough" ->
+                            poly.setFill(FOREST_MEDICAL_PATTERN);
+
+                    case "golden_age" ->
+                            poly.setFill(FOREST_GOLDEN_PATTERN);
+                }
+            }
 
             poly.setStroke(Color.BLACK);
             poly.setStrokeWidth(2);
@@ -186,6 +210,11 @@ public class WorldMapView extends Pane {
             worldGroup.getChildren().add(label);
         }
 
+        if (lastEventId != null && !lastEventId.equals(lastPlayedEvent)) {
+            AudioManager.playSoundEffect(lastEventId);
+            lastPlayedEvent = lastEventId;
+        }
+
         getChildren().add(worldGroup);
 
         widthProperty().addListener((obs, oldWidth, newWidth) -> centerWorld(worldGroup));
@@ -198,10 +227,10 @@ public class WorldMapView extends Pane {
     private void shakePolygon(Polygon poly) {
         Timeline shake = new Timeline(
                 new KeyFrame(Duration.millis(0), e -> poly.setTranslateX(0)),
-                new KeyFrame(Duration.millis(25), e -> poly.setTranslateX(-5)),
-                new KeyFrame(Duration.millis(50), e -> poly.setTranslateX(5)),
-                new KeyFrame(Duration.millis(75), e -> poly.setTranslateX(-5)),
-                new KeyFrame(Duration.millis(100), e -> poly.setTranslateX(5))
+                new KeyFrame(Duration.millis(12), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(24), e -> poly.setTranslateX(5)),
+                new KeyFrame(Duration.millis(36), e -> poly.setTranslateX(-5)),
+                new KeyFrame(Duration.millis(48), e -> poly.setTranslateX(5))
         );
 
         shake.setCycleCount(8); // faster total duration
