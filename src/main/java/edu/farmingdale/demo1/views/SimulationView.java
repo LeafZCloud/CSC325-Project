@@ -201,8 +201,62 @@ public class SimulationView extends StackPane {
         Region rightSpacer = new Region();
         HBox.setHgrow(leftSpacer, Priority.ALWAYS);
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+        Button save = new Button("💾 Save Game");
+        save.setStyle("""
+            -fx-background-color:#38bdf8;
+            -fx-text-fill:#020617;
+            -fx-font-weight:bold;
+            -fx-background-radius:10;
+            -fx-padding:10 18 10 18;
+        """);
 
-        HBox topBar = new HBox(12, titleBlock, leftSpacer, topStats, rightSpacer, end);
+        javafx.stage.Popup savePopup = new javafx.stage.Popup();
+        savePopup.setAutoHide(true);
+
+        VBox popupContent = new VBox(6);
+        popupContent.setPadding(new Insets(10));
+        popupContent.setStyle("""
+            -fx-background-color:#0f172a;
+            -fx-border-color:#38bdf8;
+            -fx-border-radius:10;
+            -fx-background-radius:10;
+        """);
+
+        Label popupTitle = new Label("Save to Slot");
+        popupTitle.setStyle("-fx-text-fill:white; -fx-font-weight:bold; -fx-font-size:13px;");
+        popupContent.getChildren().add(popupTitle);
+
+        for (int i = 1; i <= 3; i++) {
+            int slot = i;
+            Button slotBtn = new Button("Slot " + slot);
+            slotBtn.setMaxWidth(Double.MAX_VALUE);
+            slotBtn.setStyle("""
+            -fx-background-color:#1e293b;
+            -fx-text-fill:#e2e8f0;
+            -fx-background-radius:8;
+            -fx-padding:8 16 8 16;
+            -fx-cursor:hand;
+        """);
+            slotBtn.setOnAction(ev -> {
+                databaseController.saveGameState(state, authService.getSaveIdToken(), authService.getSaveLocalIdToken(), slot);
+                System.out.println("Saved to slot " + slot);
+                savePopup.hide();
+            });
+            popupContent.getChildren().add(slotBtn);
+        }
+
+        savePopup.getContent().add(popupContent);
+
+        save.setOnAction(e -> {
+            if (savePopup.isShowing()) {
+                savePopup.hide();
+            } else {
+                javafx.geometry.Bounds bounds = save.localToScreen(save.getBoundsInLocal());
+                savePopup.show(save, bounds.getMinX(), bounds.getMaxY() + 4);
+            }
+        });
+
+        HBox topBar = new HBox(12, titleBlock, leftSpacer, topStats, rightSpacer, save, end);
         topBar.setPadding(new Insets(14, 18, 8, 18));
         topBar.setAlignment(Pos.CENTER_LEFT);
         topBar.setStyle("-fx-background-color:rgba(2,6,23,0.72);");
