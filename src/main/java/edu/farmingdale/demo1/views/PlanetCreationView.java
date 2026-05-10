@@ -83,12 +83,9 @@ public class PlanetCreationView extends StackPane {
     }
 
     private void renderNameStep() {
-
         ImageView question = createStepImage("PlanetName.png", 500);
-
         TextField nameField = new TextField();
         nameField.setMaxWidth(300);
-
         Label errorLabel = createErrorLabel();
         nameField.textProperty().addListener((obs, oldValue, newValue) -> {
             if (!newValue.trim().isEmpty()) {
@@ -96,80 +93,100 @@ public class PlanetCreationView extends StackPane {
             }
         });
 
-        Button saveGame1 = loadSaveGame1();
-        Button saveGame2 = loadSaveGame2();
-        Button saveGame3 = loadSaveGame3();
-
         Button next = createNextButton();
-
         next.setOnAction(e -> {
-
             planetName = nameField.getText().trim();
-
             if (planetName.isEmpty()) {
                 errorLabel.setText("Please enter a planet name.");
                 return;
             }
-
             step++;
             renderStep();
         });
 
-        HBox saveSlots = new HBox(20); //creates the icons for the save slots, just a temporary model
+        HBox saveSlots = new HBox(20);
         saveSlots.setAlignment(Pos.CENTER);
-        saveSlots.getChildren().addAll(saveGame1, saveGame2, saveGame3);
+
+        for (int i = 1; i <= 3; i++) {
+            saveSlots.getChildren().add(buildSlotCard(i));
+        }
+
         content.getChildren().addAll(question, nameField, errorLabel, next, saveSlots);
     }
-    // Next Button UI Update
+
     private Button createNextButton() {
         return createImageButton("Next.png", 180);
     }
 
-    //These are the load game methods, when a button is pressed it will load that instance of the game from the database
-    private Button loadSaveGame1() {
-        Button btn = createImageButton("saveGame.png", 50);
-        btn.setOnAction(e -> {
-            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 1);
-            if (state != null) {
-                createdConfig = state.planet;
-                loadedState = state;
+    private VBox buildSlotCard(int slotNumber) {
+        GameTypes.GameState state = databaseController.loadGameState(
+                authService.getSaveIdToken(),
+                authService.getSaveLocalIdToken(),
+                slotNumber
+        );
+
+        boolean hasData = state != null;
+        String planetName = hasData ? state.planet.name : "Empty";
+
+        VBox card = new VBox(8);
+        card.setAlignment(Pos.CENTER);
+        card.setPrefWidth(140);
+        card.setPrefHeight(80);
+        card.setPadding(new javafx.geometry.Insets(12));
+        card.setStyle(hasData ? """
+        -fx-background-color:#1e3a5f;
+        -fx-background-radius:12;
+        -fx-border-color:#38bdf8;
+        -fx-border-radius:12;
+        -fx-cursor:hand;
+    """ : """
+        -fx-background-color:#1a1a2e;
+        -fx-background-radius:12;
+        -fx-border-color:#334155;
+        -fx-border-radius:12;
+    """);
+
+        Label slotLabel = new Label("Slot " + slotNumber);
+        slotLabel.setStyle("-fx-text-fill:#94a3b8; -fx-font-size:11px; -fx-font-weight:bold;");
+
+        Label nameLabel = new Label(planetName);
+        nameLabel.setStyle(hasData
+                ? "-fx-text-fill:white; -fx-font-size:13px; -fx-font-weight:bold;"
+                : "-fx-text-fill:#475569; -fx-font-size:12px;");
+
+        card.getChildren().addAll(slotLabel, nameLabel);
+
+        if (hasData) {
+            GameTypes.GameState finalState = state;
+            card.setOnMouseClicked(e -> {
+                createdConfig = finalState.planet;
+                loadedState = finalState;
                 if (onSimulationStart != null) onSimulationStart.run();
-            } else {
-                System.out.println("Slot 1 is empty");
-            }
-        });
-        return btn;
+            });
+
+            card.setOnMouseEntered(e -> card.setStyle("""
+            -fx-background-color:#1e4a7f;
+            -fx-background-radius:12;
+            -fx-border-color:#7dd3fc;
+            -fx-border-radius:12;
+            -fx-cursor:hand;
+        """));
+
+            card.setOnMouseExited(e -> card.setStyle("""
+            -fx-background-color:#1e3a5f;
+            -fx-background-radius:12;
+            -fx-border-color:#38bdf8;
+            -fx-border-radius:12;
+            -fx-cursor:hand;
+        """));
+        }
+
+        return card;
     }
 
-    private Button loadSaveGame2() {
-        Button btn = createImageButton("saveGame.png", 50);
-        btn.setOnAction(e -> {
-            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 2);
-            if (state != null) {
-                createdConfig = state.planet;
-                loadedState = state;
-                if (onSimulationStart != null) onSimulationStart.run();
-            } else {
-                System.out.println("Slot 2 is empty");
-            }
-        });
-        return btn;
-    }
-
-    private Button loadSaveGame3() {
-        Button btn = createImageButton("saveGame.png", 50);
-        btn.setOnAction(e -> {
-            GameTypes.GameState state = databaseController.loadGameState(authService.getSaveIdToken(), authService.getSaveLocalIdToken(), 3);
-            if (state != null) {
-                createdConfig = state.planet;
-                loadedState = state;
-                if (onSimulationStart != null) onSimulationStart.run();
-            } else {
-                System.out.println("Slot 3 is empty");
-            }
-        });
-        return btn;
-    }
+    private Button loadSaveGame1() { return new Button(); }
+    private Button loadSaveGame2() { return new Button(); }
+    private Button loadSaveGame3() { return new Button(); }
 
     private void renderTypeStep() {
 
