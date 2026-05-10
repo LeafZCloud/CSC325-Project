@@ -33,7 +33,7 @@
                        fitWidth="360"
                        preserveRatio="true">
                 <image>
-                    <Image url="@images/UsernameHolder.png" />
+                    <Image url="@images/EmailHolder.png" />
                 </image>
             </ImageView>
 
