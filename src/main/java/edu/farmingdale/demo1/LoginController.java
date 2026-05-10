@@ -112,8 +112,12 @@ public class LoginController {
     private void showPlanetCreation(StackPane gameRoot) {
         PlanetCreationView view = new PlanetCreationView(authService, databaseController);
         view.setOnSimulationStart(() -> {
-            PlanetConfig config = view.getCreatedConfig();
-            showSimulation(gameRoot, config);
+            GameState loadedState = view.getLoadedState();
+            if (loadedState != null) {
+                showSimulationFromState(gameRoot, loadedState);
+            } else {
+                showSimulation(gameRoot, view.getCreatedConfig());
+            }
         });
         gameRoot.getChildren().setAll(view);
     }
@@ -125,6 +129,13 @@ public class LoginController {
             GameState state = view.getState();
             showSummary(gameRoot, state);
         });
+        gameRoot.getChildren().setAll(view);
+    }
+
+    private void showSimulationFromState(StackPane gameRoot, GameState loadedState) {
+        AudioManager.playGameMusic();
+        SimulationView view = new SimulationView(loadedState, authService, databaseController);
+        view.setOnSimulationEnd(() -> showSummary(gameRoot, view.getState()));
         gameRoot.getChildren().setAll(view);
     }
 

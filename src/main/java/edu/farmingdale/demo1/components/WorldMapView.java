@@ -44,20 +44,20 @@ public class WorldMapView extends Pane {
         return new Image(WorldMapView.class.getResource(path).toExternalForm());
     }
 
-    private static final Image PLANET_WATER = load("/images/waterTexture2.JPG");
+    private static final Image PLANET_WATER = load("/images/waterTexture2.jpg");
 
-    private static final Image FOREST_NORMAL = load("/images/forestBiomeImages/forestBiomeNormal.PNG");
-    private static final Image FOREST_BLIZZ = load("/images/forestBiomeImages/blizzardEventForest.PNG");
-    private static final Image FOREST_METEOR = load("/images/forestBiomeImages/meteorEventForest.PNG");
-    private static final Image FOREST_QUAKE = load("/images/forestBiomeImages/earthquakeEventForest.PNG");
-    private static final Image FOREST_INDUST = load("/images/forestBiomeImages/industrializationEventForest.PNG");
-    private static final Image FOREST_VOLCANIC = load("/images/forestBiomeImages/volcanicerruptionEventForest.PNG");
-    private static final Image FOREST_DROUGHT = load("/images/forestBiomeImages/droughtEventForest.PNG");
-    private static final Image FOREST_PLAGUE = load("/images/forestBiomeImages/plagueEventForest.PNG");
-    private static final Image FOREST_NUKE = load("/images/forestBiomeImages/nukeEventForest.PNG");
-    private static final Image FOREST_WAR = load("/images/forestBiomeImages/worldWarEventForest.PNG");
-    private static final Image FOREST_MEDICAL = load("/images/forestBiomeImages/medicalBreakthroughEventForest.PNG");
-    private static final Image FOREST_GOLDEN = load("/images/forestBiomeImages/goldenAgeEventForest.PNG");
+    private static final Image FOREST_NORMAL = load("/images/forestBiomeImages/forestBiomeNormal.png");
+    private static final Image FOREST_BLIZZ = load("/images/forestBiomeImages/blizzardEventForest.png");
+    private static final Image FOREST_METEOR = load("/images/forestBiomeImages/meteorEventForest.png");
+    private static final Image FOREST_QUAKE = load("/images/forestBiomeImages/earthquakeEventForest.png");
+    private static final Image FOREST_INDUST = load("/images/forestBiomeImages/industrializationEventForest.png");
+    private static final Image FOREST_VOLCANIC = load("/images/forestBiomeImages/volcanicerruptionEventForest.png");
+    private static final Image FOREST_DROUGHT = load("/images/forestBiomeImages/droughtEventForest.png");
+    private static final Image FOREST_PLAGUE = load("/images/forestBiomeImages/plagueEventForest.png");
+    private static final Image FOREST_NUKE = load("/images/forestBiomeImages/nukeEventForest.png");
+    private static final Image FOREST_WAR = load("/images/forestBiomeImages/worldWarEventForest.png");
+    private static final Image FOREST_MEDICAL = load("/images/forestBiomeImages/medicalBreakthroughEventForest.png");
+    private static final Image FOREST_GOLDEN = load("/images/forestBiomeImages/goldenAgeEventForest.png");
 
     private static final ImagePattern FOREST_NORMAL_PATTERN = new ImagePattern(FOREST_NORMAL);
     private static final ImagePattern FOREST_BLIZZ_PATTERN = new ImagePattern(FOREST_BLIZZ);
