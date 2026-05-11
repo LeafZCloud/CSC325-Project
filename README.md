@@ -30,37 +30,6 @@ A JavaFX-based planet simulation game where you build and manage your own world.
 - **JSON Parsing:** Gson
 - **Build Tool:** Maven
 
----
-
-## Setup & Running
-
-### Prerequisites
-- JDK 21 (Temurin recommended)
-- Maven
-- Internet connection (required for Firebase auth and save/load)
-
-### Steps
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/LeafZCloud/CSC325-Project.git
-   cd CSC325-Project
-   ```
-
-2. Build the project:
-   ```bash
-   mvn clean install
-   ```
-
-3. Run the application:
-   ```bash
-   mvn javafx:run
-   ```
-
-> **Note for Linux users:** Resource filenames are case-sensitive. All image assets use lowercase extensions (`.png`, `.jpg`).
-
----
-
 ## Contributors
 
 | Name | Role |
