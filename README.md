@@ -39,21 +39,6 @@ A JavaFX-based planet simulation game where you build and manage your own world.
 - Maven
 - Internet connection (required for Firebase auth and save/load)
 
-### Firebase Configuration
-To run your own instance, replace the API keys in `FirebaseAuthService.java` 
-and `DatabaseController.java` with your own Firebase project credentials.
-
-Replace (YOUR_API_KEY):
-```bash
-private static final String SIGN_IN_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=YOUR_API_KEY";
-private static final String SIGN_UP_URL = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=YOUR_API_KEY";
-```
-
-Replace (YOUR_PROJECT_ID):
-```bash
-private static final String FIRESTORE_URL = "https://firestore.googleapis.com/v1/projects/YOUR_PROJECT_ID/databases/(default)/documents/gameStates/";
-```
-
 ### Steps
 
 1. Clone the repository:
