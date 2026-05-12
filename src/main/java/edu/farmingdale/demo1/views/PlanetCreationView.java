@@ -184,10 +184,6 @@ public class PlanetCreationView extends StackPane {
         return card;
     }
 
-    private Button loadSaveGame1() { return new Button(); }
-    private Button loadSaveGame2() { return new Button(); }
-    private Button loadSaveGame3() { return new Button(); }
-
     private void renderTypeStep() {
 
         ImageView question = createStepImage("TypeOfWorld.png", 520);
@@ -195,12 +191,12 @@ public class PlanetCreationView extends StackPane {
         HBox types = new HBox(15);
         types.setAlignment(Pos.CENTER);
 
-        Button terran = createTypeButton("🌍 Terran", "terran");
-        Button arid = createTypeButton("🏜 Arid", "arid");
-        Button oceanic = createTypeButton("🌊 Oceanic", "oceanic");
-        Button volcanic = createTypeButton("🌋 Volcanic", "volcanic");
+        Button cottonCandy = createTypeButton("🌍 Bubble Gum", "cottonCandy");
+        Button acid        = createTypeButton("🏜 Acid",          "acid");
+        Button water       = createTypeButton("🌊 Oceanic",        "water");
+        Button lava        = createTypeButton("🌋 Volcanic",       "lava");
 
-        types.getChildren().addAll(terran, arid, oceanic, volcanic);
+        types.getChildren().addAll(cottonCandy, acid, water, lava);
 
         Label errorLabel = createErrorLabel();
 
