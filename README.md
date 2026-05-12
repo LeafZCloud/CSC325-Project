@@ -32,6 +32,9 @@ A JavaFX-based planet simulation game where you build and manage your own world.
 
 ## Instructions
 - Clone the GitHub url
+- Run the game
+- Login or create an account
+- Create your planet!
 
 ## Contributors
 
