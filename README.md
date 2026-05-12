@@ -30,6 +30,9 @@ A JavaFX-based planet simulation game where you build and manage your own world.
 - **JSON Parsing:** Gson
 - **Build Tool:** Maven
 
+## Instructions
+- Clone the GitHub url
+
 ## Contributors
 
 | Name | Role |
