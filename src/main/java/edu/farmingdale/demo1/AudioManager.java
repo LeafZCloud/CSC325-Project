@@ -10,6 +10,15 @@ public final class AudioManager {
     private static final String INTRO_MUSIC = "/audios/IntroMusic.mp3";
     private static final String GAME_MUSIC = "/audios/GameMusic.mp3";
     private static final String SNOW_EVENT = "/audios/blizzardWind.mp3";
+    private static final String QUAKE_EVENT = "/audios/earthquakeRumble.mp3";
+    private static final String METEOR_EVENT = "/audios/meteorBoom.mp3";
+    private static final String INDUSTRIAL_EVENT = "/audios/industrialHonk.mp3";
+    private static final String VOLCANIC_EVENT = "/audios/bubblingLava.mp3";
+    private static final String PLAGUE_EVENT = "/audios/sickCough.mp3";
+    private static final String NUKE_EVENT = "/audios/nuclearExplosion.mp3";
+    private static final String WAR_EVENT = "/audios/warBattlefield.mp3";
+    private static final String MEDICAL_EVENT = "/audios/yay.mp3";
+    private static final String GOLDEN_EVENT = "/audios/goldenAge.mp3";
 
     private static MediaPlayer currentPlayer;
     private static String currentTrack;
@@ -77,7 +86,7 @@ public final class AudioManager {
         Media media = new Media(audioUrl.toExternalForm());
         MediaPlayer player = new MediaPlayer(media);
 
-        player.setVolume(1.0);
+        player.setVolume(0.5);
 
         player.setOnEndOfMedia(() -> {
             player.dispose();
@@ -98,6 +107,16 @@ public final class AudioManager {
 
         switch (eventId) {
             case "ice_age" -> play(SNOW_EVENT);
+            case "earthquakes" -> play(QUAKE_EVENT);
+            case "meteor" -> play(METEOR_EVENT);
+            case "industrial_revolution" -> play(INDUSTRIAL_EVENT);
+            case "volcanic_eruptions" -> play(VOLCANIC_EVENT);
+            case "plague" -> play(PLAGUE_EVENT);
+            case "nuke" -> play(NUKE_EVENT);
+            case "world_war" -> play(WAR_EVENT);
+            case "medical_breakthrough" -> play(MEDICAL_EVENT);
+            case "golden_age" -> play(GOLDEN_EVENT);
+
             default -> System.out.println("No sound mapped for: " + eventId);
         }
     }
