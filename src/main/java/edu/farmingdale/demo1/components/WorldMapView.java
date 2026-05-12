@@ -6,6 +6,7 @@ import edu.farmingdale.demo1.simulation.GameTypes.PlanetConfig;
 import edu.farmingdale.demo1.simulation.GameTypes.Region;
 import edu.farmingdale.demo1.simulation.WorldMapModel;
 
+import edu.farmingdale.demo1.views.PlanetCreationView;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -45,6 +46,9 @@ public class WorldMapView extends Pane {
     }
 
     private static final Image PLANET_WATER = load("/images/waterTexture2.jpg");
+    private static final Image PLANET_LAVA = load("/images/Lava.png");
+    private static final Image PLANET_ACID = load("/images/Acid.png");
+    private static final Image PLANET_COTTON_CANDY = load("/images/CottonCandy.png");
 
     private static final Image FOREST_NORMAL = load("/images/forestBiomeImages/forestBiomeNormal.png");
     private static final Image FOREST_BLIZZ = load("/images/forestBiomeImages/blizzardEventForest.png");
@@ -74,6 +78,17 @@ public class WorldMapView extends Pane {
 
     private static String lastPlayedEvent;
 
+    private Image planetTypeImage(String type) {
+        return switch (type) {
+            case "water"       -> PLANET_WATER;
+            case "acid"        -> PLANET_ACID;
+            case "cottonCandy" -> PLANET_COTTON_CANDY;
+            case "lava"        -> PLANET_LAVA;
+            default            -> PLANET_WATER;
+        };
+    }
+
+
     public WorldMapView(List<Region> regions, PlanetConfig config, Set<String> flashingRegions, String lastEventId) {
 
         setPrefSize(1500, 1500);
@@ -99,7 +114,7 @@ public class WorldMapView extends Pane {
         }
 
         Circle planet = new Circle(PLANET_CENTER_X, PLANET_CENTER_Y, PLANET_RADIUS);
-        planet.setFill(new ImagePattern(PLANET_WATER));
+        planet.setFill(new ImagePattern(planetTypeImage(config.type)));
         planet.setStroke(Color.BLACK);
         planet.setStrokeWidth(8);
         worldGroup.getChildren().add(planet);
