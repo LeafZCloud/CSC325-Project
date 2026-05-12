@@ -86,7 +86,7 @@ public final class AudioManager {
         Media media = new Media(audioUrl.toExternalForm());
         MediaPlayer player = new MediaPlayer(media);
 
-        player.setVolume(0.5);
+        player.setVolume(0.4);
 
         player.setOnEndOfMedia(() -> {
             player.dispose();
@@ -116,8 +116,6 @@ public final class AudioManager {
             case "world_war" -> play(WAR_EVENT);
             case "medical_breakthrough" -> play(MEDICAL_EVENT);
             case "golden_age" -> play(GOLDEN_EVENT);
-
-            default -> System.out.println("No sound mapped for: " + eventId);
         }
     }
 
