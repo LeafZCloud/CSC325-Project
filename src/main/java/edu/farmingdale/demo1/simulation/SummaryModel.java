@@ -34,7 +34,7 @@ public class SummaryModel {
             return new Outcome(
                     "💀",
                     "Extinction",
-                    "Civilization did not survive. The planet is silent now."
+                    "The population did not survive. The planet is silent now."
             );
         }
 

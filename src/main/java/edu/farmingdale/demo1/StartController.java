@@ -9,7 +9,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-public class StartController {
+public class
+
+StartController {
 
     @FXML
     private StackPane rootPane;
